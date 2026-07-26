@@ -1,0 +1,258 @@
+"""Author the Fabric medallion notebooks as .ipynb files.
+
+Notebooks are maintained here as code (readable diffs) and emitted as Fabric-compatible
+.ipynb (nbformat 4.5, Synapse PySpark kernel). scripts/10_provision_fabric.ps1 imports the
+emitted files into the workspace; scripts/20_load_data.ps1 runs them in order.
+
+Run:  python fabric/notebooks/build_notebooks.py
+"""
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+
+# Tables landed as Parquet in Files/landing (see data_gen/generate.py output).
+TABLES = [
+    "dim_project", "dim_wbs", "fact_schedule_activity", "sap_fi_cost",
+    "sap_mm_po", "sap_supplier", "fact_engineering_change", "ext_disruption_signal",
+]
+
+
+def _lines(code: str) -> list[str]:
+    """Split a code/markdown block into nbformat 'source' lines (each keeps its newline)."""
+    text = code.strip("\n") + "\n"
+    parts = text.splitlines(keepends=True)
+    return parts
+
+
+def md(code: str) -> dict:
+    return {"cell_type": "markdown", "metadata": {}, "source": _lines(code)}
+
+
+def code(src: str) -> dict:
+    return {"cell_type": "code", "metadata": {}, "execution_count": None,
+            "outputs": [], "source": _lines(src)}
+
+
+def notebook(cells: list[dict]) -> dict:
+    return {
+        "nbformat": 4,
+        "nbformat_minor": 5,
+        "metadata": {
+            "language_info": {"name": "python"},
+            "kernelspec": {"name": "synapse_pyspark", "display_name": "Synapse PySpark"},
+        },
+        "cells": cells,
+    }
+
+
+# --------------------------------------------------------------------------- 01
+def nb_01_setup() -> dict:
+    return notebook([
+        md("""
+# 01 - Setup Lakehouse
+Creates the medallion schemas (`bronze`, `silver`, `gold`) in the schema-enabled
+Project-Intelligence Lakehouse. Attach the Lakehouse as the default lakehouse before running.
+"""),
+        code("""
+for schema in ['bronze', 'silver', 'gold']:
+    spark.sql(f'CREATE SCHEMA IF NOT EXISTS {schema}')
+    print(f'schema ready: {schema}')
+"""),
+    ])
+
+
+# --------------------------------------------------------------------------- 02
+def nb_02_bronze() -> dict:
+    tbls = ", ".join(f"'{t}'" for t in TABLES)
+    return notebook([
+        md("""
+# 02 - Load Bronze
+Reads each raw Parquet file from `Files/landing/` and writes it as a Delta table in the
+**`bronze`** schema (`bronze.<table>`).
+
+> **Coexistence narrative:** in production the **SAP** tables (`sap_fi_cost`, `sap_mm_po`,
+> `sap_supplier`) arrive via **SAP BDC Connect / mirroring** (zero-copy from S/4HANA on Azure
+> via RISE), while the **non-SAP** tables (schedule, engineering change, project/WBS master)
+> arrive via **OneLake shortcuts** (data stays in Primavera / PC&E, connected in place). For
+> the synthetic demo they are all local Delta, but the origin_system column keeps the story literal.
+"""),
+        code(f"""
+LANDING = 'Files/landing'
+tables = [{tbls}]
+
+spark.sql('CREATE SCHEMA IF NOT EXISTS bronze')
+for t in tables:
+    df = spark.read.parquet(f'{{LANDING}}/{{t}}.parquet')
+    (df.write.format('delta').mode('overwrite')
+        .option('overwriteSchema', 'true').saveAsTable(f'bronze.{{t}}'))
+    print(f'bronze.{{t:26s}} {{df.count():>8,}} rows')
+print('Bronze load complete.')
+"""),
+    ])
+
+
+# --------------------------------------------------------------------------- 03
+def nb_03_silver_gold() -> dict:
+    return notebook([
+        md("""
+# 03 - Build Silver + Gold
+**Silver:** light typing (dates/booleans) and pass-through of the eight bronze tables.
+**Gold:** the cross-system model. `gold.project_schedule_risk` fuses **non-SAP** schedule
+signals with **SAP** cost + procurement signals into one governed, per-project risk table —
+the single load-bearing join no source system does alone. Curated driver tables support drill-down.
+"""),
+        code("""
+from pyspark.sql import functions as F
+
+# ---- SILVER: typed pass-through ----
+spark.sql('CREATE SCHEMA IF NOT EXISTS silver')
+
+date_cols = {
+    'dim_project': ['start_date', 'planned_finish', 'forecast_finish'],
+    'fact_schedule_activity': ['baseline_start', 'baseline_finish', 'forecast_finish', 'actual_finish'],
+    'sap_fi_cost': ['period'],
+    'sap_mm_po': ['promised_date', 'revised_date'],
+    'fact_engineering_change': ['issued_date'],
+    'ext_disruption_signal': ['event_date'],
+}
+tables = ['dim_project', 'dim_wbs', 'fact_schedule_activity', 'sap_fi_cost',
+          'sap_mm_po', 'sap_supplier', 'fact_engineering_change', 'ext_disruption_signal']
+for t in tables:
+    df = spark.table(f'bronze.{t}')
+    for c in date_cols.get(t, []):
+        if c in df.columns:
+            df = df.withColumn(c, F.to_date(F.col(c)))
+    df.write.format('delta').mode('overwrite').option('overwriteSchema', 'true').saveAsTable(f'silver.{t}')
+    print(f'silver.{t} ok')
+"""),
+        code("""
+# ---- GOLD: driver signals per project (fusing SAP + non-SAP) ----
+spark.sql('CREATE SCHEMA IF NOT EXISTS gold')
+
+# Non-SAP schedule signals (Primavera)
+spark.sql('''
+CREATE OR REPLACE TEMP VIEW v_sched AS
+SELECT project_id,
+       MAX(GREATEST(DATEDIFF(forecast_finish, baseline_finish), 0)) AS max_slip_days,
+       MIN(total_float_days) AS min_float,
+       SUM(CASE WHEN is_critical_path AND forecast_finish > baseline_finish THEN 1 ELSE 0 END) AS cp_at_risk
+FROM silver.fact_schedule_activity GROUP BY project_id
+''')
+
+# SAP procurement signal (late long-lead POs)
+spark.sql('''
+CREATE OR REPLACE TEMP VIEW v_po AS
+SELECT project_id,
+       SUM(CASE WHEN is_long_lead AND status = 'Late' THEN 1 ELSE 0 END) AS late_long_lead_pos
+FROM silver.sap_mm_po GROUP BY project_id
+''')
+
+# SAP finance signal (forecast overrun + cost-to-complete exposure)
+spark.sql('''
+CREATE OR REPLACE TEMP VIEW v_cost AS
+SELECT project_id,
+       SUM(forecast_cost - budget) AS forecast_overrun,
+       SUM(cost_to_complete)       AS cost_to_complete,
+       SUM(earned_value)           AS earned_value
+FROM silver.sap_fi_cost GROUP BY project_id
+''')
+print('driver views ready')
+"""),
+        code("""
+# ---- GOLD: the fused per-project schedule-risk table ----
+spark.sql('''
+CREATE OR REPLACE TABLE gold.project_schedule_risk
+USING delta AS
+SELECT
+    p.project_id, p.project_name, p.client, p.region, p.contract_type,
+    p.pct_complete, p.planned_finish, p.forecast_finish,
+    COALESCE(s.max_slip_days, 0)       AS schedule_slip_days,      -- non-SAP
+    COALESCE(s.min_float, 0)           AS min_total_float_days,    -- non-SAP
+    COALESCE(s.cp_at_risk, 0)          AS critical_path_at_risk,   -- non-SAP
+    COALESCE(po.late_long_lead_pos, 0) AS late_long_lead_pos,      -- SAP
+    COALESCE(c.forecast_overrun, 0)    AS forecast_overrun,        -- SAP
+    COALESCE(c.cost_to_complete, 0)    AS cost_to_complete,        -- SAP
+    COALESCE(c.earned_value, 0)        AS earned_value,            -- SAP
+    LEAST(100,
+        COALESCE(s.max_slip_days, 0) * 1.5
+      + CASE WHEN COALESCE(s.min_float, 0) < 0 THEN -s.min_float ELSE 0 END * 2
+      + COALESCE(s.cp_at_risk, 0) * 3
+      + COALESCE(po.late_long_lead_pos, 0) * 5
+      + COALESCE(c.forecast_overrun, 0) / 100000
+    ) AS schedule_risk_score
+FROM silver.dim_project p
+LEFT JOIN v_sched s ON p.project_id = s.project_id
+LEFT JOIN v_po   po ON p.project_id = po.project_id
+LEFT JOIN v_cost c  ON p.project_id = c.project_id
+''')
+
+spark.sql('''
+ALTER TABLE gold.project_schedule_risk SET TBLPROPERTIES ('note' = 'fuses SAP + non-SAP signals')
+''')
+
+# risk band
+spark.sql('''
+CREATE OR REPLACE TABLE gold.project_schedule_risk USING delta AS
+SELECT *,
+    CASE WHEN schedule_risk_score >= 61 THEN 'Red'
+         WHEN schedule_risk_score >= 26 THEN 'Amber'
+         ELSE 'Green' END AS risk_band
+FROM gold.project_schedule_risk
+''')
+
+print('gold.project_schedule_risk built. Top 5 by risk:')
+spark.sql('''
+SELECT project_id, project_name, ROUND(schedule_risk_score,1) AS score, risk_band,
+       schedule_slip_days, min_total_float_days, critical_path_at_risk,
+       late_long_lead_pos, ROUND(forecast_overrun,0) AS overrun
+FROM gold.project_schedule_risk ORDER BY schedule_risk_score DESC LIMIT 5
+''').show(truncate=False)
+"""),
+        code("""
+# ---- GOLD: curated driver-detail tables for dashboard + agent drill-down ----
+# Falcon's cross-system 'why' on one row set: at-risk critical-path activities + their EC (non-SAP),
+# the late long-lead PO + supplier (SAP), and the cost exposure (SAP).
+spark.sql('''
+CREATE OR REPLACE TABLE gold.at_risk_activities USING delta AS
+SELECT a.project_id, a.wbs_id, a.activity_id, a.activity_name, a.discipline_hint,
+       a.baseline_finish, a.forecast_finish, a.total_float_days, a.is_critical_path,
+       e.ec_id, e.title AS ec_title, e.status AS ec_status, e.schedule_impact_days
+FROM (SELECT fsa.*, w.discipline AS discipline_hint
+      FROM silver.fact_schedule_activity fsa
+      JOIN silver.dim_wbs w ON fsa.wbs_id = w.wbs_id) a
+LEFT JOIN silver.fact_engineering_change e ON e.affected_activity_id = a.activity_id
+WHERE a.is_critical_path AND a.forecast_finish > a.baseline_finish
+''')
+
+spark.sql('''
+CREATE OR REPLACE TABLE gold.late_procurement USING delta AS
+SELECT po.project_id, po.wbs_id, po.po_id, po.material_desc, po.is_long_lead,
+       po.promised_date, po.revised_date, DATEDIFF(po.revised_date, po.promised_date) AS days_late,
+       s.supplier_id, s.supplier_name, s.country, s.risk_rating
+FROM silver.sap_mm_po po
+JOIN silver.sap_supplier s ON po.supplier_id = s.supplier_id
+WHERE po.status = 'Late'
+''')
+print('gold.at_risk_activities and gold.late_procurement built.')
+print('Gold layer complete.')
+"""),
+    ])
+
+
+def main() -> int:
+    outputs = {
+        "01_setup_lakehouse.ipynb": nb_01_setup(),
+        "02_load_bronze.ipynb": nb_02_bronze(),
+        "03_build_silver_gold.ipynb": nb_03_silver_gold(),
+    }
+    for fname, nb in outputs.items():
+        (HERE / fname).write_text(json.dumps(nb, indent=1), encoding="utf-8")
+        print(f"wrote {fname}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

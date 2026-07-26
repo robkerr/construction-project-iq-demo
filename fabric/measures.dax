@@ -1,0 +1,98 @@
+// ============================================================================
+// Shared metric definitions — Contoso E&C "Project Controls IQ" semantic model
+// Define once. These become the agent's + the dashboard's shared vocabulary.
+// The Schedule Risk Score deliberately FUSES non-SAP schedule signals with SAP
+// cost + procurement signals — the whole point of the demo.
+//
+// Tables referenced (silver layer / semantic model):
+//   dim_project, dim_wbs, fact_schedule_activity (non-SAP),
+//   fact_engineering_change (non-SAP), sap_fi_cost, sap_mm_po, sap_supplier (SAP)
+// ============================================================================
+
+// ---- NON-SAP schedule signals (Primavera) ---------------------------------
+
+// Days a project/activity is forecast to finish past baseline.
+Schedule Slip (days) =
+VAR _slip =
+    MAXX (
+        fact_schedule_activity,
+        DATEDIFF (
+            fact_schedule_activity[baseline_finish],
+            fact_schedule_activity[forecast_finish],
+            DAY
+        )
+    )
+RETURN IF ( _slip > 0, _slip, 0 )
+
+// Critical-path activities currently forecast to slip.
+Critical Path At Risk =
+CALCULATE (
+    COUNTROWS ( fact_schedule_activity ),
+    fact_schedule_activity[is_critical_path] = TRUE (),
+    FILTER (
+        fact_schedule_activity,
+        fact_schedule_activity[forecast_finish] > fact_schedule_activity[baseline_finish]
+    )
+)
+
+Min Total Float (days) = MIN ( fact_schedule_activity[total_float_days] )
+
+// Approved engineering changes with schedule impact (non-SAP change control).
+Approved EC Schedule Impact (days) =
+CALCULATE (
+    SUM ( fact_engineering_change[schedule_impact_days] ),
+    fact_engineering_change[status] = "Approved"
+)
+
+// ---- SAP finance signals --------------------------------------------------
+
+Cost To Complete = SUM ( sap_fi_cost[cost_to_complete] )
+Forecast Overrun = SUM ( sap_fi_cost[forecast_cost] ) - SUM ( sap_fi_cost[budget] )
+Earned Value     = SUM ( sap_fi_cost[earned_value] )
+
+// ---- SAP procurement signals ----------------------------------------------
+
+// Late long-lead POs on the project (the SAP procurement-risk driver).
+Late Long-Lead POs =
+CALCULATE (
+    COUNTROWS ( sap_mm_po ),
+    sap_mm_po[is_long_lead] = TRUE (),
+    sap_mm_po[status] = "Late"
+)
+
+// ---- The single 0-100 ranking index (fuses SAP + non-SAP) -----------------
+
+Schedule Risk Score =
+VAR _slip    = [Schedule Slip (days)]
+VAR _float   = [Min Total Float (days)]
+VAR _cparisk = [Critical Path At Risk]
+VAR _overrun = [Forecast Overrun]
+VAR _latepo  = [Late Long-Lead POs]
+RETURN
+    MIN ( 100,
+        ( _slip * 1.5 )
+        + ( IF ( _float < 0, -_float, 0 ) * 2 )
+        + ( _cparisk * 3 )
+        + ( _latepo * 5 )
+        + ( DIVIDE ( _overrun, 100000 ) )
+    )
+
+Risk Band =
+VAR _s = [Schedule Risk Score]
+RETURN
+    SWITCH ( TRUE (),
+        _s >= 61, "Red",
+        _s >= 26, "Amber",
+        "Green"
+    )
+
+// Portfolio KPI helpers (for the dashboard header band).
+Projects At Risk =
+CALCULATE (
+    DISTINCTCOUNT ( dim_project[project_id] ),
+    FILTER ( VALUES ( dim_project[project_id] ), [Schedule Risk Score] >= 26 )
+)
+
+Total Forecast Overrun = [Forecast Overrun]
+Total Late Long-Lead POs = [Late Long-Lead POs]
+Worst Min Float (days) = MIN ( fact_schedule_activity[total_float_days] )

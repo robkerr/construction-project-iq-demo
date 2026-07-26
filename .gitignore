@@ -1,0 +1,31 @@
+# ---- Secrets / environment ----
+.env
+*.secret
+*.pem
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# ---- Generated data (regenerate with data_gen/generate.py) ----
+out/
+data/csv/
+data/parquet/
+data/manifest.json
+
+# ---- Azure / Bicep ----
+*.azure/
+.bicep/
+main.json
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

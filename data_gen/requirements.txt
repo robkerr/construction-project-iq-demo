@@ -1,0 +1,6 @@
+pandas>=2.0
+numpy>=1.24
+pyarrow>=14.0
+faker>=24.0
+python-dateutil>=2.8
+PyYAML>=6.0

@@ -1,0 +1,36 @@
+# Synthetic data-generation config for the Contoso E&C "Project Schedule Risk -> MPR" demo.
+# 100% synthetic. Deterministic: the seed makes the Falcon at-risk story reproducible.
+
+seed: 42
+today: "2026-08-01"          # "today" anchor for horizons, slips, and forecast windows
+
+# Portfolio size (the demo keeps this small on purpose: 12 projects, one hero).
+n_projects: 12
+
+# The hero project (its risk is injected deterministically in seed_scenario.py).
+hero:
+  project_id: "PRJ-001"
+  project_name: "Project Falcon"
+
+# Two secondary at-risk projects (weaker than Falcon so the ranking is unambiguous).
+secondary_at_risk:
+  - "PRJ-002"
+  - "PRJ-003"
+
+# Approximate volumes (rows land within +/-20% of these).
+wbs_per_project_min: 35
+wbs_per_project_max: 65
+activities_per_wbs_min: 15
+activities_per_wbs_max: 35
+cost_periods: 12               # trailing month-end cost snapshots per WBS
+po_count: 2000
+supplier_count: 150
+engineering_change_count: 400
+disruption_signal_count: 50
+
+# Baseline health: fraction of NON-injected activities allowed a small, benign slip.
+baseline_minor_slip_rate: 0.06
+baseline_max_minor_slip_days: 4
+
+# Share of POs flagged long-lead (transformers, vessels, large-bore valves, etc.).
+long_lead_rate: 0.18

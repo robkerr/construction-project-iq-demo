@@ -1,0 +1,38 @@
+[
+  {
+    "title": "MPR Authoring Standard",
+    "doc_type": "standard",
+    "project_id": null,
+    "path": "standards/mpr_authoring_standard.md"
+  },
+  {
+    "title": "Schedule-Risk Classification & Escalation Policy",
+    "doc_type": "standard",
+    "project_id": null,
+    "path": "standards/schedule_risk_policy.md"
+  },
+  {
+    "title": "Change-Notice Template",
+    "doc_type": "spec",
+    "project_id": null,
+    "path": "specs/change_notice_template.md"
+  },
+  {
+    "title": "Project Falcon Scope Summary",
+    "doc_type": "spec",
+    "project_id": "PRJ-001",
+    "path": "specs/project_falcon_scope.md"
+  },
+  {
+    "title": "Project Falcon MPR 2026-05",
+    "doc_type": "prior_report",
+    "project_id": "PRJ-001",
+    "path": "prior_reports/PRJ-001_MPR_2026-05.md"
+  },
+  {
+    "title": "Project Falcon MPR 2026-06",
+    "doc_type": "prior_report",
+    "project_id": "PRJ-001",
+    "path": "prior_reports/PRJ-001_MPR_2026-06.md"
+  }
+]
