@@ -124,26 +124,32 @@ A Direct Lake model over the `silver` tables, deployed via the Fabric REST API. 
   portal step, needed only for the Phase 6 Data Agent.
 
 ### Phase 4 — Azure AI Search knowledge index (🤖 script + 🧑 provisioning)
-Follow [`search/build_index.md`](search/build_index.md). This uses the AI Search **push model** —
-`build_index.py` reads each markdown file under `docs/` and pushes it straight into the index via
-`SearchClient.upload_documents()`. **No storage account or indexer is required** (a storage account is
-only needed for the *pull* model, which this demo does not use).
+Follow [`search/build_index.md`](search/build_index.md). The corpus's canonical home is the **Lakehouse
+`Files/knowledge/` section** (OneLake); `build_index.py` reads it from OneLake and **pushes** each doc
+into the index via `SearchClient.upload_documents()` — no separate Azure Storage account needed.
+> Azure AI Search *does* have a native [OneLake files indexer](https://learn.microsoft.com/azure/search/search-how-to-index-onelake-files)
+> that could crawl the lakehouse automatically (Markdown is supported). We use push for this demo
+> because it's simpler for 6 docs — no Search managed identity + Contributor role on the Fabric
+> workspace, and it keeps the `doc_type`/`project_id` facets from `corpus_index.json`. Prefer the
+> OneLake indexer for a production "auto-index on file drop" pattern.
 1. 🧑 Provision an **Azure AI Search** service; set `AI_SEARCH_ENDPOINT` in `.env`. For RBAC auth
    (recommended), enable **Role-based access control** on the service and grant your identity both
    **Search Service Contributor** (create the index) and **Search Index Data Contributor** (upload docs).
    Alternatively, set `AI_SEARCH_ADMIN_KEY` in `.env` to use a key instead.
 2. 🤖 Ensure the corpus exists (`./.venv/Scripts/python.exe data_gen/docs_gen.py` regenerates the 6 docs
-   from `out/`), then:
+   from `out/`), publish it to the Lakehouse, then build the index:
    ```powershell
    ./.venv/Scripts/python.exe -m pip install azure-search-documents azure-identity python-dotenv
-   ./.venv/Scripts/python.exe search/build_index.py     # (re)creates project-knowledge, uploads 6 docs
+   pwsh -File ./scripts/32_upload_docs_to_lakehouse.ps1   # -> Files/knowledge/ ; sets DOCS_SOURCE=onelake
+   ./.venv/Scripts/python.exe search/build_index.py       # reads OneLake, (re)creates index, uploads 6 docs
    ```
-   With no `AI_SEARCH_ADMIN_KEY`, the script uses `DefaultAzureCredential` (your `az login`). If it
-   reports `AzureCliCredential: Failed to invoke the Azure CLI`, that's a transient cold-start — just
-   re-run once (confirm `az account show` works first). Vector search is optional
-   (`AZURE_OPENAI_EMBED_DEPLOYMENT`).
-3. ✅ Verify: the run prints `uploaded 6/6 documents`; a `search("Falcon schedule risk")` returns the
-   schedule-risk policy and both prior Falcon MPRs.
+   `build_index.py` reads from OneLake when `DOCS_SOURCE=onelake` (default once workspace+lakehouse are
+   set); use `DOCS_SOURCE=local` to index straight from `docs/` offline. With no `AI_SEARCH_ADMIN_KEY`,
+   it uses `DefaultAzureCredential` (your `az login`). If it reports
+   `AzureCliCredential: Failed to invoke the Azure CLI`, that's a transient cold-start — just re-run once
+   (confirm `az account show` works first). Vector search is optional (`AZURE_OPENAI_EMBED_DEPLOYMENT`).
+3. ✅ Verify: the run prints `reading corpus from OneLake ...` then `uploaded 6/6 documents`; a
+   `search("Falcon schedule risk")` returns the schedule-risk policy and both prior Falcon MPRs.
 
 ### Phase 5 — Power BI dashboard (🤖 automated scaffold + 🧑 polish)
 A single-page "Portfolio Schedule Risk" report (PBIR) bound `byConnection` to the Phase 3 model.
