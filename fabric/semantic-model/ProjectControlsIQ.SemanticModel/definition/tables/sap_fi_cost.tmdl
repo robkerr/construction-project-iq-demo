@@ -1,0 +1,63 @@
+table sap_fi_cost
+
+	/// SAP FI: remaining cost to complete.
+	measure 'Cost To Complete' = SUM(sap_fi_cost[cost_to_complete])
+		formatString: $#,##0
+
+	/// SAP FI: forecast cost minus budget (the cost-risk driver).
+	measure 'Forecast Overrun' = SUM(sap_fi_cost[forecast_cost]) - SUM(sap_fi_cost[budget])
+		formatString: $#,##0
+
+	/// SAP FI: earned value to date.
+	measure 'Earned Value' = SUM(sap_fi_cost[earned_value])
+		formatString: $#,##0
+
+	column project_id
+		dataType: string
+		isHidden
+		sourceColumn: project_id
+
+	column wbs_id
+		dataType: string
+		isHidden
+		sourceColumn: wbs_id
+
+	column period
+		dataType: dateTime
+		sourceColumn: period
+
+	column budget
+		dataType: double
+		summarizeBy: none
+		sourceColumn: budget
+
+	column actual_cost
+		dataType: double
+		summarizeBy: none
+		sourceColumn: actual_cost
+
+	column forecast_cost
+		dataType: double
+		summarizeBy: none
+		sourceColumn: forecast_cost
+
+	column cost_to_complete
+		dataType: double
+		summarizeBy: none
+		sourceColumn: cost_to_complete
+
+	column earned_value
+		dataType: double
+		summarizeBy: none
+		sourceColumn: earned_value
+
+	column origin_system
+		dataType: string
+		sourceColumn: origin_system
+
+	partition sap_fi_cost = entity
+		mode: directLake
+		source
+			entityName: sap_fi_cost
+			schemaName: silver
+			expressionSource: DL_ProjectControlsIQ

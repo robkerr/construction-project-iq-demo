@@ -1,0 +1,96 @@
+table dim_project
+
+	/// Fused 0-100 index: combines non-SAP schedule slip/float/critical-path with SAP overrun and late long-lead POs. The single load-bearing metric of the demo.
+	measure 'Schedule Risk Score' = ```
+			VAR _slip = [Schedule Slip (days)]
+			VAR _float = [Min Total Float (days)]
+			VAR _cparisk = [Critical Path At Risk]
+			VAR _overrun = [Forecast Overrun]
+			VAR _latepo = [Late Long-Lead POs]
+			RETURN
+			    MIN(
+			        100,
+			        (_slip * 1.5)
+			            + (IF(_float < 0, -_float, 0) * 2)
+			            + (_cparisk * 3)
+			            + (_latepo * 5)
+			            + DIVIDE(_overrun, 100000)
+			    )
+			```
+		formatString: #,##0.0
+
+	/// Red/Amber/Green classification of Schedule Risk Score.
+	measure 'Risk Band' = ```
+			VAR _s = [Schedule Risk Score]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        _s >= 61, "Red",
+			        _s >= 26, "Amber",
+			        "Green"
+			    )
+			```
+
+	/// Count of projects with Schedule Risk Score >= 26 (Amber or Red).
+	measure 'Projects At Risk' = CALCULATE(DISTINCTCOUNT(dim_project[project_id]), FILTER(VALUES(dim_project[project_id]), [Schedule Risk Score] >= 26))
+		formatString: #,##0
+
+	/// Portfolio KPI: total forecast overrun (SAP FI).
+	measure 'Total Forecast Overrun' = [Forecast Overrun]
+		formatString: $#,##0
+
+	/// Portfolio KPI: total late long-lead POs (SAP MM).
+	measure 'Total Late Long-Lead POs' = [Late Long-Lead POs]
+		formatString: #,##0
+
+	column project_id
+		dataType: string
+		sourceColumn: project_id
+
+	column project_name
+		dataType: string
+		sourceColumn: project_name
+
+	column client
+		dataType: string
+		sourceColumn: client
+
+	column region
+		dataType: string
+		sourceColumn: region
+
+	column contract_type
+		dataType: string
+		sourceColumn: contract_type
+
+	column start_date
+		dataType: dateTime
+		sourceColumn: start_date
+
+	column planned_finish
+		dataType: dateTime
+		sourceColumn: planned_finish
+
+	column forecast_finish
+		dataType: dateTime
+		sourceColumn: forecast_finish
+
+	column pct_complete
+		dataType: double
+		summarizeBy: none
+		sourceColumn: pct_complete
+
+	column is_active
+		dataType: boolean
+		sourceColumn: is_active
+
+	column origin_system
+		dataType: string
+		sourceColumn: origin_system
+
+	partition dim_project = entity
+		mode: directLake
+		source
+			entityName: dim_project
+			schemaName: silver
+			expressionSource: DL_ProjectControlsIQ

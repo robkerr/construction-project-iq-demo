@@ -1,0 +1,15 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+ref table dim_project
+ref table dim_wbs
+ref table fact_schedule_activity
+ref table fact_engineering_change
+ref table sap_fi_cost
+ref table sap_mm_po
+ref table sap_supplier

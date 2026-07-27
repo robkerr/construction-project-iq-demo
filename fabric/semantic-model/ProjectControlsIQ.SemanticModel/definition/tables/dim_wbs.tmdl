@@ -1,0 +1,29 @@
+table dim_wbs
+
+	column wbs_id
+		dataType: string
+		sourceColumn: wbs_id
+
+	column project_id
+		dataType: string
+		isHidden
+		sourceColumn: project_id
+
+	column wbs_name
+		dataType: string
+		sourceColumn: wbs_name
+
+	column discipline
+		dataType: string
+		sourceColumn: discipline
+
+	column origin_system
+		dataType: string
+		sourceColumn: origin_system
+
+	partition dim_wbs = entity
+		mode: directLake
+		source
+			entityName: dim_wbs
+			schemaName: silver
+			expressionSource: DL_ProjectControlsIQ

@@ -1,0 +1,28 @@
+table sap_supplier
+
+	column supplier_id
+		dataType: string
+		sourceColumn: supplier_id
+
+	column supplier_name
+		dataType: string
+		sourceColumn: supplier_name
+
+	column country
+		dataType: string
+		sourceColumn: country
+
+	column risk_rating
+		dataType: string
+		sourceColumn: risk_rating
+
+	column origin_system
+		dataType: string
+		sourceColumn: origin_system
+
+	partition sap_supplier = entity
+		mode: directLake
+		source
+			entityName: sap_supplier
+			schemaName: silver
+			expressionSource: DL_ProjectControlsIQ

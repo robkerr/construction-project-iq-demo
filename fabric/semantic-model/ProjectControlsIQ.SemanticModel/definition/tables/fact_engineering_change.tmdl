@@ -1,0 +1,55 @@
+table fact_engineering_change
+
+	/// Non-SAP: total schedule impact of approved engineering changes.
+	measure 'Approved EC Schedule Impact (days)' = CALCULATE(SUM(fact_engineering_change[schedule_impact_days]), fact_engineering_change[status] = "Approved")
+		formatString: #,##0
+
+	column ec_id
+		dataType: string
+		sourceColumn: ec_id
+
+	column project_id
+		dataType: string
+		isHidden
+		sourceColumn: project_id
+
+	column wbs_id
+		dataType: string
+		isHidden
+		sourceColumn: wbs_id
+
+	column title
+		dataType: string
+		sourceColumn: title
+
+	column discipline
+		dataType: string
+		sourceColumn: discipline
+
+	column issued_date
+		dataType: dateTime
+		sourceColumn: issued_date
+
+	column status
+		dataType: string
+		sourceColumn: status
+
+	column schedule_impact_days
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: schedule_impact_days
+
+	column affected_activity_id
+		dataType: string
+		sourceColumn: affected_activity_id
+
+	column origin_system
+		dataType: string
+		sourceColumn: origin_system
+
+	partition fact_engineering_change = entity
+		mode: directLake
+		source
+			entityName: fact_engineering_change
+			schemaName: silver
+			expressionSource: DL_ProjectControlsIQ

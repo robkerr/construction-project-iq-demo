@@ -1,0 +1,6 @@
+/// Shared Direct Lake source pointing at the ProjectControlsIQ Lakehouse in OneLake.
+expression DL_ProjectControlsIQ =
+		let
+			Source = AzureStorage.DataLake("https://onelake.dfs.fabric.microsoft.com/8f4cf2c2-381f-4afa-9b7d-9fcfabd4f82d/3ecdff20-93ee-4f5a-81e7-c022007d128b", [HierarchicalNavigation=true])
+		in
+			Source
