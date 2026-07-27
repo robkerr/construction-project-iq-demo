@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.4.0/schema.json",
+  "name": "tileNs3",
+  "position": {
+    "x": 568,
+    "y": 430,
+    "z": 0,
+    "width": 340,
+    "height": 90,
+    "tabOrder": 9
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_engineering_change"
+                    }
+                  },
+                  "Property": "Approved EC Schedule Impact (days)"
+                }
+              },
+              "queryRef": "fact_engineering_change.Approved EC Schedule Impact (days)",
+              "nativeQueryRef": "Approved EC Schedule Impact (days)"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Non-SAP \u00b7 Approved EC Impact (days)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

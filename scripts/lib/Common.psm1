@@ -78,7 +78,13 @@ function Get-FabricToken {
     param([switch]$UseSpn)
     $env = Import-DotEnv
     $resource = 'https://api.fabric.microsoft.com'
-    if ($UseSpn -or ($env.SPN_APP_ID -and $env.SPN_CLIENT_SECRET)) {
+    if ($PSBoundParameters.ContainsKey('UseSpn')) {
+        $useSpnResolved = [bool]$UseSpn
+    }
+    else {
+        $useSpnResolved = [bool]($env.SPN_APP_ID -and $env.SPN_CLIENT_SECRET)
+    }
+    if ($useSpnResolved) {
         if (-not ($env.SPN_APP_ID -and $env.SPN_CLIENT_SECRET -and $env.SPN_TENANT_ID)) {
             throw "SPN requested but SPN_APP_ID/SPN_CLIENT_SECRET/SPN_TENANT_ID are not all set. Run setup_spn.ps1."
         }
@@ -125,7 +131,13 @@ function Get-StorageToken {
     param([switch]$UseSpn)
     $env = Import-DotEnv
     $resource = 'https://storage.azure.com'
-    if ($UseSpn -or ($env.SPN_APP_ID -and $env.SPN_CLIENT_SECRET)) {
+    if ($PSBoundParameters.ContainsKey('UseSpn')) {
+        $useSpnResolved = [bool]$UseSpn
+    }
+    else {
+        $useSpnResolved = [bool]($env.SPN_APP_ID -and $env.SPN_CLIENT_SECRET)
+    }
+    if ($useSpnResolved) {
         $body = @{
             client_id = $env.SPN_APP_ID; client_secret = $env.SPN_CLIENT_SECRET
             grant_type = 'client_credentials'; scope = "$resource/.default"

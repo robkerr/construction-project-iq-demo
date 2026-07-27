@@ -35,6 +35,10 @@ table dim_project
 	measure 'Projects At Risk' = CALCULATE(DISTINCTCOUNT(dim_project[project_id]), FILTER(VALUES(dim_project[project_id]), [Schedule Risk Score] >= 26))
 		formatString: #,##0
 
+	/// Portfolio KPI: the single highest project Schedule Risk Score (the worst project) in the current filter context.
+	measure 'Worst Schedule Risk' = MAXX(VALUES(dim_project[project_id]), [Schedule Risk Score])
+		formatString: #,##0.0
+
 	/// Portfolio KPI: total forecast overrun (SAP FI).
 	measure 'Total Forecast Overrun' = [Forecast Overrun]
 		formatString: $#,##0

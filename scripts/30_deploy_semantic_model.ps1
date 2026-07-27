@@ -14,7 +14,9 @@
 [CmdletBinding()]
 param(
     [string]$ModelName = 'ProjectControlsIQ',
-    [string]$DefinitionRoot
+    [string]$DefinitionRoot,
+    [ValidateSet('auto', 'user', 'spn')]
+    [string]$Auth = 'auto'
 )
 $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'lib\Common.psm1') -Force
@@ -29,7 +31,12 @@ if (-not (Test-Path $DefinitionRoot)) {
     throw "Definition folder not found: $DefinitionRoot. Run fabric/semantic-model/build_semantic_model.py first."
 }
 
-$useSpn = [bool]($env.SPN_APP_ID -and $env.SPN_CLIENT_SECRET -and $env.SPN_TENANT_ID)
+$spnAvailable = [bool]($env.SPN_APP_ID -and $env.SPN_CLIENT_SECRET -and $env.SPN_TENANT_ID)
+switch ($Auth) {
+    'user' { $useSpn = $false }
+    'spn' { if (-not $spnAvailable) { throw 'Auth=spn requested but SPN_* creds are not in .env.' }; $useSpn = $true }
+    default { $useSpn = $spnAvailable }
+}
 Write-Host ("Auth: " + $(if ($useSpn) { "service principal ($($env.SPN_DISPLAY_NAME))" } else { 'signed-in Azure CLI user' })) -ForegroundColor DarkCyan
 $token = Get-FabricToken -UseSpn:$useSpn
 

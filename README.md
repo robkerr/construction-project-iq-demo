@@ -54,8 +54,10 @@ Falcon #1 (~96, Red)**, its drivers spanning SAP + non-SAP, and writes a reprodu
 ## Deployment guide (repeatable)
 
 This is the full, ordered playbook for landing the demo in a Fabric workspace. It marks each step
-**🤖 automated** (a script does it) or **🧑 manual** (you do it in a portal). Phase 2 is fully
-scripted; Phases 3–6 are portal work that Fabric/Foundry don't yet expose as stable public APIs.
+**🤖 automated** (a script does it) or **🧑 manual** (you do it in a portal). Phases 2, 3, and 5 are
+fully scripted (data load, Direct Lake semantic model, and the Power BI report); Phase 4 needs a
+one-time Search provisioning, and Phase 6 (agents) is portal work Fabric/Foundry don't yet expose as
+stable public APIs.
 
 ### Prerequisites (🧑 manual, once)
 1. A Fabric workspace on an **F2+ or Trial capacity**. Copy its ID from the URL
@@ -99,15 +101,27 @@ az login                                    # or run setup_spn.ps1 for the SPN p
   (slip / critical-path). Confirmed row counts on a good run: 12 projects, 11 at-risk activities,
   135 late procurement rows.
 
-### Phase 3 — Semantic model (🧑 manual, Fabric portal)
-Follow [`fabric/semantic-model/README.md`](fabric/semantic-model/README.md).
-1. In the Lakehouse SQL endpoint, **New semantic model** → **Direct Lake** over the `silver` tables
-   (`dim_project`, `dim_wbs`, `fact_schedule_activity`, `fact_engineering_change`, `sap_fi_cost`,
-   `sap_mm_po`, `sap_supplier`). Name it `ProjectControlsIQ` (`SEMANTIC_MODEL_NAME`).
-2. Create the relationships (all `dim → fact`, single-direction) — `dim_wbs` is the SAP↔non-SAP bridge.
-3. Author every measure from [`fabric/measures.dax`](fabric/measures.dax) verbatim.
-4. Add the **verified answer**, **custom instructions**, and **synonyms** listed in that README so the
-   Data Agent is deterministic and always names SAP vs non-SAP drivers.
+### Phase 3 — Semantic model (🤖 automated)
+A Direct Lake model over the `silver` tables, deployed via the Fabric REST API. Spec:
+[`fabric/semantic-model/README.md`](fabric/semantic-model/README.md).
+
+```powershell
+./.venv/Scripts/python.exe fabric/semantic-model/build_semantic_model.py   # generates TMDL from .env IDs
+./scripts/30_deploy_semantic_model.ps1 -Auth user                          # create/update model, writes SEMANTIC_MODEL_ID
+./scripts/40_refresh_semantic_model.ps1                                     # frame Direct Lake so it's queryable
+```
+
+- `build_semantic_model.py` emits `ProjectControlsIQ.SemanticModel/` (TMDL): 7 tables mapped 1:1 to
+  `silver`, the 6 `dim → fact` relationships (`dim_wbs` is the SAP↔non-SAP bridge), and every measure
+  from [`fabric/measures.dax`](fabric/measures.dax) ported verbatim.
+- `30_deploy_semantic_model.ps1` base64-encodes the parts and creates/updates the model. **Use
+  `-Auth user`** — the model is owned by the signed-in author, so SPN `updateDefinition` returns
+  `Unauthorized`. (`-Auth auto|user|spn`.)
+- `40_refresh_semantic_model.ps1` runs a Power BI enhanced refresh so the Direct Lake partitions are
+  framed — required before the first DAX query. Re-run it after reloading the silver tables.
+- Validate with DAX (`executeQueries`): Falcon ranks **#1 at 95.7 (Red)**, matching the gold table.
+- 🧑 Optional AI-readiness (verified answer, custom instructions, synonyms per the spec README) is a
+  portal step, needed only for the Phase 6 Data Agent.
 
 ### Phase 4 — Azure AI Search knowledge index (🤖 script + 🧑 provisioning)
 Follow [`search/build_index.md`](search/build_index.md).
@@ -117,9 +131,23 @@ Follow [`search/build_index.md`](search/build_index.md).
    `./.venv/Scripts/python.exe search/build_index.py` — (re)creates the `project-knowledge` index and
    uploads the 6 docs from `docs/`. Vector search is optional (`AZURE_OPENAI_EMBED_DEPLOYMENT`).
 
-### Phase 5 — Power BI dashboard (🧑 manual, Power BI)
-Build the "Portfolio Schedule Risk" page per [`powerbi/schedule_risk_dashboard.md`](powerbi/schedule_risk_dashboard.md)
-on the Phase 3 model.
+### Phase 5 — Power BI dashboard (🤖 automated scaffold + 🧑 polish)
+A single-page "Portfolio Schedule Risk" report (PBIR) bound `byConnection` to the Phase 3 model.
+Spec: [`powerbi/schedule_risk_dashboard.md`](powerbi/schedule_risk_dashboard.md).
+
+```powershell
+./.venv/Scripts/python.exe powerbi/build_report.py     # generates ProjectControlsIQ.Report from SEMANTIC_MODEL_ID
+./scripts/31_deploy_report.ps1 -Auth user              # create/update report, writes REPORT_ID
+# open: https://app.fabric.microsoft.com/groups/<FABRIC_WORKSPACE_ID>/reports/<REPORT_ID>
+```
+
+- `build_report.py` lays out the KPI band (4 cards), the hero risk-ranked bar, 8 cross-system driver
+  tiles (4 non-SAP schedule · 4 SAP cost/procurement), the WBS detail table, and 4 slicers — every
+  binding maps to a real model measure/column.
+- Report/visual authoring is **not** exposed by the Fabric modeling tooling, so this is a best-effort,
+  API-deployable scaffold. 🧑 Polish in the service: (1) color the hero bar by risk band, and (2) add a
+  **Risk Band** slicer — `Risk Band` is a *measure*, so a slicer needs a Risk Band **column** (a
+  calculated column can disable Direct Lake; prefer a report-side approach or a bin).
 
 ### Phase 6 — Agents (🧑 manual, Fabric + Foundry + M365)
 1. **Fabric Data Agent** over the `ProjectControlsIQ` model; grab its **MCP endpoint**
