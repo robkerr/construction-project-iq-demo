@@ -25,7 +25,11 @@ $ws = $env.FABRIC_WORKSPACE_ID
 if (-not $ws -or $ws -eq '00000000-0000-0000-0000-000000000000') { throw "FABRIC_WORKSPACE_ID not set in .env." }
 $lhName = if ($env.FABRIC_LAKEHOUSE_NAME) { $env.FABRIC_LAKEHOUSE_NAME } else { 'lh_project_intelligence' }
 
-$token = Get-FabricToken -UseSpn
+# Use the service principal when .env carries SPN creds; otherwise fall back to the signed-in az user.
+$useSpn = [bool]($env.SPN_APP_ID -and $env.SPN_CLIENT_SECRET -and $env.SPN_TENANT_ID)
+Write-Host ("Auth: " + $(if ($useSpn) { "service principal ($($env.SPN_DISPLAY_NAME))" } else { 'signed-in Azure CLI user' })) -ForegroundColor DarkCyan
+
+$token = Get-FabricToken -UseSpn:$useSpn
 
 # --- 1. Create or reuse the Lakehouse ---
 Write-Host "== Lakehouse '$lhName' ==" -ForegroundColor Cyan
@@ -54,7 +58,7 @@ Set-DotEnvValue -Key 'FABRIC_LAKEHOUSE_ID' -Value $lakehouseId
 # --- 2. Upload landing parquet ---
 if (-not $SkipUpload) {
     Write-Host "== Uploading landing data to Files/landing ==" -ForegroundColor Cyan
-    $storageToken = Get-StorageToken -UseSpn
+    $storageToken = Get-StorageToken -UseSpn:$useSpn
     $parquet = Get-ChildItem (Join-Path $root 'out\parquet\*.parquet') -ErrorAction SilentlyContinue
     if (-not $parquet) { Write-Warning "  No parquet found under out\parquet. Run data_gen\generate.py first." }
     foreach ($f in $parquet) {

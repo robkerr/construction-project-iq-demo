@@ -22,7 +22,11 @@ $lhName = if ($env.FABRIC_LAKEHOUSE_NAME) { $env.FABRIC_LAKEHOUSE_NAME } else { 
 if (-not $lakehouseId) { throw "FABRIC_LAKEHOUSE_ID not set. Run 10_provision_fabric.ps1 first." }
 $apiBase = if ($env.FABRIC_API_BASE) { $env.FABRIC_API_BASE } else { 'https://api.fabric.microsoft.com/v1' }
 
-$token = Get-FabricToken -UseSpn
+# Use the service principal when .env carries SPN creds; otherwise fall back to the signed-in az user.
+$useSpn = [bool]($env.SPN_APP_ID -and $env.SPN_CLIENT_SECRET -and $env.SPN_TENANT_ID)
+Write-Host ("Auth: " + $(if ($useSpn) { "service principal ($($env.SPN_DISPLAY_NAME))" } else { 'signed-in Azure CLI user' })) -ForegroundColor DarkCyan
+
+$token = Get-FabricToken -UseSpn:$useSpn
 $order = @('01_setup_lakehouse', '02_load_bronze', '03_build_silver_gold')
 if ($Only) { $order = $order | Where-Object { $Only -contains $_ } }
 
@@ -61,7 +65,7 @@ foreach ($name in $order) {
         throw "  $name did not complete (status=$($job.status)): $($job.failureReason.message)"
     }
     Write-Host "  $name completed." -ForegroundColor Green
-    $token = Get-FabricToken -UseSpn   # refresh in case of long total runtime
+    $token = Get-FabricToken -UseSpn:$useSpn   # refresh in case of long total runtime
     $notebooks = (Invoke-FabricApi -Method GET -Path "/workspaces/$ws/notebooks" -Token $token).value
 }
 

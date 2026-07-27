@@ -129,78 +129,71 @@ for t in tables:
     print(f'silver.{t} ok')
 """),
         code("""
-# ---- GOLD: driver signals per project (fusing SAP + non-SAP) ----
+# ---- GOLD: create the schema (driver aggregations are inlined as CTEs below) ----
 spark.sql('CREATE SCHEMA IF NOT EXISTS gold')
-
-# Non-SAP schedule signals (Primavera)
-spark.sql('''
-CREATE OR REPLACE TEMP VIEW v_sched AS
-SELECT project_id,
-       MAX(GREATEST(DATEDIFF(forecast_finish, baseline_finish), 0)) AS max_slip_days,
-       MIN(total_float_days) AS min_float,
-       SUM(CASE WHEN is_critical_path AND forecast_finish > baseline_finish THEN 1 ELSE 0 END) AS cp_at_risk
-FROM silver.fact_schedule_activity GROUP BY project_id
-''')
-
-# SAP procurement signal (late long-lead POs)
-spark.sql('''
-CREATE OR REPLACE TEMP VIEW v_po AS
-SELECT project_id,
-       SUM(CASE WHEN is_long_lead AND status = 'Late' THEN 1 ELSE 0 END) AS late_long_lead_pos
-FROM silver.sap_mm_po GROUP BY project_id
-''')
-
-# SAP finance signal (forecast overrun + cost-to-complete exposure)
-spark.sql('''
-CREATE OR REPLACE TEMP VIEW v_cost AS
-SELECT project_id,
-       SUM(forecast_cost - budget) AS forecast_overrun,
-       SUM(cost_to_complete)       AS cost_to_complete,
-       SUM(earned_value)           AS earned_value
-FROM silver.sap_fi_cost GROUP BY project_id
-''')
-print('driver views ready')
+print('gold schema ready')
 """),
         code("""
-# ---- GOLD: the fused per-project schedule-risk table ----
+# ---- GOLD: the fused per-project schedule-risk table (single statement) ----
+# All driver aggregations are inlined as CTEs that read silver.* DIRECTLY. Temp views were
+# tried first but a CTAS on a schema-enabled Lakehouse re-resolves a temp view's body in a
+# different catalog context and fails with TABLE_OR_VIEW_NOT_FOUND on silver.*; direct
+# silver.* references inside the CTAS resolve fine. Also avoids reading the gold table while
+# overwriting it (self-referential CREATE OR REPLACE fails on Delta).
 spark.sql('''
 CREATE OR REPLACE TABLE gold.project_schedule_risk
 USING delta AS
-SELECT
-    p.project_id, p.project_name, p.client, p.region, p.contract_type,
-    p.pct_complete, p.planned_finish, p.forecast_finish,
-    COALESCE(s.max_slip_days, 0)       AS schedule_slip_days,      -- non-SAP
-    COALESCE(s.min_float, 0)           AS min_total_float_days,    -- non-SAP
-    COALESCE(s.cp_at_risk, 0)          AS critical_path_at_risk,   -- non-SAP
-    COALESCE(po.late_long_lead_pos, 0) AS late_long_lead_pos,      -- SAP
-    COALESCE(c.forecast_overrun, 0)    AS forecast_overrun,        -- SAP
-    COALESCE(c.cost_to_complete, 0)    AS cost_to_complete,        -- SAP
-    COALESCE(c.earned_value, 0)        AS earned_value,            -- SAP
-    LEAST(100,
-        COALESCE(s.max_slip_days, 0) * 1.5
-      + CASE WHEN COALESCE(s.min_float, 0) < 0 THEN -s.min_float ELSE 0 END * 2
-      + COALESCE(s.cp_at_risk, 0) * 3
-      + COALESCE(po.late_long_lead_pos, 0) * 5
-      + COALESCE(c.forecast_overrun, 0) / 100000
-    ) AS schedule_risk_score
-FROM silver.dim_project p
-LEFT JOIN v_sched s ON p.project_id = s.project_id
-LEFT JOIN v_po   po ON p.project_id = po.project_id
-LEFT JOIN v_cost c  ON p.project_id = c.project_id
-''')
-
-spark.sql('''
-ALTER TABLE gold.project_schedule_risk SET TBLPROPERTIES ('note' = 'fuses SAP + non-SAP signals')
-''')
-
-# risk band
-spark.sql('''
-CREATE OR REPLACE TABLE gold.project_schedule_risk USING delta AS
+WITH v_sched AS (            -- non-SAP schedule signals (Primavera)
+    SELECT project_id,
+           MAX(GREATEST(DATEDIFF(forecast_finish, baseline_finish), 0)) AS max_slip_days,
+           MIN(total_float_days) AS min_float,
+           SUM(CASE WHEN is_critical_path AND forecast_finish > baseline_finish THEN 1 ELSE 0 END) AS cp_at_risk
+    FROM silver.fact_schedule_activity GROUP BY project_id
+),
+v_po AS (                   -- SAP procurement signal (late long-lead POs)
+    SELECT project_id,
+           SUM(CASE WHEN is_long_lead AND status = 'Late' THEN 1 ELSE 0 END) AS late_long_lead_pos
+    FROM silver.sap_mm_po GROUP BY project_id
+),
+v_cost AS (                 -- SAP finance signal (overrun + cost-to-complete + EV)
+    SELECT project_id,
+           SUM(forecast_cost - budget) AS forecast_overrun,
+           SUM(cost_to_complete)       AS cost_to_complete,
+           SUM(earned_value)           AS earned_value
+    FROM silver.sap_fi_cost GROUP BY project_id
+),
+scored AS (
+    SELECT
+        p.project_id, p.project_name, p.client, p.region, p.contract_type,
+        p.pct_complete, p.planned_finish, p.forecast_finish,
+        COALESCE(s.max_slip_days, 0)       AS schedule_slip_days,      -- non-SAP
+        COALESCE(s.min_float, 0)           AS min_total_float_days,    -- non-SAP
+        COALESCE(s.cp_at_risk, 0)          AS critical_path_at_risk,   -- non-SAP
+        COALESCE(po.late_long_lead_pos, 0) AS late_long_lead_pos,      -- SAP
+        COALESCE(c.forecast_overrun, 0)    AS forecast_overrun,        -- SAP
+        COALESCE(c.cost_to_complete, 0)    AS cost_to_complete,        -- SAP
+        COALESCE(c.earned_value, 0)        AS earned_value,            -- SAP
+        LEAST(100,
+            COALESCE(s.max_slip_days, 0) * 1.5
+          + CASE WHEN COALESCE(s.min_float, 0) < 0 THEN -s.min_float ELSE 0 END * 2
+          + COALESCE(s.cp_at_risk, 0) * 3
+          + COALESCE(po.late_long_lead_pos, 0) * 5
+          + COALESCE(c.forecast_overrun, 0) / 100000
+        ) AS schedule_risk_score
+    FROM silver.dim_project p
+    LEFT JOIN v_sched s ON p.project_id = s.project_id
+    LEFT JOIN v_po   po ON p.project_id = po.project_id
+    LEFT JOIN v_cost c  ON p.project_id = c.project_id
+)
 SELECT *,
     CASE WHEN schedule_risk_score >= 61 THEN 'Red'
          WHEN schedule_risk_score >= 26 THEN 'Amber'
          ELSE 'Green' END AS risk_band
-FROM gold.project_schedule_risk
+FROM scored
+''')
+
+spark.sql('''
+ALTER TABLE gold.project_schedule_risk SET TBLPROPERTIES ('note' = 'fuses SAP + non-SAP signals')
 ''')
 
 print('gold.project_schedule_risk built. Top 5 by risk:')
