@@ -124,12 +124,26 @@ A Direct Lake model over the `silver` tables, deployed via the Fabric REST API. 
   portal step, needed only for the Phase 6 Data Agent.
 
 ### Phase 4 — Azure AI Search knowledge index (🤖 script + 🧑 provisioning)
-Follow [`search/build_index.md`](search/build_index.md).
-1. 🧑 Provision an **Azure AI Search** service; set `AI_SEARCH_ENDPOINT` in `.env`. Give your identity
-   **Search Index Data Contributor** (or set `AI_SEARCH_ADMIN_KEY`).
-2. 🤖 `pip install azure-search-documents azure-identity` then
-   `./.venv/Scripts/python.exe search/build_index.py` — (re)creates the `project-knowledge` index and
-   uploads the 6 docs from `docs/`. Vector search is optional (`AZURE_OPENAI_EMBED_DEPLOYMENT`).
+Follow [`search/build_index.md`](search/build_index.md). This uses the AI Search **push model** —
+`build_index.py` reads each markdown file under `docs/` and pushes it straight into the index via
+`SearchClient.upload_documents()`. **No storage account or indexer is required** (a storage account is
+only needed for the *pull* model, which this demo does not use).
+1. 🧑 Provision an **Azure AI Search** service; set `AI_SEARCH_ENDPOINT` in `.env`. For RBAC auth
+   (recommended), enable **Role-based access control** on the service and grant your identity both
+   **Search Service Contributor** (create the index) and **Search Index Data Contributor** (upload docs).
+   Alternatively, set `AI_SEARCH_ADMIN_KEY` in `.env` to use a key instead.
+2. 🤖 Ensure the corpus exists (`./.venv/Scripts/python.exe data_gen/docs_gen.py` regenerates the 6 docs
+   from `out/`), then:
+   ```powershell
+   ./.venv/Scripts/python.exe -m pip install azure-search-documents azure-identity python-dotenv
+   ./.venv/Scripts/python.exe search/build_index.py     # (re)creates project-knowledge, uploads 6 docs
+   ```
+   With no `AI_SEARCH_ADMIN_KEY`, the script uses `DefaultAzureCredential` (your `az login`). If it
+   reports `AzureCliCredential: Failed to invoke the Azure CLI`, that's a transient cold-start — just
+   re-run once (confirm `az account show` works first). Vector search is optional
+   (`AZURE_OPENAI_EMBED_DEPLOYMENT`).
+3. ✅ Verify: the run prints `uploaded 6/6 documents`; a `search("Falcon schedule risk")` returns the
+   schedule-risk policy and both prior Falcon MPRs.
 
 ### Phase 5 — Power BI dashboard (🤖 automated scaffold + 🧑 polish)
 A single-page "Portfolio Schedule Risk" report (PBIR) bound `byConnection` to the Phase 3 model.
