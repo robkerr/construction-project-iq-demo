@@ -37,7 +37,8 @@ def _load(out_dir: Path):
     ext = "parquet" if src == pq else "csv"
     frames = {}
     for name in ["dim_project", "sap_mm_po", "sap_supplier", "fact_engineering_change",
-                 "sap_fi_cost", "fact_schedule_activity"]:
+                 "sap_fi_cost", "fact_schedule_activity", "dim_rfq", "fact_bid",
+                 "fact_bid_tech_eval", "dim_tech_requirement"]:
         frames[name] = reader(src / f"{name}.{ext}")
     manifest = json.loads((out_dir / "manifest.json").read_text(encoding="utf-8"))
     return frames, manifest
@@ -75,6 +76,43 @@ def _falcon_facts(frames, manifest):
         "min_float": int(inj["min_float"]),
         "worst_slip": int(inj["worst_slip_days"]),
         "overrun": overrun,
+    }
+
+
+def _bid_facts(frames, manifest):
+    """Pull the hero RFQ-0001 bid-evaluation numbers + per-bidder technical deviations so the
+    TBE/CBE docs quote the same figures the model would."""
+    hero = manifest["hero_bid_eval"]
+    rfq = frames["dim_rfq"]
+    rfq_row = rfq[rfq["rfq_id"] == hero["rfq_id"]].iloc[0]
+    reqs = frames["dim_tech_requirement"]
+    cat_reqs = reqs[reqs["material_category"] == hero["material_category"]].reset_index(drop=True)
+    tev = frames["fact_bid_tech_eval"]
+    bid = frames["fact_bid"]
+    proj = frames["dim_project"]
+    prow = proj[proj["project_id"] == hero["project_id"]].iloc[0]
+
+    bidders = []
+    for b in hero["bids"]:
+        sid = b["supplier_id"]
+        bid_row = bid[(bid["rfq_id"] == hero["rfq_id"]) & (bid["supplier_id"] == sid)].iloc[0]
+        devs = tev[(tev["rfq_id"] == hero["rfq_id"]) & (tev["supplier_id"] == sid)
+                   & (tev["compliance"] != "Compliant")]
+        deviations = [{"requirement": r["requirement"], "required_value": r["required_value"],
+                       "compliance": r["compliance"], "mandatory": bool(r["is_mandatory"])}
+                      for _, r in devs.iterrows()]
+        bidders.append({**b, "bid_id": str(bid_row["bid_id"]), "deviations": deviations,
+                        "spares_price": float(bid_row["spares_price"]),
+                        "freight_price": float(bid_row["freight_price"]),
+                        "price_loading": float(bid_row["price_loading"])})
+    return {
+        "rfq": hero,
+        "project_name": prow["project_name"],
+        "client": prow["client"],
+        "requirements": [{"requirement": r["requirement"], "required_value": r["required_value"],
+                          "unit": r["unit"], "mandatory": bool(r["is_mandatory"]),
+                          "weight": int(r["weight"])} for _, r in cat_reqs.iterrows()],
+        "bidders": bidders,
     }
 
 
@@ -247,6 +285,207 @@ def doc_prior_mpr_older(f) -> str:
     return _mpr("May 2026", f, "Green/Amber", 5, 3, f["overrun"] * 0.2, narrative)
 
 
+# --------------------------------------------------------------------------- bid evaluation
+def doc_tbe_standard() -> str:
+    return f"""
+# Technical Bid Evaluation (TBE) Standard
+**Owner:** {COMPANY_SHORT} Engineering & Procurement · **Doc type:** standard
+
+A Technical Bid Evaluation compares each supplier's technical proposal against the project
+**technical datasheet (RFQ requirements)** for a tagged equipment item and determines which bids
+are technically acceptable *before* any commercial comparison. The pilot covers three material
+categories — **Heat Exchanger**, **Centrifugal Pump**, and **Electrical Equipment** — and is
+designed so new categories can be added with minimal configuration (a new requirement set only).
+
+## Compliance categories (per requirement)
+- **Compliant** — the offer meets the specified requirement. Scoring factor **1.0**.
+- **Deviation** — the offer differs but may be acceptable after normalization. Scoring factor **0.6**;
+  every deviation is carried into the Commercial Bid Evaluation as a price loading.
+- **Exception** — the requirement is not met or not addressed. Scoring factor **0.0**.
+
+## Technical score
+`Technical Score (0-100) = 100 x SUM(weight x factor) / SUM(weight)` across all requirements, where
+`weight` reflects the engineering importance of the requirement (mandatory requirements carry the
+highest weights).
+
+## Qualification (the gate to commercial evaluation)
+A bid is **technically qualified** only if BOTH hold:
+1. **No mandatory requirement is an Exception.** Any Exception on a *mandatory* requirement (e.g. a
+   missing design-code compliance or type-test certificate) makes the bid **Non-Compliant** and it is
+   **disqualified regardless of price**.
+2. **Technical Score ≥ 70.**
+
+TBE status resolves to: **Compliant** (no deviations), **Compliant with Deviations** (qualified, one
+or more deviations to normalize), or **Non-Compliant** (disqualified).
+
+## Rules
+- Never advance a Non-Compliant bid to commercial comparison on the basis of a low price.
+- Name the specific unmet requirement (and whether it was mandatory) when disqualifying a bid.
+- Every requirement must be evaluated for every bidder; "not addressed" counts as an Exception.
+"""
+
+
+def doc_cbe_standard() -> str:
+    return f"""
+# Commercial Bid Evaluation (CBE) Standard
+**Owner:** {COMPANY_SHORT} Procurement / Supply Chain · **Doc type:** standard
+
+A Commercial Bid Evaluation compares the **technically-qualified** bids on a like-for-like basis and
+recommends the **lowest evaluated cost**, not simply the lowest quoted price. It works from the
+commercial terms & pricing extracted from each supplier's bid document for the tagged equipment.
+
+## Evaluated price (normalization)
+```
+Evaluated Price = Quoted Price
+               + Recommended Spares
+               + Freight
+               + Technical-deviation loading      (each carried-forward TBE deviation)
+               + Commercial-terms deviation loading (deviations to the standard T&Cs)
+               + Schedule loading                  (each week delivery lands past Required-On-Site)
+               + Advance-payment financing cost    (cost of any advance payment above the 10% norm)
+               + Short-warranty loading            (warranty shorter than the 18-month standard)
+```
+
+The loadings put every bid on the same commercial footing: a cheap quote with technical deviations,
+a long delivery, a large advance payment, or a short warranty is normalized to what it would truly
+cost the project.
+
+## Recommendation
+- Rank technically-qualified bids by **Evaluated Price**, ascending.
+- **Rank 1 → Recommended award.** **Rank 2 → Alternate.** Remaining qualified bids → Not Recommended.
+- Disqualified (Non-Compliant) bids are **excluded from the ranking** even if their quoted price is
+  the lowest received.
+
+## Rules
+- Always report BOTH the lowest *quoted* price and the recommended *evaluated* price, and explain the
+  gap (deviations, schedule, terms).
+- Cite the delivery week vs Required-On-Site date when a schedule loading is applied.
+- Extract commercial terms (price, spares, freight, delivery, payment terms, warranty, Incoterms)
+  from the supplier bid documents; never invent a term that is not in the bid.
+"""
+
+
+def doc_tbe_template() -> str:
+    return f"""
+# Technical Bid Evaluation — Output Template
+**Owner:** {COMPANY_SHORT} Engineering · **Doc type:** spec
+
+Use this structure when producing a TBE for a tagged equipment RFQ.
+
+```
+TECHNICAL BID EVALUATION
+RFQ:               <rfq_id>  ·  Tag: <equipment_tag>  ·  Category: <material_category>
+Project:           <project name> (<project_id>)      ·  Required-On-Site: <yyyy-mm-dd>
+
+Compliance matrix (per bidder):
+| Requirement | Required value | Mandatory | <Supplier A> | <Supplier B> | ... |
+|-------------|----------------|-----------|--------------|--------------|-----|
+| ...         | ...            | Y/N       | Compliant    | Exception    | ... |
+
+Roll-up (per bidder):
+| Supplier | Technical Score | Deviations | Exceptions | TBE Status | Qualified? |
+
+Recommendation:
+  Technically qualified: <suppliers>.  Disqualified: <supplier> — <mandatory requirement not met>.
+```
+
+Rules: gate on mandatory Exceptions first; quote the Technical Score; name each disqualifying
+requirement.
+"""
+
+
+def doc_cbe_template() -> str:
+    return f"""
+# Commercial Bid Evaluation — Output Template
+**Owner:** {COMPANY_SHORT} Procurement · **Doc type:** spec
+
+Use this structure when producing a CBE for the technically-qualified bids.
+
+```
+COMMERCIAL BID EVALUATION
+RFQ:               <rfq_id>  ·  Tag: <equipment_tag>  ·  Category: <material_category>
+
+Commercial comparison (technically-qualified bids only):
+| Supplier | Quoted | Spares | Freight | Delivery (wk) | Payment | Warranty | Incoterms | Loadings | Evaluated |
+
+Recommendation:
+  Award:      <supplier> — Evaluated <$>, Quoted <$>  (Rank 1, technically <status>)
+  Alternate:  <supplier> — Evaluated <$>
+  Note:       Lowest quoted bid was <$ supplier>, DISQUALIFIED (<reason>) / or higher evaluated cost.
+```
+
+Rules: rank qualified bids by Evaluated Price; always contrast lowest quoted vs recommended evaluated.
+"""
+
+
+def doc_rfq_datasheet(b) -> str:
+    r = b["rfq"]
+    lines = "\n".join(
+        f"| {q['requirement']} | {q['required_value']}{(' ' + q['unit']) if q['unit'] else ''} | "
+        f"{'Yes' if q['mandatory'] else 'No'} | {q['weight']} |"
+        for q in b["requirements"])
+    return f"""
+# {r['rfq_id']} — Technical Datasheet ({r['equipment_tag']})
+**Project:** {b['project_name']} ({r['project_id']}) · **Client:** {b['client']}
+**Category:** {r['material_category']} · **Equipment:** {r['equipment_desc']}
+**Doc type:** spec · **Required-On-Site:** {r['required_on_site']} · **Bids due:** {r['bids_due_date']}
+**Engineer's estimate:** ${r['engineers_estimate']:,.0f}
+
+This datasheet defines the technical requirements bidders must meet for tagged equipment
+**{r['equipment_tag']}**. Mandatory requirements gate technical qualification — an Exception on any
+mandatory line makes a bid Non-Compliant regardless of price (see the TBE Standard).
+
+## Technical requirements
+| Requirement | Required value | Mandatory | Weight |
+|---|---|---|---|
+{lines}
+
+## Notes
+- Bidders shall state compliance (Compliant / Deviation / Exception) against every line above.
+- Deviations must be described and are carried into the Commercial Bid Evaluation as price loadings.
+"""
+
+
+def doc_supplier_quotation(b, bid) -> str:
+    r = b["rfq"]
+    devtxt = "\n".join(
+        f"- **{d['requirement']}** ({'mandatory' if d['mandatory'] else 'non-mandatory'}): "
+        f"{'deviation offered against' if d['compliance'] == 'Deviation' else 'not offered / not addressed for'} "
+        f"required value '{d['required_value']}'."
+        for d in bid["deviations"]) or "- No technical deviations; the offer is fully compliant with the datasheet."
+    total_price = bid["quoted_price"] + bid["spares_price"] + bid["freight_price"]
+    return f"""
+# Supplier Quotation — {bid['supplier_name']} — {r['rfq_id']} ({r['equipment_tag']})
+**Doc type:** supplier_bid · **Project:** {b['project_name']} ({r['project_id']})
+**Category:** {r['material_category']} · **Equipment:** {r['equipment_desc']}
+
+{bid['supplier_name']} is pleased to submit its proposal for tagged equipment {r['equipment_tag']}.
+
+## Commercial terms & pricing
+| Item | Value |
+|---|---|
+| Base equipment price | ${bid['quoted_price']:,.0f} |
+| Recommended spare parts | ${bid['spares_price']:,.0f} |
+| Freight | ${bid['freight_price']:,.0f} |
+| **Total quoted (base + spares + freight)** | **${total_price:,.0f}** |
+| Delivery (ex-works to on-site) | {bid['delivery_weeks']} weeks |
+| Payment terms | {bid['payment_advance_pct']}% advance / balance on delivery |
+| Warranty | {bid['warranty_months']} months |
+| Incoterms | {bid['incoterms']} |
+| Currency | USD |
+
+## Technical compliance statement
+Overall technical status per {COMPANY_SHORT} evaluation: **{bid['tbe_status']}**
+(Technical Score {bid['technical_score']}).
+{devtxt}
+
+## Validity
+This quotation is valid for 60 days from the bid due date ({r['bids_due_date']}). Prices are firm and
+fixed for the stated delivery. All work complies with the applicable international codes except where a
+deviation is explicitly noted above.
+"""
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Generate the synthetic unstructured corpus.")
     ap.add_argument("--out", type=Path, default=DEFAULT_OUT, help="Generated data dir (out/).")
@@ -255,6 +494,7 @@ def main(argv=None) -> int:
 
     frames, manifest = _load(args.out)
     f = _falcon_facts(frames, manifest)
+    b = _bid_facts(frames, manifest)
     d = args.docs
 
     print(f"Generating unstructured corpus in {d.resolve()} ...")
@@ -264,6 +504,25 @@ def main(argv=None) -> int:
     write(d / "specs" / "project_falcon_scope.md", doc_falcon_scope(f))
     write(d / "prior_reports" / "PRJ-001_MPR_2026-05.md", doc_prior_mpr_older(f))
     write(d / "prior_reports" / "PRJ-001_MPR_2026-06.md", doc_prior_mpr_recent(f))
+
+    # ---- Bid evaluation (TBE / CBE) corpus ----
+    write(d / "standards" / "tbe_evaluation_standard.md", doc_tbe_standard())
+    write(d / "standards" / "cbe_evaluation_standard.md", doc_cbe_standard())
+    write(d / "specs" / "tbe_output_template.md", doc_tbe_template())
+    write(d / "specs" / "cbe_output_template.md", doc_cbe_template())
+    rfq_id = b["rfq"]["rfq_id"]
+    write(d / "specs" / f"{rfq_id}_datasheet.md", doc_rfq_datasheet(b))
+    # Supplier quotation documents for the hero RFQ (the CBE "extract terms from bid docs" source):
+    # include the recommended, the disqualified lowest-quote, and the alternate.
+    wanted = {"Recommended", "Disqualified", "Alternate"}
+    bid_docs = []
+    for bid in b["bidders"]:
+        if bid["award_status"] in wanted:
+            fname = f"{rfq_id}_{bid['supplier_id']}_quotation.md"
+            write(d / "bids" / fname, doc_supplier_quotation(b, bid))
+            bid_docs.append({"title": f"{bid['supplier_name']} Quotation — {rfq_id}",
+                             "doc_type": "supplier_bid", "project_id": b["rfq"]["project_id"],
+                             "path": f"bids/{fname}"})
 
     # A tiny corpus index to aid the AI Search field mapping / ingestion.
     index = [
@@ -279,7 +538,18 @@ def main(argv=None) -> int:
          "path": "prior_reports/PRJ-001_MPR_2026-05.md"},
         {"title": "Project Falcon MPR 2026-06", "doc_type": "prior_report", "project_id": "PRJ-001",
          "path": "prior_reports/PRJ-001_MPR_2026-06.md"},
-    ]
+        {"title": "Technical Bid Evaluation (TBE) Standard", "doc_type": "standard",
+         "project_id": None, "path": "standards/tbe_evaluation_standard.md"},
+        {"title": "Commercial Bid Evaluation (CBE) Standard", "doc_type": "standard",
+         "project_id": None, "path": "standards/cbe_evaluation_standard.md"},
+        {"title": "TBE Output Template", "doc_type": "spec", "project_id": None,
+         "path": "specs/tbe_output_template.md"},
+        {"title": "CBE Output Template", "doc_type": "spec", "project_id": None,
+         "path": "specs/cbe_output_template.md"},
+        {"title": f"RFQ {rfq_id} Technical Datasheet ({b['rfq']['equipment_tag']})",
+         "doc_type": "spec", "project_id": b["rfq"]["project_id"],
+         "path": f"specs/{rfq_id}_datasheet.md"},
+    ] + bid_docs
     (d / "corpus_index.json").write_text(json.dumps(index, indent=2), encoding="utf-8")
     print(f"  wrote {(d / 'corpus_index.json').name}")
     print(f"\nCorpus complete: {len(index)} documents.")

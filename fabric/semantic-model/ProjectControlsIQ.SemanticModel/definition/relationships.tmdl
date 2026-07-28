@@ -21,3 +21,23 @@ relationship rel_wbs_po
 relationship rel_supplier_po
 	fromColumn: sap_mm_po.supplier_id
 	toColumn: sap_supplier.supplier_id
+
+relationship rel_project_rfq
+	fromColumn: dim_rfq.project_id
+	toColumn: dim_project.project_id
+
+relationship rel_rfq_bid
+	fromColumn: fact_bid.rfq_id
+	toColumn: dim_rfq.rfq_id
+
+relationship rel_supplier_bid
+	fromColumn: fact_bid.supplier_id
+	toColumn: sap_supplier.supplier_id
+
+relationship rel_bid_tech_eval
+	fromColumn: fact_bid_tech_eval.bid_id
+	toColumn: fact_bid.bid_id
+
+relationship rel_req_tech_eval
+	fromColumn: fact_bid_tech_eval.req_id
+	toColumn: dim_tech_requirement.req_id

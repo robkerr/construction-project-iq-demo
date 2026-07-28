@@ -1,0 +1,161 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.4.0/schema.json",
+  "name": "bidTable",
+  "position": {
+    "x": 16,
+    "y": 408,
+    "z": 0,
+    "width": 616,
+    "height": 296,
+    "tabOrder": 11
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_bid"
+                    }
+                  },
+                  "Property": "supplier_name"
+                }
+              },
+              "queryRef": "fact_bid.supplier_name",
+              "nativeQueryRef": "supplier_name"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_bid"
+                    }
+                  },
+                  "Property": "Avg Technical Score"
+                }
+              },
+              "queryRef": "fact_bid.Avg Technical Score",
+              "nativeQueryRef": "Avg Technical Score"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_bid"
+                    }
+                  },
+                  "Property": "tbe_status"
+                }
+              },
+              "queryRef": "fact_bid.tbe_status",
+              "nativeQueryRef": "tbe_status"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_bid"
+                    }
+                  },
+                  "Property": "Quoted Price"
+                }
+              },
+              "queryRef": "fact_bid.Quoted Price",
+              "nativeQueryRef": "Quoted Price"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_bid"
+                    }
+                  },
+                  "Property": "Evaluated Price"
+                }
+              },
+              "queryRef": "fact_bid.Evaluated Price",
+              "nativeQueryRef": "Evaluated Price"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_bid"
+                    }
+                  },
+                  "Property": "delivery_weeks"
+                }
+              },
+              "queryRef": "fact_bid.delivery_weeks",
+              "nativeQueryRef": "delivery_weeks"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_bid"
+                    }
+                  },
+                  "Property": "award_status"
+                }
+              },
+              "queryRef": "fact_bid.award_status",
+              "nativeQueryRef": "award_status"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "fact_bid"
+                  }
+                },
+                "Property": "Evaluated Price"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ]
+      }
+    },
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Bid comparison (sorted by evaluated price)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

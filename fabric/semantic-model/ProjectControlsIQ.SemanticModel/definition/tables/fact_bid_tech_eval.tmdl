@@ -1,0 +1,72 @@
+table fact_bid_tech_eval
+
+	/// TBE: count of technical requirement line items in context (used in the compliance matrix).
+	measure 'Compliance Items' = COUNTROWS(fact_bid_tech_eval)
+		formatString: #,##0
+
+	/// TBE: count of requirement line items evaluated as a deviation.
+	measure 'Deviation Items' = CALCULATE(COUNTROWS(fact_bid_tech_eval), fact_bid_tech_eval[compliance] = "Deviation")
+		formatString: #,##0
+
+	/// TBE: count of requirement line items evaluated as an exception (non-compliant).
+	measure 'Exception Items' = CALCULATE(COUNTROWS(fact_bid_tech_eval), fact_bid_tech_eval[compliance] = "Exception")
+		formatString: #,##0
+
+	column eval_id
+		dataType: string
+		sourceColumn: eval_id
+
+	column bid_id
+		dataType: string
+		isHidden
+		sourceColumn: bid_id
+
+	column rfq_id
+		dataType: string
+		isHidden
+		sourceColumn: rfq_id
+
+	column supplier_id
+		dataType: string
+		isHidden
+		sourceColumn: supplier_id
+
+	column req_id
+		dataType: string
+		isHidden
+		sourceColumn: req_id
+
+	column requirement
+		dataType: string
+		sourceColumn: requirement
+
+	column required_value
+		dataType: string
+		sourceColumn: required_value
+
+	column quoted_value
+		dataType: string
+		sourceColumn: quoted_value
+
+	column compliance
+		dataType: string
+		sourceColumn: compliance
+
+	column is_mandatory
+		dataType: boolean
+		sourceColumn: is_mandatory
+
+	column comment
+		dataType: string
+		sourceColumn: comment
+
+	column origin_system
+		dataType: string
+		sourceColumn: origin_system
+
+	partition fact_bid_tech_eval = entity
+		mode: directLake
+		source
+			entityName: fact_bid_tech_eval
+			schemaName: silver
+			expressionSource: DL_ProjectControlsIQ

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.4.0/schema.json",
+  "name": "cardEvalDelta",
+  "position": {
+    "x": 964,
+    "y": 624,
+    "z": 0,
+    "width": 300,
+    "height": 80,
+    "tabOrder": 14
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_bid"
+                    }
+                  },
+                  "Property": "Evaluated vs Lowest Quote"
+                }
+              },
+              "queryRef": "fact_bid.Evaluated vs Lowest Quote",
+              "nativeQueryRef": "Evaluated vs Lowest Quote"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Evaluated premium vs lowest quote'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

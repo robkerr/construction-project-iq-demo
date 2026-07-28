@@ -1,0 +1,96 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.4.0/schema.json",
+  "name": "complianceMatrix",
+  "position": {
+    "x": 648,
+    "y": 408,
+    "z": 0,
+    "width": 616,
+    "height": 210,
+    "tabOrder": 12
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_tech_requirement"
+                    }
+                  },
+                  "Property": "requirement"
+                }
+              },
+              "queryRef": "dim_tech_requirement.requirement",
+              "nativeQueryRef": "requirement"
+            }
+          ]
+        },
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_bid_tech_eval"
+                    }
+                  },
+                  "Property": "supplier_id"
+                }
+              },
+              "queryRef": "fact_bid_tech_eval.supplier_id",
+              "nativeQueryRef": "supplier_id"
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_bid_tech_eval"
+                    }
+                  },
+                  "Property": "Compliance Items"
+                }
+              },
+              "queryRef": "fact_bid_tech_eval.Compliance Items",
+              "nativeQueryRef": "Compliance Items"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Technical compliance matrix (requirement x supplier)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

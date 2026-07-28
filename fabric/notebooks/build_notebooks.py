@@ -17,6 +17,7 @@ HERE = Path(__file__).resolve().parent
 TABLES = [
     "dim_project", "dim_wbs", "fact_schedule_activity", "sap_fi_cost",
     "sap_mm_po", "sap_supplier", "fact_engineering_change", "ext_disruption_signal",
+    "dim_rfq", "dim_tech_requirement", "fact_bid", "fact_bid_tech_eval",
 ]
 
 
@@ -99,10 +100,13 @@ def nb_03_silver_gold() -> dict:
     return notebook([
         md("""
 # 03 - Build Silver + Gold
-**Silver:** light typing (dates/booleans) and pass-through of the eight bronze tables.
+**Silver:** light typing (dates/booleans) and pass-through of the twelve bronze tables.
 **Gold:** the cross-system model. `gold.project_schedule_risk` fuses **non-SAP** schedule
 signals with **SAP** cost + procurement signals into one governed, per-project risk table —
-the single load-bearing join no source system does alone. Curated driver tables support drill-down.
+the single load-bearing join no source system does alone. `gold.bid_evaluation` +
+`gold.rfq_award_recommendation` support the **Technical / Commercial Bid Evaluation** use cases,
+fusing the non-SAP technical compliance with the SAP commercial evaluation into an award
+recommendation. Curated driver tables support drill-down.
 """),
         code("""
 from pyspark.sql import functions as F
@@ -117,9 +121,12 @@ date_cols = {
     'sap_mm_po': ['promised_date', 'revised_date'],
     'fact_engineering_change': ['issued_date'],
     'ext_disruption_signal': ['event_date'],
+    'dim_rfq': ['issued_date', 'bids_due_date', 'required_on_site'],
+    'fact_bid': ['bid_date'],
 }
 tables = ['dim_project', 'dim_wbs', 'fact_schedule_activity', 'sap_fi_cost',
-          'sap_mm_po', 'sap_supplier', 'fact_engineering_change', 'ext_disruption_signal']
+          'sap_mm_po', 'sap_supplier', 'fact_engineering_change', 'ext_disruption_signal',
+          'dim_rfq', 'dim_tech_requirement', 'fact_bid', 'fact_bid_tech_eval']
 for t in tables:
     df = spark.table(f'bronze.{t}')
     for c in date_cols.get(t, []):
@@ -230,6 +237,61 @@ JOIN silver.sap_supplier s ON po.supplier_id = s.supplier_id
 WHERE po.status = 'Late'
 ''')
 print('gold.at_risk_activities and gold.late_procurement built.')
+"""),
+        code("""
+# ---- GOLD: bid-evaluation tables for the TBE/CBE use cases (dashboard + agent) ----
+# gold.bid_evaluation: one row per supplier bid, joined to its RFQ / project / supplier, carrying
+# the technical (TBE) roll-up and the commercial (CBE) evaluated price + award recommendation.
+spark.sql('''
+CREATE OR REPLACE TABLE gold.bid_evaluation USING delta AS
+SELECT
+    b.bid_id, b.rfq_id, b.project_id, p.project_name, p.client,
+    r.equipment_tag, r.material_category, r.equipment_desc,
+    r.engineers_estimate, r.required_on_site, r.bids_due_date,
+    b.supplier_id, b.supplier_name, s.country AS supplier_country, s.risk_rating AS supplier_risk,
+    b.quoted_price, b.spares_price, b.freight_price,
+    (b.quoted_price + b.spares_price + b.freight_price) AS total_quoted,
+    b.delivery_weeks, b.weeks_late, b.payment_advance_pct, b.warranty_months, b.incoterms,
+    b.technical_score, b.tech_compliant_count, b.tech_deviation_count, b.tech_exception_count,
+    b.tbe_status, b.is_technically_qualified,
+    b.commercial_deviation_count, b.price_loading, b.evaluated_price, b.cbe_rank,
+    b.award_status, b.recommended
+FROM silver.fact_bid b
+JOIN silver.dim_rfq r      ON b.rfq_id = r.rfq_id
+JOIN silver.dim_project p  ON b.project_id = p.project_id
+JOIN silver.sap_supplier s ON b.supplier_id = s.supplier_id
+''')
+
+# gold.rfq_award_recommendation: one row per RFQ contrasting the lowest quoted bid with the
+# recommended (lowest evaluated, technically qualified) award — the load-bearing CBE insight.
+spark.sql('''
+CREATE OR REPLACE TABLE gold.rfq_award_recommendation USING delta AS
+WITH lowest_quote AS (
+    SELECT rfq_id, supplier_name AS lowest_quote_supplier, quoted_price AS lowest_quoted_price,
+           is_technically_qualified AS lowest_quote_qualified,
+           ROW_NUMBER() OVER (PARTITION BY rfq_id ORDER BY quoted_price ASC) AS rn
+    FROM silver.fact_bid
+),
+recommended AS (
+    SELECT rfq_id, supplier_name AS recommended_supplier, quoted_price AS recommended_quoted,
+           evaluated_price AS recommended_evaluated, technical_score AS recommended_tech_score
+    FROM silver.fact_bid WHERE recommended = true
+)
+SELECT r.rfq_id, r.project_id, r.equipment_tag, r.material_category, r.bidder_count,
+       lq.lowest_quote_supplier, lq.lowest_quoted_price, lq.lowest_quote_qualified,
+       rc.recommended_supplier, rc.recommended_quoted, rc.recommended_evaluated, rc.recommended_tech_score,
+       (rc.recommended_evaluated - lq.lowest_quoted_price) AS evaluated_vs_lowest_quote
+FROM silver.dim_rfq r
+LEFT JOIN (SELECT * FROM lowest_quote WHERE rn = 1) lq ON r.rfq_id = lq.rfq_id
+LEFT JOIN recommended rc ON r.rfq_id = rc.rfq_id
+''')
+
+print('gold.bid_evaluation and gold.rfq_award_recommendation built. Hero RFQ-0001:')
+spark.sql('''
+SELECT supplier_name, ROUND(quoted_price,0) AS quoted, ROUND(evaluated_price,0) AS evaluated,
+       technical_score, tbe_status, award_status
+FROM gold.bid_evaluation WHERE rfq_id = 'RFQ-0001' ORDER BY evaluated_price
+''').show(truncate=False)
 print('Gold layer complete.')
 """),
     ])

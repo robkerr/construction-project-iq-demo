@@ -38,6 +38,12 @@ FK_CHECKS = [
     ("sap_mm_po", "wbs_id", "dim_wbs", "wbs_id"),
     ("sap_mm_po", "supplier_id", "sap_supplier", "supplier_id"),
     ("fact_engineering_change", "wbs_id", "dim_wbs", "wbs_id"),
+    ("dim_rfq", "project_id", "dim_project", "project_id"),
+    ("dim_rfq", "wbs_id", "dim_wbs", "wbs_id"),
+    ("fact_bid", "rfq_id", "dim_rfq", "rfq_id"),
+    ("fact_bid", "supplier_id", "sap_supplier", "supplier_id"),
+    ("fact_bid_tech_eval", "bid_id", "fact_bid", "bid_id"),
+    ("fact_bid_tech_eval", "req_id", "dim_tech_requirement", "req_id"),
 ]
 
 
@@ -128,6 +134,38 @@ def write_frames(frames: dict, out_dir: Path, formats) -> dict:
     return counts
 
 
+def bid_eval_summary(ctx) -> dict:
+    """Verify the hero RFQ-0001 story: recommended bid is technically qualified and is NOT the
+    lowest quoted (the lowest quoted is disqualified) — the load-bearing TBE/CBE insight."""
+    bids = ctx.get("fact_bid")
+    hero = bids[bids["rfq_id"] == "RFQ-0001"].copy()
+    out = {"ok": False, "detail": ""}
+    if hero.empty:
+        out["detail"] = "RFQ-0001 has no bids"
+        return out
+    lowest_quoted = hero.sort_values("quoted_price").iloc[0]
+    rec = hero[hero["recommended"]]
+    if rec.empty:
+        out["detail"] = "no recommended bid on RFQ-0001"
+        return out
+    rec = rec.iloc[0]
+    lowest_qualified_eval = (hero[hero["is_technically_qualified"]]
+                             .sort_values("evaluated_price").iloc[0])
+    out["lowest_quoted_supplier"] = lowest_quoted["supplier_name"]
+    out["lowest_quoted_price"] = float(lowest_quoted["quoted_price"])
+    out["lowest_quoted_qualified"] = bool(lowest_quoted["is_technically_qualified"])
+    out["recommended_supplier"] = rec["supplier_name"]
+    out["recommended_quoted"] = float(rec["quoted_price"])
+    out["recommended_evaluated"] = float(rec["evaluated_price"])
+    out["ok"] = (
+        bool(rec["is_technically_qualified"])                      # recommendation is qualified
+        and rec["bid_id"] == lowest_qualified_eval["bid_id"]       # = lowest evaluated qualified bid
+        and not bool(lowest_quoted["is_technically_qualified"])    # cheapest is disqualified
+        and rec["quoted_price"] > lowest_quoted["quoted_price"]    # and not the cheapest quote
+    )
+    return out
+
+
 def main(argv=None) -> int:
     args = parse_args(argv)
     cfg = load_config(args.config, args.seed)
@@ -154,6 +192,32 @@ def main(argv=None) -> int:
 
     counts = write_frames(ctx.frames, args.out, args.formats)
 
+    # ---- Hero bid-evaluation facts (so docs_gen quotes the same numbers) ----
+    bids_all = ctx.get("fact_bid")
+    hero_bids = bids_all[bids_all["rfq_id"] == "RFQ-0001"]
+    hero_rfq = ctx.get("dim_rfq")
+    hero_rfq_row = hero_rfq[hero_rfq["rfq_id"] == "RFQ-0001"].iloc[0]
+    hero_bid_eval = {
+        "rfq_id": "RFQ-0001",
+        "project_id": str(hero_rfq_row["project_id"]),
+        "equipment_tag": str(hero_rfq_row["equipment_tag"]),
+        "material_category": str(hero_rfq_row["material_category"]),
+        "equipment_desc": str(hero_rfq_row["equipment_desc"]),
+        "engineers_estimate": float(hero_rfq_row["engineers_estimate"]),
+        "required_on_site": str(hero_rfq_row["required_on_site"]),
+        "bids_due_date": str(hero_rfq_row["bids_due_date"]),
+        "bids": [
+            {k: (float(b[k]) if k in ("quoted_price", "evaluated_price", "technical_score") else
+                 int(b[k]) if k in ("delivery_weeks", "warranty_months", "payment_advance_pct",
+                                    "tech_deviation_count", "tech_exception_count") else str(b[k]))
+             for k in ("supplier_name", "supplier_id", "quoted_price", "evaluated_price",
+                       "technical_score", "tbe_status", "award_status", "delivery_weeks",
+                       "warranty_months", "payment_advance_pct", "incoterms",
+                       "tech_deviation_count", "tech_exception_count")}
+            for _, b in hero_bids.sort_values("evaluated_price").iterrows()
+        ],
+    }
+
     # ---- Manifest ----
     origin = {name: (df["origin_system"].iloc[0] if "origin_system" in df.columns else "n/a")
               for name, df in ctx.frames.items()}
@@ -166,6 +230,7 @@ def main(argv=None) -> int:
         "origin_system": origin,
         "total_rows": int(sum(counts.values())),
         "injected_projects": injections,
+        "hero_bid_eval": hero_bid_eval,
     }
     with open(args.out / "manifest.json", "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)
@@ -192,6 +257,28 @@ def main(argv=None) -> int:
     else:
         print(f"\nACCEPTANCE FAILED: expected {hero_id} #1 but got {top['project_id']}.")
         return 3
+
+    # ---- Bid-evaluation (TBE/CBE) summary + acceptance ----
+    bids = ctx.get("fact_bid")
+    rfqs = ctx.get("dim_rfq")
+    print(f"\nBid evaluation: {len(rfqs)} RFQs, {len(bids)} bids across "
+          f"{bids['material_category'].nunique()} material categories.")
+    be = bid_eval_summary(ctx)
+    print("Hero RFQ-0001 (Project Falcon 230 kV transformer):")
+    hero_bids = bids[bids["rfq_id"] == "RFQ-0001"].sort_values("evaluated_price")
+    print("  supplier                       quoted$     evaluated$  techScore  status                     award")
+    for _, b in hero_bids.iterrows():
+        print(f"  {b['supplier_name'][:28]:<28}  {b['quoted_price']:>10,.0f}  "
+              f"{b['evaluated_price']:>11,.0f}  {b['technical_score']:>8}  "
+              f"{b['tbe_status']:<26}  {b['award_status']}")
+    if be["ok"]:
+        print(f"\nACCEPTANCE OK: lowest quote (${be['lowest_quoted_price']:,.0f}, "
+              f"{be['lowest_quoted_supplier']}) is DISQUALIFIED; recommended award is "
+              f"{be['recommended_supplier']} at ${be['recommended_quoted']:,.0f} "
+              f"(${be['recommended_evaluated']:,.0f} evaluated) — lowest evaluated qualified bid.")
+    else:
+        print(f"\nACCEPTANCE FAILED (bid eval): {be.get('detail', be)}")
+        return 4
 
     print(f"\nOutput written to: {args.out.resolve()}")
     print(f"Manifest: {(args.out / 'manifest.json').resolve()}")

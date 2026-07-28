@@ -17,6 +17,8 @@
 param(
     [string]$ReportName = 'ProjectControlsIQ',
     [string]$DefinitionRoot,
+    [string]$ReportIdKey = 'REPORT_ID',
+    [string]$ReportNameKey = 'REPORT_NAME',
     [ValidateSet('auto', 'user', 'spn')]
     [string]$Auth = 'auto'
 )
@@ -73,8 +75,8 @@ else {
 }
 
 if (-not $reportId) { throw "Deployment reported success but the report could not be found by name." }
-Set-DotEnvValue -Key 'REPORT_ID' -Value $reportId
-Set-DotEnvValue -Key 'REPORT_NAME' -Value $ReportName
+Set-DotEnvValue -Key $ReportIdKey -Value $reportId
+Set-DotEnvValue -Key $ReportNameKey -Value $ReportName
 
 Write-Host ''
 Write-Host "Report deployed. id=$reportId" -ForegroundColor Green

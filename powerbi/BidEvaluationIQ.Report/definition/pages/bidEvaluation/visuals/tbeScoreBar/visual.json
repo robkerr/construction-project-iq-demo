@@ -1,0 +1,95 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.4.0/schema.json",
+  "name": "tbeScoreBar",
+  "position": {
+    "x": 16,
+    "y": 168,
+    "z": 0,
+    "width": 616,
+    "height": 232,
+    "tabOrder": 9
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_bid"
+                    }
+                  },
+                  "Property": "supplier_name"
+                }
+              },
+              "queryRef": "fact_bid.supplier_name",
+              "nativeQueryRef": "supplier_name"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_bid"
+                    }
+                  },
+                  "Property": "Avg Technical Score"
+                }
+              },
+              "queryRef": "fact_bid.Avg Technical Score",
+              "nativeQueryRef": "Avg Technical Score"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "fact_bid"
+                  }
+                },
+                "Property": "Avg Technical Score"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'TBE \u00b7 Technical Score by supplier'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,41 @@
+table dim_tech_requirement
+
+	column req_id
+		dataType: string
+		sourceColumn: req_id
+
+	column material_category
+		dataType: string
+		sourceColumn: material_category
+
+	column requirement
+		dataType: string
+		sourceColumn: requirement
+
+	column required_value
+		dataType: string
+		sourceColumn: required_value
+
+	column unit
+		dataType: string
+		sourceColumn: unit
+
+	column weight
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: weight
+
+	column is_mandatory
+		dataType: boolean
+		sourceColumn: is_mandatory
+
+	column origin_system
+		dataType: string
+		sourceColumn: origin_system
+
+	partition dim_tech_requirement = entity
+		mode: directLake
+		source
+			entityName: dim_tech_requirement
+			schemaName: silver
+			expressionSource: DL_ProjectControlsIQ

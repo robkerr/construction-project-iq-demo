@@ -1,15 +1,20 @@
 # Project Controls IQ — "Art of the Possible" Demo
 
 A self-contained, **100% synthetic** demo showing how Microsoft Fabric + Azure AI Foundry + M365
-Copilot turn siloed **SAP** (cost, procurement) and **non-SAP** (schedule, engineering change) data
-into one governed answer: **which project is most at risk, why, and here's the Monthly Progress
-Report.**
+Copilot turn siloed **SAP** (cost, procurement) and **non-SAP** (schedule, engineering change,
+technical evaluation) data into one governed answer. It tells **two** cross-system stories:
+
+1. **Portfolio schedule risk → MPR** — *which project is most at risk, why, and here's the Monthly
+   Progress Report.*
+2. **Bid evaluation (TBE → CBE)** — *evaluate the supplier bids for tagged equipment technically and
+   commercially, and recommend an award — where the cheapest quote is **not** the best value.*
 
 > **Generic branding.** The fictional EPC contractor is **Contoso Engineering & Construction**.
 > Clients (Northwind Energy, Fabrikam, Adventure Works, …) and projects (Falcon, Kestrel, Osprey, …)
 > are fictional. **No customer-specific data or names appear anywhere** — safe to show to anyone.
 
 ## The story
+### Story 1 — Portfolio schedule risk
 Twelve capital projects. One — **Project Falcon (PRJ-001)** — is the clear #1 schedule risk, and the
 reason spans **both** systems on the **same** work package:
 - **SAP** — a late long-lead **main power transformer** PO (PO-00512) and a ~$1M forecast overrun.
@@ -19,15 +24,30 @@ reason spans **both** systems on the **same** work package:
 Neither system alone tells you Falcon is in trouble. Fused, it's obvious — and the agent writes the
 MPR that says so.
 
+### Story 2 — Bid evaluation (Technical + Commercial)
+Procurement runs competitive RFQs for tagged equipment in three material categories (Heat Exchanger,
+Centrifugal Pump, Electrical Equipment). The hero — **RFQ-0001, the Falcon 230 kV main power
+transformer (tag ET-1001)** — draws four bids. The award decision spans **both** systems:
+- **non-SAP (Engineering)** — the **Technical Bid Evaluation (TBE)**: a weighted compliance score
+  against the datasheet requirements. The **cheapest** bidder (a **high-risk** supplier) is
+  **disqualified** on a mandatory requirement.
+- **SAP (Procurement)** — the **Commercial Bid Evaluation (CBE)**: quoted prices normalized to an
+  **evaluated price** (spares, freight, schedule-delay, financing, warranty/deviation loadings). The
+  award goes to the lowest **evaluated** price among *technically qualified* bidders — not the
+  lowest raw quote.
+
+Tie-back: the disqualified cheapest bidder is the **same high-risk supplier** whose late transformer
+PO drives Project Falcon's schedule risk in Story 1.
+
 ## Architecture / phases
 | Phase | Folder | What |
 |---|---|---|
-| 1. Synthetic data | `data_gen/` | SAP + non-SAP tables (seed 42), deterministic at-risk injection, docs corpus |
-| 2. Unify in OneLake | `fabric/` | PowerShell provisioning + medallion notebooks → Lakehouse `gold.project_schedule_risk` |
-| 3. Semantic model | `fabric/measures.dax`, `fabric/semantic-model/` | shared measures incl. fused **Schedule Risk Score** |
-| 4. Knowledge index | `search/`, `docs/` | Azure AI Search over standards, policies, prior MPRs |
-| 5. Dashboard | `powerbi/` | "Portfolio Schedule Risk" page spec |
-| 6. Agent | `agent/` | Foundry + M365 Copilot assistant: generate MPR, draft change notice |
+| 1. Synthetic data | `data_gen/` | SAP + non-SAP tables (seed 42), at-risk injection, **RFQ/bid tables**, docs corpus |
+| 2. Unify in OneLake | `fabric/` | PowerShell provisioning + medallion notebooks → Lakehouse `gold.project_schedule_risk`, **`gold.bid_evaluation`, `gold.rfq_award_recommendation`** |
+| 3. Semantic model | `fabric/measures.dax`, `fabric/semantic-model/` | shared measures incl. fused **Schedule Risk Score** and **bid TBE/CBE measures** |
+| 4. Knowledge index | `search/`, `docs/` | Azure AI Search over standards, policies, prior MPRs, **TBE/CBE standards + supplier quotations** |
+| 5. Dashboard | `powerbi/` | "Portfolio Schedule Risk" **and "Bid Evaluation (TBE/CBE)"** report pages |
+| 6. Agent | `agent/` | Foundry + M365 Copilot assistant: MPR, change notice, **generate TBE, generate CBE** |
 
 ## Quick start
 ```powershell
@@ -151,31 +171,44 @@ into the index via `SearchClient.upload_documents()` — no separate Azure Stora
 3. ✅ Verify: the run prints `reading corpus from OneLake ...` then `uploaded 6/6 documents`; a
    `search("Falcon schedule risk")` returns the schedule-risk policy and both prior Falcon MPRs.
 
-### Phase 5 — Power BI dashboard (🤖 automated scaffold + 🧑 polish)
-A single-page "Portfolio Schedule Risk" report (PBIR) bound `byConnection` to the Phase 3 model.
+### Phase 5 — Power BI dashboards (🤖 automated scaffold + 🧑 polish)
+Two single-page reports (PBIR) bound `byConnection` to the Phase 3 model.
 Spec: [`powerbi/schedule_risk_dashboard.md`](powerbi/schedule_risk_dashboard.md).
 
 ```powershell
+# Story 1 — Portfolio Schedule Risk
 ./.venv/Scripts/python.exe powerbi/build_report.py     # generates ProjectControlsIQ.Report from SEMANTIC_MODEL_ID
 ./scripts/31_deploy_report.ps1 -Auth user              # create/update report, writes REPORT_ID
+
+# Story 2 — Bid Evaluation (TBE / CBE)
+./.venv/Scripts/python.exe powerbi/build_bid_report.py # generates BidEvaluationIQ.Report from SEMANTIC_MODEL_ID
+./scripts/31_deploy_report.ps1 -Auth user `
+    -ReportName BidEvaluationIQ -DefinitionRoot powerbi/BidEvaluationIQ.Report `
+    -ReportIdKey BID_REPORT_ID -ReportNameKey BID_REPORT_NAME
 # open: https://app.fabric.microsoft.com/groups/<FABRIC_WORKSPACE_ID>/reports/<REPORT_ID>
 ```
 
 - `build_report.py` lays out the KPI band (4 cards), the hero risk-ranked bar, 8 cross-system driver
   tiles (4 non-SAP schedule · 4 SAP cost/procurement), the WBS detail table, and 4 slicers — every
   binding maps to a real model measure/column.
-- Report/visual authoring is **not** exposed by the Fabric modeling tooling, so this is a best-effort,
-  API-deployable scaffold. 🧑 Polish in the service: (1) color the hero bar by risk band, and (2) add a
-  **Risk Band** slicer — `Risk Band` is a *measure*, so a slicer needs a Risk Band **column** (a
-  calculated column can disable Direct Lake; prefer a report-side approach or a bin).
+- `build_bid_report.py` lays out a bid-evaluation page: KPI band (bids / qualified / lowest quote /
+  recommended evaluated), a **TBE** technical-score bar, a **CBE** quoted-vs-evaluated price bar, the
+  bid comparison table (sorted by evaluated price), the requirement × supplier compliance matrix, the
+  recommended-supplier card, and RFQ / category / project / supplier-risk slicers.
+- Report/visual authoring is **not** exposed by the Fabric modeling tooling, so these are best-effort,
+  API-deployable scaffolds. 🧑 Polish in the service: (1) color the hero risk bar by risk band, (2)
+  add a **Risk Band** slicer (`Risk Band` is a *measure*, so a slicer needs a Risk Band **column**),
+  and (3) on the bid page, conditionally color the bid table by `tbe_status` / `award_status`.
 
 ### Phase 6 — Agents (🧑 manual, Fabric + Foundry + M365)
 1. **Fabric Data Agent** over the `ProjectControlsIQ` model; grab its **MCP endpoint**
    (`DATA_AGENT_MCP_ENDPOINT`, ends in `/agent`). Ground it with [`agent/grounding.md`](agent/grounding.md)
    and [`agent/system_prompt.md`](agent/system_prompt.md).
-2. **Azure AI Foundry agent** (`gpt-4.1`) wiring the Data Agent + AI Search tools, with the two
-   actions in [`agent/actions/`](agent/actions/).
-3. **M365 Copilot** declarative agent per [`agent/m365_copilot.md`](agent/m365_copilot.md).
+2. **Azure AI Foundry agent** (`gpt-4.1`) wiring the Data Agent + AI Search tools, with the four
+   actions in [`agent/actions/`](agent/actions/): `generate_mpr`, `draft_change_notice`,
+   `generate_tbe`, `generate_cbe`.
+3. **M365 Copilot** declarative agent per [`agent/m365_copilot.md`](agent/m365_copilot.md) — includes
+   conversation starters and the two-story demo flow (MPR + bid evaluation).
 
 ### Troubleshooting notes (lessons from this build)
 - **Schema-enabled Lakehouse + CTAS + TEMP VIEW = `TABLE_OR_VIEW_NOT_FOUND`.** A
@@ -198,12 +231,12 @@ Spec: [`powerbi/schedule_risk_dashboard.md`](powerbi/schedule_risk_dashboard.md)
 
 ## Repo layout
 ```
-data_gen/     synthetic data + docs generators (seed 42, reproducible)
+data_gen/     synthetic data + docs generators (seed 42, reproducible; incl. bid_evaluation)
 fabric/       Common.psm1 + PS scripts, notebooks, measures.dax, semantic-model spec, load doc
 search/       AI Search index spec + build_index.py
 docs/         generated unstructured corpus (committed for review; regen with docs_gen.py)
-powerbi/      dashboard spec
-agent/        grounding, system prompt, M365 surface, action specs
+powerbi/      dashboard specs + build_report.py (schedule risk) + build_bid_report.py (TBE/CBE)
+agent/        grounding, system prompt, M365 surface, action specs (MPR, change notice, TBE, CBE)
 out/          generated parquet/csv/manifest (git-ignored)
 .env.example  all keys (Fabric, SPN, AI Search, Foundry, M365) — generic names
 ```

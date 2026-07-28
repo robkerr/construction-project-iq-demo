@@ -13,3 +13,7 @@ ref table fact_engineering_change
 ref table sap_fi_cost
 ref table sap_mm_po
 ref table sap_supplier
+ref table dim_rfq
+ref table dim_tech_requirement
+ref table fact_bid
+ref table fact_bid_tech_eval

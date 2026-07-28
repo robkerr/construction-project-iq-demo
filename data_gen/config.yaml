@@ -34,3 +34,19 @@ baseline_max_minor_slip_days: 4
 
 # Share of POs flagged long-lead (transformers, vessels, large-bore valves, etc.).
 long_lead_rate: 0.18
+
+# ---------------------------------------------------------------------------
+# Bid evaluation (Technical Bid Evaluation / Commercial Bid Evaluation) use cases.
+# Generates RFQs (inquiries) for tagged equipment in three material categories, the
+# supplier bids against each, the per-requirement technical evaluation (TBE), and the
+# normalized commercial evaluation (CBE) with an award recommendation. A deterministic
+# hero RFQ on Project Falcon proves the "lowest quoted is not lowest evaluated" story.
+bid_eval:
+  # Non-hero RFQs distributed across the rest of the portfolio (hero Falcon RFQs are added
+  # on top of these deterministically).
+  rfq_count: 9
+  bidders_per_rfq_min: 3
+  bidders_per_rfq_max: 5
+  # Schedule cost applied per week a bid's delivery lands past the required-on-site date
+  # (used to normalize late deliveries into the CBE evaluated price).
+  schedule_cost_per_week: 45000

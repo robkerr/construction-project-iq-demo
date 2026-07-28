@@ -96,3 +96,39 @@ CALCULATE (
 Total Forecast Overrun = [Forecast Overrun]
 Total Late Long-Lead POs = [Late Long-Lead POs]
 Worst Min Float (days) = MIN ( fact_schedule_activity[total_float_days] )
+
+
+// ============================================================================
+// Bid Evaluation (TBE / CBE) — procurement use cases
+//   Tables: dim_rfq, dim_tech_requirement, fact_bid, fact_bid_tech_eval
+//   TBE (technical) = Engineering / non-SAP ; CBE (commercial) = Procurement / SAP
+// ============================================================================
+
+// ---- RFQ (bid package) ----------------------------------------------------
+RFQ Count = DISTINCTCOUNT ( dim_rfq[rfq_id] )
+Engineers Estimate = SUM ( dim_rfq[engineers_estimate] )
+
+// ---- Technical Bid Evaluation (TBE) ---------------------------------------
+Bid Count = COUNTROWS ( fact_bid )
+Qualified Bids = CALCULATE ( COUNTROWS ( fact_bid ), fact_bid[is_technically_qualified] = TRUE () )
+Disqualified Bids = CALCULATE ( COUNTROWS ( fact_bid ), fact_bid[is_technically_qualified] = FALSE () )
+Avg Technical Score = AVERAGE ( fact_bid[technical_score] )
+Technical Deviations = SUM ( fact_bid[tech_deviation_count] )
+Compliance Items = COUNTROWS ( fact_bid_tech_eval )
+Deviation Items = CALCULATE ( COUNTROWS ( fact_bid_tech_eval ), fact_bid_tech_eval[compliance] = "Deviation" )
+Exception Items = CALCULATE ( COUNTROWS ( fact_bid_tech_eval ), fact_bid_tech_eval[compliance] = "Exception" )
+
+// ---- Commercial Bid Evaluation (CBE) --------------------------------------
+Quoted Price = SUM ( fact_bid[quoted_price] )
+Evaluated Price = SUM ( fact_bid[evaluated_price] )
+Lowest Quoted Price = MIN ( fact_bid[quoted_price] )
+Lowest Evaluated Price =
+    CALCULATE ( MIN ( fact_bid[evaluated_price] ), fact_bid[is_technically_qualified] = TRUE () )
+Recommended Evaluated Price =
+    CALCULATE ( SUM ( fact_bid[evaluated_price] ), fact_bid[recommended] = TRUE () )
+Recommended Quoted Price =
+    CALCULATE ( SUM ( fact_bid[quoted_price] ), fact_bid[recommended] = TRUE () )
+Recommended Supplier =
+    CALCULATE ( SELECTEDVALUE ( fact_bid[supplier_name] ), fact_bid[recommended] = TRUE () )
+// CBE headline: the premium paid for the compliant best-value bid over the cheapest raw quote.
+Evaluated vs Lowest Quote = [Recommended Evaluated Price] - [Lowest Quoted Price]

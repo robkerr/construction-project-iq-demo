@@ -34,5 +34,53 @@
     "doc_type": "prior_report",
     "project_id": "PRJ-001",
     "path": "prior_reports/PRJ-001_MPR_2026-06.md"
+  },
+  {
+    "title": "Technical Bid Evaluation (TBE) Standard",
+    "doc_type": "standard",
+    "project_id": null,
+    "path": "standards/tbe_evaluation_standard.md"
+  },
+  {
+    "title": "Commercial Bid Evaluation (CBE) Standard",
+    "doc_type": "standard",
+    "project_id": null,
+    "path": "standards/cbe_evaluation_standard.md"
+  },
+  {
+    "title": "TBE Output Template",
+    "doc_type": "spec",
+    "project_id": null,
+    "path": "specs/tbe_output_template.md"
+  },
+  {
+    "title": "CBE Output Template",
+    "doc_type": "spec",
+    "project_id": null,
+    "path": "specs/cbe_output_template.md"
+  },
+  {
+    "title": "RFQ RFQ-0001 Technical Datasheet (ET-1001)",
+    "doc_type": "spec",
+    "project_id": "PRJ-001",
+    "path": "specs/RFQ-0001_datasheet.md"
+  },
+  {
+    "title": "Henderson Systems Quotation \u2014 RFQ-0001",
+    "doc_type": "supplier_bid",
+    "project_id": "PRJ-001",
+    "path": "bids/RFQ-0001_SUP-009_quotation.md"
+  },
+  {
+    "title": "Johnson Steel Works Quotation \u2014 RFQ-0001",
+    "doc_type": "supplier_bid",
+    "project_id": "PRJ-001",
+    "path": "bids/RFQ-0001_SUP-002_quotation.md"
+  },
+  {
+    "title": "Walker Manufacturing Quotation \u2014 RFQ-0001",
+    "doc_type": "supplier_bid",
+    "project_id": "PRJ-001",
+    "path": "bids/RFQ-0001_SUP-004_quotation.md"
   }
 ]

@@ -11,6 +11,7 @@ from . import (
     cost,
     procurement,
     engineering_change,
+    bid_evaluation,
     external,
 )
 
@@ -22,6 +23,7 @@ PIPELINE = [
     ("cost", cost),                        # SAP finance cost snapshots
     ("procurement", procurement),          # SAP purchase orders
     ("engineering_change", engineering_change),  # non-SAP EC log
+    ("bid_evaluation", bid_evaluation),    # SAP sourcing RFQ/bids + non-SAP technical eval
     ("external", external),                # external disruption signals
 ]
 
