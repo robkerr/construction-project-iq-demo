@@ -3,7 +3,7 @@
   "version": "4.0",
   "datasetReference": {
     "byConnection": {
-      "connectionString": "semanticmodelid=0692651d-0893-47f7-b923-1c3524548987"
+      "connectionString": "Data Source=\"powerbi://api.powerbi.com/v1.0/myorg/EPC Demo\";initial catalog=ProjectControlsIQ;access mode=readonly;integrated security=ClaimsToken;semanticmodelid=0692651d-0893-47f7-b923-1c3524548987"
     }
   }
 }

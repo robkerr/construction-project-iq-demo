@@ -213,10 +213,14 @@ governed model and measures the Foundry/Copilot agents use. The report pages are
 # then open powerbi/EPCDemo.pbip in Power BI Desktop (sign in to Power BI with workspace access)
 ```
 
-- **Connection** = `EPCDemo.Report/definition.pbir` → `byConnection` with
-  `semanticmodelid=<SEMANTIC_MODEL_ID>`. Opening the `.pbip` connects live to the workspace model
-  (Desktop opens the report in *live-connect* mode; the model is edited in the workspace / via the
-  skills, not in this Desktop session). To repoint to a different model, change that one id.
+- **Connection** = `EPCDemo.Report/definition.pbir` → `byConnection`. Its `connectionString` uses the
+  **full open-in-Desktop form** — `Data Source="powerbi://api.powerbi.com/v1.0/myorg/<WorkspaceName>";
+  initial catalog=<ModelName>;access mode=readonly;integrated security=ClaimsToken;semanticmodelid=<ModelId>`.
+  ⚠️ The bare shorthand `semanticmodelid=<id>` is valid **only for Fabric REST deployment**; Power BI
+  Desktop rejects it with *"Non-empty assertion failure: serverName"* because it lacks the XMLA server.
+  Opening the `.pbip` connects live to the workspace model (Desktop opens the report in *live-connect*
+  mode; the model is edited in the workspace / via the skills, not in this Desktop session). To repoint
+  to a different model, change the workspace name, model name, and id.
 - **Model edits when live-connected** are done on the *deployed* model: edit
   `fabric/semantic-model/build_semantic_model.py` and redeploy with
   `./scripts/30_deploy_semantic_model.ps1`, or use the `semantic-model-authoring` skill
