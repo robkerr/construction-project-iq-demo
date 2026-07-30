@@ -144,6 +144,9 @@ def matrix(name, position, rows, cols, vals, title) -> dict:
 
 
 def slicer(name, position, entity, column, title) -> dict:
+    objs = title_objs(title)
+    # render as a dropdown so users see there are choices (list mode hides options)
+    objs["data"] = [{"properties": {"mode": {"expr": {"Literal": {"Value": "'Dropdown'"}}}}}]
     return {
         "$schema": S_VISUAL,
         "name": name,
@@ -151,7 +154,7 @@ def slicer(name, position, entity, column, title) -> dict:
         "visual": {
             "visualType": "slicer",
             "query": {"queryState": {"Values": {"projections": [proj(col(entity, column), entity, column)]}}},
-            "objects": title_objs(title),
+            "objects": objs,
             "drillFilterOtherVisuals": True,
         },
     }
@@ -281,7 +284,7 @@ def page_bid_eval() -> list[dict]:
                  "fact_bid", "supplier_name",
                  [("fact_bid", "Quoted Price"), ("fact_bid", "Evaluated Price")],
                  "CBE \u00b7 Quoted vs evaluated price by supplier",
-                 "fact_bid", "Evaluated Price", sort_dir="Ascending"))
+                 "fact_bid", "Evaluated Price", sort_dir="Descending"))
 
     # bid comparison table (bottom-left)
     v.append(table("p2BidTable", pos(24, 652, 928, 404, tab=12), [

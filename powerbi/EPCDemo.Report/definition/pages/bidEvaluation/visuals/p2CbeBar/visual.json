@@ -77,7 +77,7 @@
                 "Property": "Evaluated Price"
               }
             },
-            "direction": "Ascending"
+            "direction": "Descending"
           }
         ]
       }

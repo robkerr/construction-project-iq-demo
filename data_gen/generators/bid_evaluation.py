@@ -155,8 +155,14 @@ def _quoted_value(required: str, compliance: str) -> str:
     return "Not offered / not addressed"
 
 
-def _score_and_qualify(evals: list[dict], reqs: pd.DataFrame) -> dict:
-    """Roll a bid's per-requirement evaluation into TBE score, counts, status, qualification."""
+def _score_and_qualify(evals: list[dict], reqs: pd.DataFrame, rng=None, vary: bool = False) -> dict:
+    """Roll a bid's per-requirement evaluation into TBE score, counts, status, qualification.
+
+    When ``vary`` is set (randomly-generated, non-hero bids) each compliant/deviation line
+    gets a realistic quality band instead of a flat factor, so all-compliant bidders no
+    longer pile up at exactly 100.0. Hand-authored hero bids keep the crisp factors
+    (``vary=False``) so the RFQ-0001 narrative numbers stay exact.
+    """
     wsum = 0.0
     wscore = 0.0
     comp = dev = exc = 0
@@ -164,7 +170,13 @@ def _score_and_qualify(evals: list[dict], reqs: pd.DataFrame) -> dict:
     for e in evals:
         w = float(reqs.loc[reqs["req_id"] == e["req_id"], "weight"].iloc[0])
         wsum += w
-        wscore += w * COMPLIANCE_FACTOR[e["compliance"]]
+        factor = COMPLIANCE_FACTOR[e["compliance"]]
+        if vary and rng is not None:
+            if e["compliance"] == "Compliant":
+                factor = float(rng.uniform(0.90, 1.00))   # meets spec, with margin
+            elif e["compliance"] == "Deviation":
+                factor = float(rng.uniform(0.45, 0.72))   # normalizable shortfall
+        wscore += w * factor
         if e["compliance"] == "Compliant":
             comp += 1
         elif e["compliance"] == "Deviation":
@@ -290,7 +302,7 @@ def generate(ctx: GenContext) -> None:
                     "origin_system": "non-SAP",
                 })
                 eval_seq += 1
-            roll = _score_and_qualify(evals, cat_reqs)
+            roll = _score_and_qualify(evals, cat_reqs, rng=ctx.rng, vary=not hero)
 
             weeks = int(spec.get("weeks") or int(ctx.rng.integers(*spec["tier"]["weeks"])))
             weeks_late = max(weeks - int(round(ros_days / 7)), 0) if hero else \
