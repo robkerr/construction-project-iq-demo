@@ -1,0 +1,42 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "p0Copilot",
+  "position": {
+    "x": 1160,
+    "y": 16,
+    "z": 0,
+    "width": 736,
+    "height": 104,
+    "tabOrder": 1
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "\u26a0 Ask Copilot\n",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "One project is trending Red on schedule. Click the largest red-flagged bubble, then open the agent and ask: \u201cWhich project is most at risk right now, and why?\u201d",
+                    "textStyle": {
+                      "fontSize": "11pt"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

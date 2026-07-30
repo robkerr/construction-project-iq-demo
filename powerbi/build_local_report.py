@@ -143,6 +143,54 @@ def matrix(name, position, rows, cols, vals, title) -> dict:
     }
 
 
+def donut(name, position, cat_entity, cat_col, val_entity, val_meas, title) -> dict:
+    return {
+        "$schema": S_VISUAL,
+        "name": name,
+        "position": position,
+        "visual": {
+            "visualType": "donutChart",
+            "query": {
+                "queryState": {
+                    "Category": {"projections": [proj(col(cat_entity, cat_col), cat_entity, cat_col)]},
+                    "Y": {"projections": [proj(meas(val_entity, val_meas), val_entity, val_meas)]},
+                }
+            },
+            "objects": title_objs(title),
+            "drillFilterOtherVisuals": True,
+        },
+    }
+
+
+def map_bubble(name, position, lat, lon, size_spec, legend, tooltip_specs, title) -> dict:
+    """Classic bubble map. lat/lon = (entity, col); size_spec/legend = (entity, name);
+    tooltip_specs = list of (entity, prop, is_measure)."""
+    le, lc = lat
+    oe, oc = lon
+    se, sm = size_spec
+    ge, gc = legend
+    tips = [proj((meas(e, p) if m else col(e, p)), e, p) for (e, p, m) in tooltip_specs]
+    return {
+        "$schema": S_VISUAL,
+        "name": name,
+        "position": position,
+        "visual": {
+            "visualType": "map",
+            "query": {
+                "queryState": {
+                    "Y": {"projections": [proj(col(le, lc), le, lc)]},
+                    "X": {"projections": [proj(col(oe, oc), oe, oc)]},
+                    "Size": {"projections": [proj(meas(se, sm), se, sm)]},
+                    "Series": {"projections": [proj(col(ge, gc), ge, gc)]},
+                    "Tooltips": {"projections": tips},
+                }
+            },
+            "objects": title_objs(title),
+            "drillFilterOtherVisuals": True,
+        },
+    }
+
+
 def slicer(name, position, entity, column, title) -> dict:
     objs = title_objs(title)
     # render as a dropdown so users see there are choices (list mode hides options)
@@ -185,6 +233,52 @@ H1 = {"fontSize": "22pt", "fontWeight": "bold"}
 CALLOUT_HDR = {"fontSize": "13pt", "fontWeight": "bold"}
 CALLOUT_BODY = {"fontSize": "11pt"}
 GROUP_HDR = {"fontSize": "12pt", "fontWeight": "bold"}
+
+
+# --------------------------------------------------------------- page 0: executive overview
+def page_executive() -> list[dict]:
+    v = []
+    v.append(textbox("p0Title", pos(24, 16, 1120, 56, tab=0),
+                     [("Executive Portfolio Overview", H1)]))
+    v.append(textbox("p0Copilot", pos(1160, 16, 736, 104, tab=1), [
+        ("\u26a0 Ask Copilot\n", CALLOUT_HDR),
+        ("One project is trending Red on schedule. Click the largest red-flagged bubble, then open "
+         "the agent and ask: \u201cWhich project is most at risk right now, and why?\u201d", CALLOUT_BODY),
+    ]))
+
+    # KPI band
+    v.append(card("p0KpiActive", pos(24, 132, 456, 120, tab=2), "dim_project", "Active Projects", "Active Projects"))
+    v.append(card("p0KpiPct", pos(496, 132, 456, 120, tab=3), "dim_project", "Avg % Complete", "Avg % Complete"))
+    v.append(card("p0KpiAtRisk", pos(968, 132, 456, 120, tab=4), "dim_project", "Projects At Risk", "Projects At Risk"))
+    v.append(card("p0KpiOverrun", pos(1440, 132, 456, 120, tab=5), "dim_project", "Total Forecast Overrun", "Forecast Overrun (SAP)"))
+
+    # map (left) — global portfolio, bubble size = project financial size, color by region
+    v.append(map_bubble("p0Map", pos(24, 280, 1160, 560, tab=6),
+                        ("dim_project", "latitude"), ("dim_project", "longitude"),
+                        ("sap_fi_cost", "Earned Value"), ("dim_project", "region"),
+                        [("dim_project", "project_name", False),
+                         ("dim_project", "Risk Band", True),
+                         ("dim_project", "Schedule Risk Score", True),
+                         ("dim_project", "Avg % Complete", True)],
+                        "Portfolio map \u00b7 bubble size = earned value, color = region"))
+
+    # right column: donut (portfolio mix) + % complete bar
+    v.append(donut("p0RegionDonut", pos(1208, 280, 688, 270, tab=7),
+                   "dim_project", "region", "dim_project", "Active Projects",
+                   "Active projects by region"))
+    v.append(bar("p0PctBar", pos(1208, 566, 688, 274, tab=8),
+                 "dim_project", "project_name",
+                 [("dim_project", "Avg % Complete")],
+                 "% complete by project",
+                 "dim_project", "Avg % Complete"))
+
+    # bottom: schedule-risk bar across the full portfolio (the "spot the issue" hook)
+    v.append(bar("p0RiskBar", pos(24, 856, 1872, 200, tab=9),
+                 "dim_project", "project_name",
+                 [("dim_project", "Schedule Risk Score")],
+                 "Schedule Risk Score by project (Red = act now)",
+                 "dim_project", "Schedule Risk Score"))
+    return v
 
 
 # --------------------------------------------------------------- page 1: schedule risk
@@ -309,6 +403,7 @@ def page_bid_eval() -> list[dict]:
 
 
 PAGE_DEFS = [
+    ("executive", "Executive Portfolio Overview", page_executive),
     ("scheduleRisk", "Portfolio Schedule Risk", page_schedule_risk),
     ("bidEvaluation", "Bid Evaluation (TBE / CBE)", page_bid_eval),
 ]

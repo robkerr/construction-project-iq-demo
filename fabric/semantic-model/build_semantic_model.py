@@ -21,13 +21,17 @@ SCHEMA = "silver"
 TAB = "\t"
 
 # --------------------------------------------------------------------------- schema
-# (name, dataType, sourceColumn, hidden, summarizeBy)  -- summarizeBy None => omit
+# (name, dataType, sourceColumn, hidden, summarizeBy[, dataCategory])  -- summarizeBy/dataCategory None => omit
 COLS = {
     "dim_project": [
         ("project_id", "string", "project_id", False, None),
         ("project_name", "string", "project_name", False, None),
         ("client", "string", "client", False, None),
         ("region", "string", "region", False, None),
+        ("city", "string", "city", False, None, "City"),
+        ("country", "string", "country", False, None, "Country"),
+        ("latitude", "double", "latitude", False, "none", "Latitude"),
+        ("longitude", "double", "longitude", False, "none", "Longitude"),
         ("contract_type", "string", "contract_type", False, None),
         ("start_date", "dateTime", "start_date", False, None),
         ("planned_finish", "dateTime", "planned_finish", False, None),
@@ -261,6 +265,12 @@ MEASURES = {
         {"name": "Total Late Long-Lead POs", "fmt": "#,##0",
          "desc": "Portfolio KPI: total late long-lead POs (SAP MM).",
          "dax": "[Late Long-Lead POs]"},
+        {"name": "Active Projects", "fmt": "#,##0",
+         "desc": "Executive KPI: count of active projects in the current filter context.",
+         "dax": "CALCULATE(DISTINCTCOUNT(dim_project[project_id]), dim_project[is_active] = TRUE())"},
+        {"name": "Avg % Complete", "fmt": "0.0%",
+         "desc": "Executive KPI: average physical percent complete across projects in context.",
+         "dax": "AVERAGE(dim_project[pct_complete])"},
     ],
     "fact_bid": [
         {"name": "Bid Count", "fmt": "#,##0",
@@ -372,7 +382,9 @@ def table_tmdl(tname: str) -> str:
     out = [f"table {q(tname)}", ""]
     for m in MEASURES.get(tname, []):
         out += measure_tmdl(m)
-    for (cname, dtype, scol, hidden, sby) in COLS[tname]:
+    for col_def in COLS[tname]:
+        cname, dtype, scol, hidden, sby = col_def[0], col_def[1], col_def[2], col_def[3], col_def[4]
+        dcat = col_def[5] if len(col_def) > 5 else None
         out.append(f"{TAB}column {q(cname)}")
         out.append(f"{TAB}{TAB}dataType: {dtype}")
         if hidden:
@@ -380,6 +392,8 @@ def table_tmdl(tname: str) -> str:
         if sby:
             out.append(f"{TAB}{TAB}summarizeBy: {sby}")
         out.append(f"{TAB}{TAB}sourceColumn: {scol}")
+        if dcat:
+            out.append(f"{TAB}{TAB}dataCategory: {dcat}")
         out.append("")
     out.append(f"{TAB}partition {q(tname)} = entity")
     out.append(f"{TAB}{TAB}mode: directLake")

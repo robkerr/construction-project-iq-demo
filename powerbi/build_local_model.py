@@ -77,7 +77,8 @@ def measure_tmdl(m: dict) -> list[str]:
 def m_partition(tname: str) -> list[str]:
     """Import-mode Power Query partition that reads out/csv/<tname>.csv."""
     transforms = []
-    for (cname, dtype, _scol, _hidden, _sby) in COLS[tname]:
+    for col_def in COLS[tname]:
+        cname, dtype = col_def[0], col_def[1]
         transforms.append(f'{{"{cname}", {PQ_TYPE[dtype]}}}')
     types_list = ", ".join(transforms)
     q6 = TAB * 6  # indentation for M body lines inside the fenced block
@@ -100,7 +101,9 @@ def table_tmdl(tname: str) -> str:
     out = [f"table {q(tname)}", ""]
     for m in MEASURES.get(tname, []):
         out += measure_tmdl(m)
-    for (cname, dtype, scol, hidden, sby) in COLS[tname]:
+    for col_def in COLS[tname]:
+        cname, dtype, scol, hidden, sby = col_def[0], col_def[1], col_def[2], col_def[3], col_def[4]
+        dcat = col_def[5] if len(col_def) > 5 else None
         out.append(f"{TAB}column {q(cname)}")
         out.append(f"{TAB}{TAB}dataType: {dtype}")
         if hidden:
@@ -108,6 +111,8 @@ def table_tmdl(tname: str) -> str:
         if sby:
             out.append(f"{TAB}{TAB}summarizeBy: {sby}")
         out.append(f"{TAB}{TAB}sourceColumn: {scol}")
+        if dcat:
+            out.append(f"{TAB}{TAB}dataCategory: {dcat}")
         out.append("")
     out += m_partition(tname)
     out.append("")

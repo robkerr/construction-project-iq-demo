@@ -202,8 +202,14 @@ Spec: [`powerbi/schedule_risk_dashboard.md`](powerbi/schedule_risk_dashboard.md)
 
 #### Local PBIP for Power BI Desktop (`powerbi/EPCDemo.pbip`)
 
-`EPCDemo.pbip` is the Desktop authoring project for the two dashboards (Portfolio Schedule Risk +
-Bid Evaluation). By default it is a **thin report, live-connected to the deployed Direct Lake
+`EPCDemo.pbip` is the Desktop authoring project for the three dashboard pages — **Executive Portfolio
+Overview** (visualization-forward: a global project **map** by lat/lon, portfolio KPI cards, %-complete
+and risk bars), **Portfolio Schedule Risk**, and **Bid Evaluation**. `dim_project` carries
+`city`/`country`/`latitude`/`longitude` (dataCategory-tagged so they geocode, not sum) plus the
+`Active Projects` and `Avg % Complete` measures that back the exec KPIs. The Executive page is the first
+(active) page. The classic Bing **map** visual requires the tenant *Map and filled map visuals* setting
+enabled; if it doesn't render, switch it to Azure Maps interactively. By default it is a **thin report,
+live-connected to the deployed Direct Lake
 `ProjectControlsIQ` semantic model** in the Fabric workspace — so every visual reads the same
 governed model and measures the Foundry/Copilot agents use. The report pages are (re)authored with:
 

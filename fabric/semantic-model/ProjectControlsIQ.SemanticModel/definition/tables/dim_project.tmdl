@@ -47,6 +47,14 @@ table dim_project
 	measure 'Total Late Long-Lead POs' = [Late Long-Lead POs]
 		formatString: #,##0
 
+	/// Executive KPI: count of active projects in the current filter context.
+	measure 'Active Projects' = CALCULATE(DISTINCTCOUNT(dim_project[project_id]), dim_project[is_active] = TRUE())
+		formatString: #,##0
+
+	/// Executive KPI: average physical percent complete across projects in context.
+	measure 'Avg % Complete' = AVERAGE(dim_project[pct_complete])
+		formatString: 0.0%
+
 	column project_id
 		dataType: string
 		sourceColumn: project_id
@@ -62,6 +70,28 @@ table dim_project
 	column region
 		dataType: string
 		sourceColumn: region
+
+	column city
+		dataType: string
+		sourceColumn: city
+		dataCategory: City
+
+	column country
+		dataType: string
+		sourceColumn: country
+		dataCategory: Country
+
+	column latitude
+		dataType: double
+		summarizeBy: none
+		sourceColumn: latitude
+		dataCategory: Latitude
+
+	column longitude
+		dataType: double
+		summarizeBy: none
+		sourceColumn: longitude
+		dataCategory: Longitude
 
 	column contract_type
 		dataType: string
