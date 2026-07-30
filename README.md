@@ -200,6 +200,40 @@ Spec: [`powerbi/schedule_risk_dashboard.md`](powerbi/schedule_risk_dashboard.md)
   add a **Risk Band** slicer (`Risk Band` is a *measure*, so a slicer needs a Risk Band **column**),
   and (3) on the bid page, conditionally color the bid table by `tbe_status` / `award_status`.
 
+#### Local, self-contained PBIP for Power BI Desktop (`powerbi/EPCDemo.pbip`)
+
+The REST-deployed reports above bind to the live Direct Lake model in the service. For **offline
+authoring in Power BI Desktop** there is a second, fully self-contained project — `EPCDemo.pbip` —
+whose semantic model is **Import mode over the local CSVs** (`out/csv`), so it opens and refreshes
+with no Fabric connection. Two generators (re)build it from the same schema + measures as the
+deployed model, so the two never drift:
+
+```powershell
+# 1. make sure the synthetic data exists (writes out/csv + out/parquet)
+./.venv/Scripts/python.exe generate.py
+
+# 2. (re)build the Import-mode semantic model  (11 tables, 33 measures, 11 relationships)
+./.venv/Scripts/python.exe powerbi/build_local_model.py
+
+# 3. (re)author the two report pages  (Portfolio Schedule Risk + Bid Evaluation)
+./.venv/Scripts/python.exe powerbi/build_local_report.py
+
+# 4. open powerbi/EPCDemo.pbip in Power BI Desktop and click Refresh
+```
+
+- **Data source** = the `DataFolder` M parameter in
+  `EPCDemo.SemanticModel/definition/expressions.tmdl`, defaulting to this repo's `out/csv`. If you
+  move the repo or open a different checkout, update that one value (Desktop → *Transform data →
+  Manage parameters*) and Refresh.
+- **Report** binds `byPath` to the sibling `EPCDemo.SemanticModel` and uses the **modern** PBIR
+  schema Desktop writes (visual `2.12.0` / page `2.3.1`) — this is what actually renders cleanly in
+  Desktop (the older `1.4.0` REST scaffolds did not).
+- Each page carries an **"⚠ Ask Copilot"** callout so the demo flows *spot the issue on the
+  dashboard → open the agent in another window to investigate* (Falcon red / cheapest bid
+  disqualified). 🧑 Polish interactively in Desktop: color the hero bar by risk band, add data
+  labels, and conditionally format the bid/WBS tables.
+- `out/` is git-ignored, so a fresh clone must run `generate.py` before opening the PBIP.
+
 ### Phase 6 — Agents (🧑 manual, Fabric + Foundry + M365)
 1. **Fabric Data Agent** over the `ProjectControlsIQ` model; grab its **MCP endpoint**
    (`DATA_AGENT_MCP_ENDPOINT`, ends in `/agent`). Ground it with [`agent/grounding.md`](agent/grounding.md)

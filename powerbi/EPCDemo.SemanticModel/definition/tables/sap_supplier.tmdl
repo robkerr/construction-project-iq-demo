@@ -1,0 +1,32 @@
+table sap_supplier
+
+	column supplier_id
+		dataType: string
+		sourceColumn: supplier_id
+
+	column supplier_name
+		dataType: string
+		sourceColumn: supplier_name
+
+	column country
+		dataType: string
+		sourceColumn: country
+
+	column risk_rating
+		dataType: string
+		sourceColumn: risk_rating
+
+	column origin_system
+		dataType: string
+		sourceColumn: origin_system
+
+	partition sap_supplier = m
+		mode: import
+		source = ```
+						let
+							Source = Csv.Document(File.Contents(DataFolder & "sap_supplier.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+							Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+							Typed = Table.TransformColumnTypes(Promoted, {{"supplier_id", type text}, {"supplier_name", type text}, {"country", type text}, {"risk_rating", type text}, {"origin_system", type text}})
+						in
+							Typed
+						```

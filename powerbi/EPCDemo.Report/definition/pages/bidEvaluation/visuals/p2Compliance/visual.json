@@ -1,0 +1,96 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "p2Compliance",
+  "position": {
+    "x": 968,
+    "y": 652,
+    "z": 0,
+    "width": 928,
+    "height": 280,
+    "tabOrder": 13
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_tech_requirement"
+                    }
+                  },
+                  "Property": "requirement"
+                }
+              },
+              "queryRef": "dim_tech_requirement.requirement",
+              "nativeQueryRef": "requirement"
+            }
+          ]
+        },
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_bid"
+                    }
+                  },
+                  "Property": "supplier_name"
+                }
+              },
+              "queryRef": "fact_bid.supplier_name",
+              "nativeQueryRef": "supplier_name"
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_bid_tech_eval"
+                    }
+                  },
+                  "Property": "Exception Items"
+                }
+              },
+              "queryRef": "fact_bid_tech_eval.Exception Items",
+              "nativeQueryRef": "Exception Items"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Technical compliance \u00b7 exceptions by requirement \u00d7 supplier'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

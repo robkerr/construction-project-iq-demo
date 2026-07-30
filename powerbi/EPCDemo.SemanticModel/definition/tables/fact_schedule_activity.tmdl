@@ -1,0 +1,82 @@
+table fact_schedule_activity
+
+	/// Non-SAP: days the project is forecast to finish past its baseline (Primavera).
+	measure 'Schedule Slip (days)' = ```
+			VAR _slip =
+			    MAXX(
+			        fact_schedule_activity,
+			        DATEDIFF(fact_schedule_activity[baseline_finish], fact_schedule_activity[forecast_finish], DAY)
+			    )
+			RETURN IF(_slip > 0, _slip, 0)
+			```
+		formatString: #,##0
+
+	/// Non-SAP: count of critical-path activities forecast to finish late.
+	measure 'Critical Path At Risk' = CALCULATE(COUNTROWS(fact_schedule_activity), fact_schedule_activity[is_critical_path] = TRUE(), FILTER(fact_schedule_activity, fact_schedule_activity[forecast_finish] > fact_schedule_activity[baseline_finish]))
+		formatString: #,##0
+
+	/// Non-SAP: minimum total float across activities (negative = behind).
+	measure 'Min Total Float (days)' = MIN(fact_schedule_activity[total_float_days])
+		formatString: #,##0
+
+	/// Portfolio helper: worst (minimum) total float across activities.
+	measure 'Worst Min Float (days)' = MIN(fact_schedule_activity[total_float_days])
+		formatString: #,##0
+
+	column activity_id
+		dataType: string
+		sourceColumn: activity_id
+
+	column wbs_id
+		dataType: string
+		isHidden
+		sourceColumn: wbs_id
+
+	column project_id
+		dataType: string
+		isHidden
+		sourceColumn: project_id
+
+	column activity_name
+		dataType: string
+		sourceColumn: activity_name
+
+	column baseline_start
+		dataType: dateTime
+		sourceColumn: baseline_start
+
+	column baseline_finish
+		dataType: dateTime
+		sourceColumn: baseline_finish
+
+	column forecast_finish
+		dataType: dateTime
+		sourceColumn: forecast_finish
+
+	column actual_finish
+		dataType: dateTime
+		sourceColumn: actual_finish
+
+	column total_float_days
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: total_float_days
+
+	column is_critical_path
+		dataType: boolean
+		sourceColumn: is_critical_path
+
+	column origin_system
+		dataType: string
+		sourceColumn: origin_system
+
+	partition fact_schedule_activity = m
+		mode: import
+		source = ```
+						let
+							Source = Csv.Document(File.Contents(DataFolder & "fact_schedule_activity.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+							Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+							Typed = Table.TransformColumnTypes(Promoted, {{"activity_id", type text}, {"wbs_id", type text}, {"project_id", type text}, {"activity_name", type text}, {"baseline_start", type datetime}, {"baseline_finish", type datetime}, {"forecast_finish", type datetime}, {"actual_finish", type datetime}, {"total_float_days", Int64.Type}, {"is_critical_path", type logical}, {"origin_system", type text}})
+						in
+							Typed
+						```

@@ -1,0 +1,206 @@
+table fact_bid
+
+	/// Number of supplier bids in context (across the selected RFQ/category/project).
+	measure 'Bid Count' = COUNTROWS(fact_bid)
+		formatString: #,##0
+
+	/// CBE: quoted base price summed in context (at supplier grain = that bid's quote).
+	measure 'Quoted Price' = SUM(fact_bid[quoted_price])
+		formatString: $#,##0
+
+	/// CBE: normalized evaluated price summed in context (at supplier grain = that bid's evaluated cost, incl. disqualified bids).
+	measure 'Evaluated Price' = SUM(fact_bid[evaluated_price])
+		formatString: $#,##0
+
+	/// TBE: bids that passed technical evaluation (no mandatory exception, score >= 70).
+	measure 'Qualified Bids' = CALCULATE(COUNTROWS(fact_bid), fact_bid[is_technically_qualified] = TRUE())
+		formatString: #,##0
+
+	/// TBE: technically non-compliant bids (excluded from commercial ranking).
+	measure 'Disqualified Bids' = CALCULATE(COUNTROWS(fact_bid), fact_bid[is_technically_qualified] = FALSE())
+		formatString: #,##0
+
+	/// TBE: average weighted technical compliance score (0-100) of bids in context.
+	measure 'Avg Technical Score' = AVERAGE(fact_bid[technical_score])
+		formatString: #,##0.0
+
+	/// TBE: total number of technical deviations across bids in context.
+	measure 'Technical Deviations' = SUM(fact_bid[tech_deviation_count])
+		formatString: #,##0
+
+	/// CBE: lowest quoted base price received (may be a disqualified bid).
+	measure 'Lowest Quoted Price' = MIN(fact_bid[quoted_price])
+		formatString: $#,##0
+
+	/// CBE: lowest normalized evaluated price among technically-qualified bids.
+	measure 'Lowest Evaluated Price' = CALCULATE(MIN(fact_bid[evaluated_price]), fact_bid[is_technically_qualified] = TRUE())
+		formatString: $#,##0
+
+	/// CBE: evaluated price of the recommended award (lowest evaluated qualified bid).
+	measure 'Recommended Evaluated Price' = CALCULATE(SUM(fact_bid[evaluated_price]), fact_bid[recommended] = TRUE())
+		formatString: $#,##0
+
+	/// CBE: quoted price of the recommended award.
+	measure 'Recommended Quoted Price' = CALCULATE(SUM(fact_bid[quoted_price]), fact_bid[recommended] = TRUE())
+		formatString: $#,##0
+
+	/// CBE: supplier name of the recommended award in the current context (single RFQ).
+	measure 'Recommended Supplier' = CALCULATE(SELECTEDVALUE(fact_bid[supplier_name]), fact_bid[recommended] = TRUE())
+
+	/// CBE headline: recommended evaluated price minus the lowest quoted price — the cost of choosing the compliant, best-value bid over the cheapest quote.
+	measure 'Evaluated vs Lowest Quote' = [Recommended Evaluated Price] - [Lowest Quoted Price]
+		formatString: $#,##0
+
+	column bid_id
+		dataType: string
+		sourceColumn: bid_id
+
+	column rfq_id
+		dataType: string
+		isHidden
+		sourceColumn: rfq_id
+
+	column project_id
+		dataType: string
+		isHidden
+		sourceColumn: project_id
+
+	column wbs_id
+		dataType: string
+		isHidden
+		sourceColumn: wbs_id
+
+	column equipment_tag
+		dataType: string
+		sourceColumn: equipment_tag
+
+	column material_category
+		dataType: string
+		sourceColumn: material_category
+
+	column supplier_id
+		dataType: string
+		isHidden
+		sourceColumn: supplier_id
+
+	column supplier_name
+		dataType: string
+		sourceColumn: supplier_name
+
+	column bid_date
+		dataType: dateTime
+		sourceColumn: bid_date
+
+	column currency
+		dataType: string
+		sourceColumn: currency
+
+	column quoted_price
+		dataType: double
+		summarizeBy: none
+		sourceColumn: quoted_price
+
+	column spares_price
+		dataType: double
+		summarizeBy: none
+		sourceColumn: spares_price
+
+	column freight_price
+		dataType: double
+		summarizeBy: none
+		sourceColumn: freight_price
+
+	column delivery_weeks
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: delivery_weeks
+
+	column weeks_late
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: weeks_late
+
+	column payment_advance_pct
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: payment_advance_pct
+
+	column warranty_months
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: warranty_months
+
+	column incoterms
+		dataType: string
+		sourceColumn: incoterms
+
+	column technical_score
+		dataType: double
+		summarizeBy: none
+		sourceColumn: technical_score
+
+	column tech_compliant_count
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: tech_compliant_count
+
+	column tech_deviation_count
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: tech_deviation_count
+
+	column tech_exception_count
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: tech_exception_count
+
+	column tbe_status
+		dataType: string
+		sourceColumn: tbe_status
+
+	column is_technically_qualified
+		dataType: boolean
+		sourceColumn: is_technically_qualified
+
+	column commercial_deviation_count
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: commercial_deviation_count
+
+	column evaluated_price
+		dataType: double
+		summarizeBy: none
+		sourceColumn: evaluated_price
+
+	column price_loading
+		dataType: double
+		summarizeBy: none
+		sourceColumn: price_loading
+
+	column cbe_rank
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: cbe_rank
+
+	column award_status
+		dataType: string
+		sourceColumn: award_status
+
+	column recommended
+		dataType: boolean
+		sourceColumn: recommended
+
+	column origin_system
+		dataType: string
+		sourceColumn: origin_system
+
+	partition fact_bid = m
+		mode: import
+		source = ```
+						let
+							Source = Csv.Document(File.Contents(DataFolder & "fact_bid.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+							Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+							Typed = Table.TransformColumnTypes(Promoted, {{"bid_id", type text}, {"rfq_id", type text}, {"project_id", type text}, {"wbs_id", type text}, {"equipment_tag", type text}, {"material_category", type text}, {"supplier_id", type text}, {"supplier_name", type text}, {"bid_date", type datetime}, {"currency", type text}, {"quoted_price", type number}, {"spares_price", type number}, {"freight_price", type number}, {"delivery_weeks", Int64.Type}, {"weeks_late", Int64.Type}, {"payment_advance_pct", Int64.Type}, {"warranty_months", Int64.Type}, {"incoterms", type text}, {"technical_score", type number}, {"tech_compliant_count", Int64.Type}, {"tech_deviation_count", Int64.Type}, {"tech_exception_count", Int64.Type}, {"tbe_status", type text}, {"is_technically_qualified", type logical}, {"commercial_deviation_count", Int64.Type}, {"evaluated_price", type number}, {"price_loading", type number}, {"cbe_rank", Int64.Type}, {"award_status", type text}, {"recommended", type logical}, {"origin_system", type text}})
+						in
+							Typed
+						```

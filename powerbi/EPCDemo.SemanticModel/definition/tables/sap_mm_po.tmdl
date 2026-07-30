@@ -1,0 +1,59 @@
+table sap_mm_po
+
+	/// SAP MM: count of late long-lead purchase orders (the procurement-risk driver).
+	measure 'Late Long-Lead POs' = CALCULATE(COUNTROWS(sap_mm_po), sap_mm_po[is_long_lead] = TRUE(), sap_mm_po[status] = "Late")
+		formatString: #,##0
+
+	column po_id
+		dataType: string
+		sourceColumn: po_id
+
+	column project_id
+		dataType: string
+		isHidden
+		sourceColumn: project_id
+
+	column wbs_id
+		dataType: string
+		isHidden
+		sourceColumn: wbs_id
+
+	column material_desc
+		dataType: string
+		sourceColumn: material_desc
+
+	column supplier_id
+		dataType: string
+		isHidden
+		sourceColumn: supplier_id
+
+	column promised_date
+		dataType: dateTime
+		sourceColumn: promised_date
+
+	column revised_date
+		dataType: dateTime
+		sourceColumn: revised_date
+
+	column status
+		dataType: string
+		sourceColumn: status
+
+	column is_long_lead
+		dataType: boolean
+		sourceColumn: is_long_lead
+
+	column origin_system
+		dataType: string
+		sourceColumn: origin_system
+
+	partition sap_mm_po = m
+		mode: import
+		source = ```
+						let
+							Source = Csv.Document(File.Contents(DataFolder & "sap_mm_po.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+							Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+							Typed = Table.TransformColumnTypes(Promoted, {{"po_id", type text}, {"project_id", type text}, {"wbs_id", type text}, {"material_desc", type text}, {"supplier_id", type text}, {"promised_date", type datetime}, {"revised_date", type datetime}, {"status", type text}, {"is_long_lead", type logical}, {"origin_system", type text}})
+						in
+							Typed
+						```

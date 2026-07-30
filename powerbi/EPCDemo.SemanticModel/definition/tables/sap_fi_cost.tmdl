@@ -1,0 +1,67 @@
+table sap_fi_cost
+
+	/// SAP FI: remaining cost to complete.
+	measure 'Cost To Complete' = SUM(sap_fi_cost[cost_to_complete])
+		formatString: $#,##0
+
+	/// SAP FI: forecast cost minus budget (the cost-risk driver).
+	measure 'Forecast Overrun' = SUM(sap_fi_cost[forecast_cost]) - SUM(sap_fi_cost[budget])
+		formatString: $#,##0
+
+	/// SAP FI: earned value to date.
+	measure 'Earned Value' = SUM(sap_fi_cost[earned_value])
+		formatString: $#,##0
+
+	column project_id
+		dataType: string
+		isHidden
+		sourceColumn: project_id
+
+	column wbs_id
+		dataType: string
+		isHidden
+		sourceColumn: wbs_id
+
+	column period
+		dataType: dateTime
+		sourceColumn: period
+
+	column budget
+		dataType: double
+		summarizeBy: none
+		sourceColumn: budget
+
+	column actual_cost
+		dataType: double
+		summarizeBy: none
+		sourceColumn: actual_cost
+
+	column forecast_cost
+		dataType: double
+		summarizeBy: none
+		sourceColumn: forecast_cost
+
+	column cost_to_complete
+		dataType: double
+		summarizeBy: none
+		sourceColumn: cost_to_complete
+
+	column earned_value
+		dataType: double
+		summarizeBy: none
+		sourceColumn: earned_value
+
+	column origin_system
+		dataType: string
+		sourceColumn: origin_system
+
+	partition sap_fi_cost = m
+		mode: import
+		source = ```
+						let
+							Source = Csv.Document(File.Contents(DataFolder & "sap_fi_cost.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+							Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+							Typed = Table.TransformColumnTypes(Promoted, {{"project_id", type text}, {"wbs_id", type text}, {"period", type datetime}, {"budget", type number}, {"actual_cost", type number}, {"forecast_cost", type number}, {"cost_to_complete", type number}, {"earned_value", type number}, {"origin_system", type text}})
+						in
+							Typed
+						```

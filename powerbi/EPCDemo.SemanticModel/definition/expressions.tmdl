@@ -1,0 +1,3 @@
+/// Folder that contains the generated synthetic CSVs (out/csv). Change this one
+/// value if you move the repo or open a different checkout.
+expression DataFolder = "C:\Users\robkerr\projects\copilot-worktrees\construction-project-iq-demo\robkerr-bookish-system\out\csv\" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]

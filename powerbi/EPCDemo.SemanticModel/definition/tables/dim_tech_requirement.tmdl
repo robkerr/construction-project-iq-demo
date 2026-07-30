@@ -1,0 +1,45 @@
+table dim_tech_requirement
+
+	column req_id
+		dataType: string
+		sourceColumn: req_id
+
+	column material_category
+		dataType: string
+		sourceColumn: material_category
+
+	column requirement
+		dataType: string
+		sourceColumn: requirement
+
+	column required_value
+		dataType: string
+		sourceColumn: required_value
+
+	column unit
+		dataType: string
+		sourceColumn: unit
+
+	column weight
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: weight
+
+	column is_mandatory
+		dataType: boolean
+		sourceColumn: is_mandatory
+
+	column origin_system
+		dataType: string
+		sourceColumn: origin_system
+
+	partition dim_tech_requirement = m
+		mode: import
+		source = ```
+						let
+							Source = Csv.Document(File.Contents(DataFolder & "dim_tech_requirement.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+							Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+							Typed = Table.TransformColumnTypes(Promoted, {{"req_id", type text}, {"material_category", type text}, {"requirement", type text}, {"required_value", type text}, {"unit", type text}, {"weight", Int64.Type}, {"is_mandatory", type logical}, {"origin_system", type text}})
+						in
+							Typed
+						```
