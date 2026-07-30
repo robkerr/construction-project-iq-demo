@@ -2,8 +2,8 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definitionProperties/2.0.0/schema.json",
   "version": "4.0",
   "datasetReference": {
-    "byPath": {
-      "path": "../EPCDemo.SemanticModel"
+    "byConnection": {
+      "connectionString": "semanticmodelid=0692651d-0893-47f7-b923-1c3524548987"
     }
   }
 }

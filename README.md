@@ -200,39 +200,53 @@ Spec: [`powerbi/schedule_risk_dashboard.md`](powerbi/schedule_risk_dashboard.md)
   add a **Risk Band** slicer (`Risk Band` is a *measure*, so a slicer needs a Risk Band **column**),
   and (3) on the bid page, conditionally color the bid table by `tbe_status` / `award_status`.
 
-#### Local, self-contained PBIP for Power BI Desktop (`powerbi/EPCDemo.pbip`)
+#### Local PBIP for Power BI Desktop (`powerbi/EPCDemo.pbip`)
 
-The REST-deployed reports above bind to the live Direct Lake model in the service. For **offline
-authoring in Power BI Desktop** there is a second, fully self-contained project — `EPCDemo.pbip` —
-whose semantic model is **Import mode over the local CSVs** (`out/csv`), so it opens and refreshes
-with no Fabric connection. Two generators (re)build it from the same schema + measures as the
-deployed model, so the two never drift:
+`EPCDemo.pbip` is the Desktop authoring project for the two dashboards (Portfolio Schedule Risk +
+Bid Evaluation). By default it is a **thin report, live-connected to the deployed Direct Lake
+`ProjectControlsIQ` semantic model** in the Fabric workspace — so every visual reads the same
+governed model and measures the Foundry/Copilot agents use. The report pages are (re)authored with:
 
 ```powershell
-# 1. make sure the synthetic data exists (writes out/csv + out/parquet)
-./.venv/Scripts/python.exe generate.py
-
-# 2. (re)build the Import-mode semantic model  (11 tables, 33 measures, 11 relationships)
-./.venv/Scripts/python.exe powerbi/build_local_model.py
-
-# 3. (re)author the two report pages  (Portfolio Schedule Risk + Bid Evaluation)
+# (re)author the two report pages (modern PBIR schema — visual 2.12.0 / page 2.3.1)
 ./.venv/Scripts/python.exe powerbi/build_local_report.py
-
-# 4. open powerbi/EPCDemo.pbip in Power BI Desktop and click Refresh
+# then open powerbi/EPCDemo.pbip in Power BI Desktop (sign in to Power BI with workspace access)
 ```
 
-- **Data source** = the `DataFolder` M parameter in
-  `EPCDemo.SemanticModel/definition/expressions.tmdl`, defaulting to this repo's `out/csv`. If you
-  move the repo or open a different checkout, update that one value (Desktop → *Transform data →
-  Manage parameters*) and Refresh.
-- **Report** binds `byPath` to the sibling `EPCDemo.SemanticModel` and uses the **modern** PBIR
-  schema Desktop writes (visual `2.12.0` / page `2.3.1`) — this is what actually renders cleanly in
-  Desktop (the older `1.4.0` REST scaffolds did not).
+- **Connection** = `EPCDemo.Report/definition.pbir` → `byConnection` with
+  `semanticmodelid=<SEMANTIC_MODEL_ID>`. Opening the `.pbip` connects live to the workspace model
+  (Desktop opens the report in *live-connect* mode; the model is edited in the workspace / via the
+  skills, not in this Desktop session). To repoint to a different model, change that one id.
+- **Model edits when live-connected** are done on the *deployed* model: edit
+  `fabric/semantic-model/build_semantic_model.py` and redeploy with
+  `./scripts/30_deploy_semantic_model.ps1`, or use the `semantic-model-authoring` skill
+  (REST `updateDefinition` / XMLA). The live report reflects them after a refresh.
+- **Keeping the workspace data current:** the Direct Lake model reads the Lakehouse `silver`
+  tables, so after regenerating synthetic data you must reload the workspace for the report to show
+  it: `data_gen/generate.py` → `./scripts/10_provision_fabric.ps1` (re-upload parquet) →
+  `./scripts/20_load_data.ps1` (rebuild bronze/silver/gold) → `./scripts/40_refresh_semantic_model.ps1`
+  (reframe Direct Lake).
 - Each page carries an **"⚠ Ask Copilot"** callout so the demo flows *spot the issue on the
   dashboard → open the agent in another window to investigate* (Falcon red / cheapest bid
   disqualified). 🧑 Polish interactively in Desktop: color the hero bar by risk band, add data
   labels, and conditionally format the bid/WBS tables.
-- `out/` is git-ignored, so a fresh clone must run `generate.py` before opening the PBIP.
+
+<details><summary><b>Offline variant</b> — self-contained Import model over local CSVs (no Fabric)</summary>
+
+For fully offline authoring, the repo also ships an Import-mode model generator that reads
+`out/csv`. To use it, (re)build the local model and point the report back at it:
+
+```powershell
+./.venv/Scripts/python.exe data_gen/generate.py            # writes out/csv + out/parquet
+./.venv/Scripts/python.exe powerbi/build_local_model.py    # Import-mode TMDL over out/csv into EPCDemo.SemanticModel
+# then set EPCDemo.Report/definition.pbir back to  { "byPath": { "path": "../EPCDemo.SemanticModel" } }
+```
+
+Data source = the `DataFolder` M parameter in `EPCDemo.SemanticModel/definition/expressions.tmdl`
+(defaults to this repo's `out/csv`). `out/` is git-ignored, so a fresh clone must run
+`generate.py` first.
+</details>
+
 
 ### Phase 6 — Agents (🧑 manual, Fabric + Foundry + M365)
 1. **Fabric Data Agent** over the `ProjectControlsIQ` model; grab its **MCP endpoint**
