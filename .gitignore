@@ -29,3 +29,7 @@ main.json
 Thumbs.db
 .vscode/
 .idea/
+
+# ---- Power BI Project (PBIP) local/user files ----
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
