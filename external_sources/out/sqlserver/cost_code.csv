@@ -1,0 +1,109 @@
+cost_code_id,project_id,code,description,discipline,origin_system
+CC-00001,PRJ-001,001-01,Site Preparation,Process,OnPrem-SQLServer
+CC-00002,PRJ-001,001-02,Concrete,Piping,OnPrem-SQLServer
+CC-00003,PRJ-001,001-03,Structural Steel,Electrical,OnPrem-SQLServer
+CC-00004,PRJ-001,001-04,Mechanical Equipment,Civil,OnPrem-SQLServer
+CC-00005,PRJ-001,001-05,Piping,Structural,OnPrem-SQLServer
+CC-00006,PRJ-001,001-06,Electrical,Electrical,OnPrem-SQLServer
+CC-00007,PRJ-001,001-07,Instrumentation,Piping,OnPrem-SQLServer
+CC-00008,PRJ-001,001-08,Insulation & Coatings,Piping,OnPrem-SQLServer
+CC-00009,PRJ-001,001-09,Commissioning,Piping,OnPrem-SQLServer
+CC-00010,PRJ-002,002-01,Site Preparation,Civil,OnPrem-SQLServer
+CC-00011,PRJ-002,002-02,Concrete,Civil,OnPrem-SQLServer
+CC-00012,PRJ-002,002-03,Structural Steel,Process,OnPrem-SQLServer
+CC-00013,PRJ-002,002-04,Mechanical Equipment,Civil,OnPrem-SQLServer
+CC-00014,PRJ-002,002-05,Piping,Process,OnPrem-SQLServer
+CC-00015,PRJ-002,002-06,Electrical,Mechanical,OnPrem-SQLServer
+CC-00016,PRJ-002,002-07,Instrumentation,I&C,OnPrem-SQLServer
+CC-00017,PRJ-002,002-08,Insulation & Coatings,Mechanical,OnPrem-SQLServer
+CC-00018,PRJ-002,002-09,Commissioning,Structural,OnPrem-SQLServer
+CC-00019,PRJ-003,003-01,Site Preparation,Piping,OnPrem-SQLServer
+CC-00020,PRJ-003,003-02,Concrete,Structural,OnPrem-SQLServer
+CC-00021,PRJ-003,003-03,Structural Steel,Electrical,OnPrem-SQLServer
+CC-00022,PRJ-003,003-04,Mechanical Equipment,Mechanical,OnPrem-SQLServer
+CC-00023,PRJ-003,003-05,Piping,Piping,OnPrem-SQLServer
+CC-00024,PRJ-003,003-06,Electrical,I&C,OnPrem-SQLServer
+CC-00025,PRJ-003,003-07,Instrumentation,Electrical,OnPrem-SQLServer
+CC-00026,PRJ-003,003-08,Insulation & Coatings,Mechanical,OnPrem-SQLServer
+CC-00027,PRJ-003,003-09,Commissioning,Civil,OnPrem-SQLServer
+CC-00028,PRJ-004,004-01,Site Preparation,Civil,OnPrem-SQLServer
+CC-00029,PRJ-004,004-02,Concrete,Piping,OnPrem-SQLServer
+CC-00030,PRJ-004,004-03,Structural Steel,Structural,OnPrem-SQLServer
+CC-00031,PRJ-004,004-04,Mechanical Equipment,Piping,OnPrem-SQLServer
+CC-00032,PRJ-004,004-05,Piping,Electrical,OnPrem-SQLServer
+CC-00033,PRJ-004,004-06,Electrical,Structural,OnPrem-SQLServer
+CC-00034,PRJ-004,004-07,Instrumentation,Process,OnPrem-SQLServer
+CC-00035,PRJ-004,004-08,Insulation & Coatings,I&C,OnPrem-SQLServer
+CC-00036,PRJ-004,004-09,Commissioning,Piping,OnPrem-SQLServer
+CC-00037,PRJ-005,005-01,Site Preparation,Piping,OnPrem-SQLServer
+CC-00038,PRJ-005,005-02,Concrete,Piping,OnPrem-SQLServer
+CC-00039,PRJ-005,005-03,Structural Steel,Structural,OnPrem-SQLServer
+CC-00040,PRJ-005,005-04,Mechanical Equipment,Piping,OnPrem-SQLServer
+CC-00041,PRJ-005,005-05,Piping,Structural,OnPrem-SQLServer
+CC-00042,PRJ-005,005-06,Electrical,Structural,OnPrem-SQLServer
+CC-00043,PRJ-005,005-07,Instrumentation,Structural,OnPrem-SQLServer
+CC-00044,PRJ-005,005-08,Insulation & Coatings,Structural,OnPrem-SQLServer
+CC-00045,PRJ-005,005-09,Commissioning,Civil,OnPrem-SQLServer
+CC-00046,PRJ-006,006-01,Site Preparation,Civil,OnPrem-SQLServer
+CC-00047,PRJ-006,006-02,Concrete,Process,OnPrem-SQLServer
+CC-00048,PRJ-006,006-03,Structural Steel,Civil,OnPrem-SQLServer
+CC-00049,PRJ-006,006-04,Mechanical Equipment,Piping,OnPrem-SQLServer
+CC-00050,PRJ-006,006-05,Piping,I&C,OnPrem-SQLServer
+CC-00051,PRJ-006,006-06,Electrical,I&C,OnPrem-SQLServer
+CC-00052,PRJ-006,006-07,Instrumentation,Process,OnPrem-SQLServer
+CC-00053,PRJ-006,006-08,Insulation & Coatings,Structural,OnPrem-SQLServer
+CC-00054,PRJ-006,006-09,Commissioning,Structural,OnPrem-SQLServer
+CC-00055,PRJ-007,007-01,Site Preparation,I&C,OnPrem-SQLServer
+CC-00056,PRJ-007,007-02,Concrete,Piping,OnPrem-SQLServer
+CC-00057,PRJ-007,007-03,Structural Steel,Piping,OnPrem-SQLServer
+CC-00058,PRJ-007,007-04,Mechanical Equipment,Piping,OnPrem-SQLServer
+CC-00059,PRJ-007,007-05,Piping,Piping,OnPrem-SQLServer
+CC-00060,PRJ-007,007-06,Electrical,Process,OnPrem-SQLServer
+CC-00061,PRJ-007,007-07,Instrumentation,I&C,OnPrem-SQLServer
+CC-00062,PRJ-007,007-08,Insulation & Coatings,Piping,OnPrem-SQLServer
+CC-00063,PRJ-007,007-09,Commissioning,Process,OnPrem-SQLServer
+CC-00064,PRJ-008,008-01,Site Preparation,Civil,OnPrem-SQLServer
+CC-00065,PRJ-008,008-02,Concrete,Piping,OnPrem-SQLServer
+CC-00066,PRJ-008,008-03,Structural Steel,Civil,OnPrem-SQLServer
+CC-00067,PRJ-008,008-04,Mechanical Equipment,Civil,OnPrem-SQLServer
+CC-00068,PRJ-008,008-05,Piping,Electrical,OnPrem-SQLServer
+CC-00069,PRJ-008,008-06,Electrical,Mechanical,OnPrem-SQLServer
+CC-00070,PRJ-008,008-07,Instrumentation,Civil,OnPrem-SQLServer
+CC-00071,PRJ-008,008-08,Insulation & Coatings,Structural,OnPrem-SQLServer
+CC-00072,PRJ-008,008-09,Commissioning,Civil,OnPrem-SQLServer
+CC-00073,PRJ-009,009-01,Site Preparation,Process,OnPrem-SQLServer
+CC-00074,PRJ-009,009-02,Concrete,I&C,OnPrem-SQLServer
+CC-00075,PRJ-009,009-03,Structural Steel,Mechanical,OnPrem-SQLServer
+CC-00076,PRJ-009,009-04,Mechanical Equipment,Process,OnPrem-SQLServer
+CC-00077,PRJ-009,009-05,Piping,Mechanical,OnPrem-SQLServer
+CC-00078,PRJ-009,009-06,Electrical,Process,OnPrem-SQLServer
+CC-00079,PRJ-009,009-07,Instrumentation,Structural,OnPrem-SQLServer
+CC-00080,PRJ-009,009-08,Insulation & Coatings,Process,OnPrem-SQLServer
+CC-00081,PRJ-009,009-09,Commissioning,Civil,OnPrem-SQLServer
+CC-00082,PRJ-010,010-01,Site Preparation,Civil,OnPrem-SQLServer
+CC-00083,PRJ-010,010-02,Concrete,Mechanical,OnPrem-SQLServer
+CC-00084,PRJ-010,010-03,Structural Steel,Electrical,OnPrem-SQLServer
+CC-00085,PRJ-010,010-04,Mechanical Equipment,Civil,OnPrem-SQLServer
+CC-00086,PRJ-010,010-05,Piping,Civil,OnPrem-SQLServer
+CC-00087,PRJ-010,010-06,Electrical,I&C,OnPrem-SQLServer
+CC-00088,PRJ-010,010-07,Instrumentation,Structural,OnPrem-SQLServer
+CC-00089,PRJ-010,010-08,Insulation & Coatings,I&C,OnPrem-SQLServer
+CC-00090,PRJ-010,010-09,Commissioning,Civil,OnPrem-SQLServer
+CC-00091,PRJ-011,011-01,Site Preparation,Electrical,OnPrem-SQLServer
+CC-00092,PRJ-011,011-02,Concrete,Electrical,OnPrem-SQLServer
+CC-00093,PRJ-011,011-03,Structural Steel,Process,OnPrem-SQLServer
+CC-00094,PRJ-011,011-04,Mechanical Equipment,Electrical,OnPrem-SQLServer
+CC-00095,PRJ-011,011-05,Piping,Piping,OnPrem-SQLServer
+CC-00096,PRJ-011,011-06,Electrical,I&C,OnPrem-SQLServer
+CC-00097,PRJ-011,011-07,Instrumentation,Process,OnPrem-SQLServer
+CC-00098,PRJ-011,011-08,Insulation & Coatings,Civil,OnPrem-SQLServer
+CC-00099,PRJ-011,011-09,Commissioning,I&C,OnPrem-SQLServer
+CC-00100,PRJ-012,012-01,Site Preparation,Process,OnPrem-SQLServer
+CC-00101,PRJ-012,012-02,Concrete,Mechanical,OnPrem-SQLServer
+CC-00102,PRJ-012,012-03,Structural Steel,I&C,OnPrem-SQLServer
+CC-00103,PRJ-012,012-04,Mechanical Equipment,Mechanical,OnPrem-SQLServer
+CC-00104,PRJ-012,012-05,Piping,Electrical,OnPrem-SQLServer
+CC-00105,PRJ-012,012-06,Electrical,Electrical,OnPrem-SQLServer
+CC-00106,PRJ-012,012-07,Instrumentation,Electrical,OnPrem-SQLServer
+CC-00107,PRJ-012,012-08,Insulation & Coatings,Mechanical,OnPrem-SQLServer
+CC-00108,PRJ-012,012-09,Commissioning,Civil,OnPrem-SQLServer

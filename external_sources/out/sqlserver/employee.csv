@@ -1,0 +1,121 @@
+emp_id,full_name,craft,labor_class,region,hire_date,hourly_rate,is_active,origin_system
+EMP-0001,William Thomas,Millwright,Apprentice,EMEA,2018-06-07,32.57,1,OnPrem-SQLServer
+EMP-0002,Eric Vincent,Millwright,Journeyman,EMEA,2017-12-07,55.1,1,OnPrem-SQLServer
+EMP-0003,Bonnie Ward,Boilermaker,Journeyman,Latin America,2022-02-25,49.78,1,OnPrem-SQLServer
+EMP-0004,James Thomas,Electrician,Journeyman,North America,2025-10-26,49.74,1,OnPrem-SQLServer
+EMP-0005,Thomas Nelson,Laborer,Journeyman,North America,2021-02-07,56.54,0,OnPrem-SQLServer
+EMP-0006,Troy Sloan,Millwright,Journeyman,Middle East,2023-05-27,50.59,1,OnPrem-SQLServer
+EMP-0007,Alice Nelson,Laborer,General Foreman,EMEA,2020-08-28,88.71,1,OnPrem-SQLServer
+EMP-0008,Jill Kirby,Boilermaker,Apprentice,North America,2024-12-03,33.93,0,OnPrem-SQLServer
+EMP-0009,Jamie Johnson,Boilermaker,General Foreman,Latin America,2018-08-02,75.51,1,OnPrem-SQLServer
+EMP-0010,Jennifer Garrett,Electrician,Apprentice,Asia Pacific,2019-09-23,34.49,1,OnPrem-SQLServer
+EMP-0011,Danny Anderson,Instrument Tech,Apprentice,EMEA,2020-02-09,35.84,0,OnPrem-SQLServer
+EMP-0012,Matthew Morrison,Pipefitter,Apprentice,Asia Pacific,2021-05-17,35.33,1,OnPrem-SQLServer
+EMP-0013,Justin Waller,Operator,Foreman,North America,2024-02-27,61.35,0,OnPrem-SQLServer
+EMP-0014,Debra Cooper,Laborer,Journeyman,North America,2017-04-22,53.82,1,OnPrem-SQLServer
+EMP-0015,Lauren Bell,Millwright,Superintendent,EMEA,2023-09-22,110.58,1,OnPrem-SQLServer
+EMP-0016,Carlos Rodriguez,Laborer,Foreman,Middle East,2022-10-07,71.38,1,OnPrem-SQLServer
+EMP-0017,Emma Conrad,Instrument Tech,Journeyman,Asia Pacific,2017-06-06,50.57,1,OnPrem-SQLServer
+EMP-0018,Sarah Jackson,Pipefitter,General Foreman,EMEA,2025-11-13,77.79,1,OnPrem-SQLServer
+EMP-0019,Stanley Holder,Welder,General Foreman,Latin America,2025-01-23,87.84,1,OnPrem-SQLServer
+EMP-0020,Morgan Lang,Instrument Tech,Foreman,EMEA,2018-12-31,74.31,1,OnPrem-SQLServer
+EMP-0021,Dawn Hawkins,Operator,Journeyman,Latin America,2022-10-01,58.66,1,OnPrem-SQLServer
+EMP-0022,Susan Palmer,Pipefitter,Foreman,North America,2020-09-25,76.6,1,OnPrem-SQLServer
+EMP-0023,Daniel Gray,Instrument Tech,Apprentice,North America,2020-09-21,31.51,1,OnPrem-SQLServer
+EMP-0024,Adam Fox,Laborer,General Foreman,Middle East,2018-05-16,86.18,1,OnPrem-SQLServer
+EMP-0025,David Dixon,Pipefitter,Superintendent,Middle East,2020-05-06,90.69,1,OnPrem-SQLServer
+EMP-0026,Robert Grant,Laborer,Journeyman,North America,2022-03-13,48.03,1,OnPrem-SQLServer
+EMP-0027,Justin Armstrong,Ironworker,Apprentice,EMEA,2021-01-08,29.37,1,OnPrem-SQLServer
+EMP-0028,Manuel Bradley Jr.,Instrument Tech,Apprentice,Asia Pacific,2019-03-23,36.22,1,OnPrem-SQLServer
+EMP-0029,Anthony Duncan,Pipefitter,General Foreman,Asia Pacific,2022-08-23,76.92,1,OnPrem-SQLServer
+EMP-0030,Kendra Colon,Instrument Tech,Foreman,EMEA,2024-08-16,69.4,1,OnPrem-SQLServer
+EMP-0031,Vanessa Long,Boilermaker,Foreman,North America,2021-08-15,68.56,1,OnPrem-SQLServer
+EMP-0032,Lori Bass,Millwright,General Foreman,Middle East,2016-09-24,80.46,1,OnPrem-SQLServer
+EMP-0033,Veronica Ramirez,Operator,Journeyman,EMEA,2025-03-09,53.79,0,OnPrem-SQLServer
+EMP-0034,Jeffrey Cole,Welder,General Foreman,Asia Pacific,2024-08-07,73.86,1,OnPrem-SQLServer
+EMP-0035,Kathy Wilson,Pipefitter,Apprentice,EMEA,2016-10-10,31.84,1,OnPrem-SQLServer
+EMP-0036,Kelsey Flores,Boilermaker,Apprentice,Middle East,2018-05-08,32.63,1,OnPrem-SQLServer
+EMP-0037,Charles Foley,Operator,Journeyman,EMEA,2025-02-20,57.24,0,OnPrem-SQLServer
+EMP-0038,Zachary Gonzalez,Electrician,Journeyman,EMEA,2024-03-25,55.91,1,OnPrem-SQLServer
+EMP-0039,Melissa Newton,Carpenter,Journeyman,Latin America,2019-09-03,57.85,1,OnPrem-SQLServer
+EMP-0040,Heather Murphy,Instrument Tech,Foreman,EMEA,2018-10-19,67.6,1,OnPrem-SQLServer
+EMP-0041,Pam Smith,Carpenter,Apprentice,Latin America,2019-04-06,29.93,1,OnPrem-SQLServer
+EMP-0042,Joshua Bennett,Boilermaker,Foreman,EMEA,2018-01-18,68.02,1,OnPrem-SQLServer
+EMP-0043,Natasha Mcknight,Electrician,Apprentice,Asia Pacific,2021-06-05,36.5,1,OnPrem-SQLServer
+EMP-0044,Kirk Salazar,Electrician,Foreman,Latin America,2017-11-26,64.84,1,OnPrem-SQLServer
+EMP-0045,Joseph Tate,Ironworker,Apprentice,EMEA,2020-07-29,30.2,1,OnPrem-SQLServer
+EMP-0046,Ann King,Ironworker,Foreman,Asia Pacific,2021-09-21,77.25,1,OnPrem-SQLServer
+EMP-0047,Aaron Riley,Operator,Journeyman,North America,2020-03-11,59.15,0,OnPrem-SQLServer
+EMP-0048,Anna Bradley,Operator,Journeyman,Latin America,2022-03-03,48.74,1,OnPrem-SQLServer
+EMP-0049,Brittany Young,Operator,Journeyman,EMEA,2020-06-23,56.8,1,OnPrem-SQLServer
+EMP-0050,Christina Bryant,Ironworker,Apprentice,EMEA,2018-04-24,32.24,1,OnPrem-SQLServer
+EMP-0051,Megan Landry,Pipefitter,Journeyman,Latin America,2017-02-15,53.2,1,OnPrem-SQLServer
+EMP-0052,Julia Moran,Ironworker,Apprentice,Middle East,2020-09-25,32.79,1,OnPrem-SQLServer
+EMP-0053,Adam Pope,Laborer,Apprentice,EMEA,2026-03-15,36.55,1,OnPrem-SQLServer
+EMP-0054,Joshua Kirby,Laborer,Foreman,Latin America,2020-05-02,64.34,1,OnPrem-SQLServer
+EMP-0055,Scott Browning,Laborer,Apprentice,EMEA,2023-11-09,34.98,1,OnPrem-SQLServer
+EMP-0056,Zachary Price,Pipefitter,Apprentice,Asia Pacific,2024-01-03,28.85,0,OnPrem-SQLServer
+EMP-0057,Alexander Carlson,Boilermaker,Journeyman,Asia Pacific,2017-11-10,54.97,1,OnPrem-SQLServer
+EMP-0058,Leah Ramirez,Instrument Tech,Journeyman,Latin America,2022-01-02,55.28,1,OnPrem-SQLServer
+EMP-0059,Jeffrey Zamora,Welder,Journeyman,North America,2018-09-22,56.6,1,OnPrem-SQLServer
+EMP-0060,Dana Griffin,Boilermaker,Journeyman,North America,2022-09-26,58.84,1,OnPrem-SQLServer
+EMP-0061,Kelly Miller,Pipefitter,Journeyman,EMEA,2020-06-22,56.6,1,OnPrem-SQLServer
+EMP-0062,Larry Brewer,Electrician,Journeyman,Middle East,2019-12-01,56.32,0,OnPrem-SQLServer
+EMP-0063,Erin Thomas,Pipefitter,Journeyman,North America,2017-09-29,50.1,1,OnPrem-SQLServer
+EMP-0064,Renee Hernandez,Carpenter,Journeyman,EMEA,2024-05-20,59.71,0,OnPrem-SQLServer
+EMP-0065,Mark Ballard,Laborer,Foreman,Latin America,2020-11-27,69.16,1,OnPrem-SQLServer
+EMP-0066,Andrea Harris,Boilermaker,Journeyman,Asia Pacific,2022-05-22,52.23,1,OnPrem-SQLServer
+EMP-0067,Diamond Jenkins,Pipefitter,Foreman,Middle East,2021-11-01,69.73,1,OnPrem-SQLServer
+EMP-0068,James Andrews,Millwright,Journeyman,EMEA,2018-03-03,51.92,1,OnPrem-SQLServer
+EMP-0069,Diane Zamora,Boilermaker,Journeyman,EMEA,2024-12-17,54.52,1,OnPrem-SQLServer
+EMP-0070,Jared Alexander,Electrician,Journeyman,North America,2021-01-18,51.35,1,OnPrem-SQLServer
+EMP-0071,Anna Pierce,Instrument Tech,General Foreman,EMEA,2022-07-24,78.72,1,OnPrem-SQLServer
+EMP-0072,Mathew Smith,Carpenter,Journeyman,Latin America,2017-09-19,58.86,0,OnPrem-SQLServer
+EMP-0073,Randy Kent,Laborer,Journeyman,North America,2024-03-11,58.86,1,OnPrem-SQLServer
+EMP-0074,Brittany Taylor,Laborer,General Foreman,Latin America,2024-01-15,83.97,1,OnPrem-SQLServer
+EMP-0075,Jeremy Nielsen,Laborer,Journeyman,Middle East,2025-05-22,59.31,1,OnPrem-SQLServer
+EMP-0076,Aaron Woodward,Pipefitter,Journeyman,EMEA,2022-01-24,52.2,1,OnPrem-SQLServer
+EMP-0077,Andrew Reed,Ironworker,Journeyman,Asia Pacific,2026-02-25,51.84,1,OnPrem-SQLServer
+EMP-0078,Kathleen Barker,Ironworker,Apprentice,Latin America,2021-06-27,36.14,1,OnPrem-SQLServer
+EMP-0079,Julie Clarke,Electrician,Foreman,Middle East,2024-02-15,71.96,1,OnPrem-SQLServer
+EMP-0080,Wesley Jenkins,Electrician,Journeyman,EMEA,2022-06-10,56.71,1,OnPrem-SQLServer
+EMP-0081,Timothy Cooper,Ironworker,Apprentice,Asia Pacific,2020-06-27,32.1,0,OnPrem-SQLServer
+EMP-0082,Adam Miller,Operator,Apprentice,Asia Pacific,2019-09-25,32.06,1,OnPrem-SQLServer
+EMP-0083,Wendy Castro,Welder,Superintendent,Middle East,2025-09-02,90.24,0,OnPrem-SQLServer
+EMP-0084,Michael Rodriguez,Boilermaker,Journeyman,EMEA,2024-11-02,59.37,1,OnPrem-SQLServer
+EMP-0085,Jason Jones,Pipefitter,Journeyman,EMEA,2023-03-25,49.76,1,OnPrem-SQLServer
+EMP-0086,Mark Murphy,Electrician,General Foreman,Middle East,2021-04-22,83.93,1,OnPrem-SQLServer
+EMP-0087,Donna Cline,Ironworker,Journeyman,Asia Pacific,2017-11-02,48.29,1,OnPrem-SQLServer
+EMP-0088,Stephen Brown,Ironworker,Foreman,Latin America,2024-12-07,72.2,1,OnPrem-SQLServer
+EMP-0089,Colleen Baker,Operator,Foreman,Asia Pacific,2025-08-10,67.84,1,OnPrem-SQLServer
+EMP-0090,Anthony Anderson,Carpenter,Journeyman,Asia Pacific,2020-04-05,56.78,1,OnPrem-SQLServer
+EMP-0091,Charles Miller,Electrician,Foreman,North America,2016-12-05,70.18,1,OnPrem-SQLServer
+EMP-0092,Shawn Solomon,Millwright,Superintendent,Latin America,2018-05-06,91.37,1,OnPrem-SQLServer
+EMP-0093,Stuart Bradley,Laborer,Apprentice,Latin America,2020-11-13,28.89,1,OnPrem-SQLServer
+EMP-0094,Lori Jones MD,Pipefitter,Apprentice,EMEA,2026-01-24,30.5,1,OnPrem-SQLServer
+EMP-0095,Tanner Potts,Laborer,Foreman,Latin America,2020-10-06,73.51,1,OnPrem-SQLServer
+EMP-0096,Alexandra Moss,Carpenter,Journeyman,Latin America,2021-11-25,57.57,1,OnPrem-SQLServer
+EMP-0097,Frederick Sosa,Pipefitter,Journeyman,North America,2021-12-30,51.24,1,OnPrem-SQLServer
+EMP-0098,Monica Beltran,Electrician,Apprentice,North America,2021-07-24,33.09,1,OnPrem-SQLServer
+EMP-0099,James Williams,Instrument Tech,Foreman,EMEA,2020-11-26,65.28,0,OnPrem-SQLServer
+EMP-0100,Mary English,Boilermaker,Foreman,Latin America,2019-05-24,76.17,1,OnPrem-SQLServer
+EMP-0101,Jennifer Robinson,Carpenter,General Foreman,EMEA,2024-06-04,93.59,1,OnPrem-SQLServer
+EMP-0102,Janet Burch,Ironworker,Journeyman,Latin America,2025-07-17,56.59,0,OnPrem-SQLServer
+EMP-0103,Brandon Young,Instrument Tech,Superintendent,Latin America,2025-10-07,90.38,1,OnPrem-SQLServer
+EMP-0104,Nathan Lindsey,Welder,Journeyman,Asia Pacific,2022-05-22,52.48,1,OnPrem-SQLServer
+EMP-0105,Dr. Ellen Bruce,Millwright,Journeyman,Asia Pacific,2021-06-01,59.68,1,OnPrem-SQLServer
+EMP-0106,Gregory Woodward,Electrician,Journeyman,Latin America,2018-10-09,49.78,1,OnPrem-SQLServer
+EMP-0107,Zachary Nichols,Electrician,Journeyman,North America,2022-02-15,55.52,1,OnPrem-SQLServer
+EMP-0108,Evan Garcia,Electrician,Journeyman,Asia Pacific,2021-03-09,59.0,1,OnPrem-SQLServer
+EMP-0109,Samantha Barnett,Laborer,Apprentice,Middle East,2016-12-13,34.99,1,OnPrem-SQLServer
+EMP-0110,Jesse Smith,Pipefitter,Journeyman,EMEA,2019-02-10,54.72,0,OnPrem-SQLServer
+EMP-0111,Jason Lamb,Ironworker,Foreman,Middle East,2019-09-03,69.81,1,OnPrem-SQLServer
+EMP-0112,Tara Logan,Ironworker,Apprentice,Latin America,2022-10-15,36.23,1,OnPrem-SQLServer
+EMP-0113,Savannah Hill,Pipefitter,Foreman,EMEA,2024-10-21,67.91,0,OnPrem-SQLServer
+EMP-0114,Timothy Suarez,Laborer,Journeyman,Latin America,2017-06-28,58.52,1,OnPrem-SQLServer
+EMP-0115,Jennifer Gardner,Ironworker,Journeyman,Middle East,2020-12-24,52.4,0,OnPrem-SQLServer
+EMP-0116,Sarah Tyler,Electrician,Journeyman,North America,2025-07-08,56.64,1,OnPrem-SQLServer
+EMP-0117,John Miller,Electrician,Apprentice,EMEA,2021-08-29,36.13,1,OnPrem-SQLServer
+EMP-0118,Anthony Clark,Operator,Superintendent,Asia Pacific,2025-05-21,101.69,1,OnPrem-SQLServer
+EMP-0119,Jason Cantu,Instrument Tech,Superintendent,North America,2016-11-27,95.79,1,OnPrem-SQLServer
+EMP-0120,Elizabeth Cunningham,Boilermaker,Journeyman,North America,2021-03-21,47.46,1,OnPrem-SQLServer

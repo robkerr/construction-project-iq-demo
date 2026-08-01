@@ -1,0 +1,30 @@
+{
+  "seed": 42,
+  "today": "2026-08-01",
+  "sources": {
+    "bigquery": {
+      "equipment_asset": 79,
+      "work_order": 821,
+      "work_order_task": 2077,
+      "work_order_labor": 1521,
+      "work_order_material": 469,
+      "work_order_status_history": 1206
+    },
+    "sqlserver": {
+      "employee": 120,
+      "crew": 37,
+      "cost_code": 108,
+      "timesheet": 1049,
+      "time_entry": 5291,
+      "labor_charge": 5066
+    },
+    "s3": {
+      "authority": 72,
+      "permit": 105,
+      "inspection": 211,
+      "code_violation": 31,
+      "permit_fee": 203,
+      "environmental_reading": 503
+    }
+  }
+}
