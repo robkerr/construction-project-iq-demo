@@ -53,5 +53,37 @@
       }
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "683b25f209e7a42c5234",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_project"
+              }
+            },
+            "Property": "region"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "0b36f1f0c42373ca41e1",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_project"
+              }
+            },
+            "Property": "Active Projects"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

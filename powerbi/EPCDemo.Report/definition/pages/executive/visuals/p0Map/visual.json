@@ -32,24 +32,6 @@
             }
           ]
         },
-        "Series": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "dim_project"
-                    }
-                  },
-                  "Property": "region"
-                }
-              },
-              "queryRef": "dim_project.region",
-              "nativeQueryRef": "region"
-            }
-          ]
-        },
         "Size": {
           "projections": [
             {
@@ -183,7 +165,7 @@
             "zoom": {
               "expr": {
                 "Literal": {
-                  "Value": "1.33D"
+                  "Value": "1.47D"
                 }
               }
             },
@@ -198,6 +180,116 @@
               "expr": {
                 "Literal": {
                   "Value": "0.9143500000000131D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dataPoint": [
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "FillRule": {
+                      "Input": {
+                        "Measure": {
+                          "Expression": {
+                            "SourceRef": {
+                              "Entity": "dim_project"
+                            }
+                          },
+                          "Property": "Schedule Risk Score"
+                        }
+                      },
+                      "FillRule": {
+                        "linearGradient3": {
+                          "min": {
+                            "color": {
+                              "Literal": {
+                                "Value": "'#2E7D32'"
+                              }
+                            },
+                            "value": {
+                              "Literal": {
+                                "Value": "0D"
+                              }
+                            }
+                          },
+                          "mid": {
+                            "color": {
+                              "Literal": {
+                                "Value": "'#E8A800'"
+                              }
+                            },
+                            "value": {
+                              "Literal": {
+                                "Value": "50D"
+                              }
+                            }
+                          },
+                          "max": {
+                            "color": {
+                              "Literal": {
+                                "Value": "'#C62828'"
+                              }
+                            },
+                            "value": {
+                              "Literal": {
+                                "Value": "100D"
+                              }
+                            }
+                          },
+                          "nullColoringStrategy": {
+                            "strategy": {
+                              "Literal": {
+                                "Value": "'asZero'"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 0
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Risk by Project Size'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Size of bubble indicates earned value, color indicates risk'"
                 }
               }
             }
@@ -287,7 +379,8 @@
             "Property": "region"
           }
         },
-        "type": "Categorical"
+        "type": "Categorical",
+        "howCreated": "User"
       },
       {
         "name": "52d20742c9477160c900",

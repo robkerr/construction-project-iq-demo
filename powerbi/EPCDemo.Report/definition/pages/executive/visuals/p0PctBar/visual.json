@@ -70,5 +70,37 @@
       }
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "d61c4b773e481c490005",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_project"
+              }
+            },
+            "Property": "project_name"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "57664116dcca47118262",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_project"
+              }
+            },
+            "Property": "Avg % Complete"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }
