@@ -35,17 +35,22 @@
           "projections": [
             {
               "field": {
-                "Column": {
+                "Aggregation": {
                   "Expression": {
-                    "SourceRef": {
-                      "Entity": "dim_project"
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "dim_project"
+                        }
+                      },
+                      "Property": "latitude"
                     }
                   },
-                  "Property": "latitude"
+                  "Function": 1
                 }
               },
-              "queryRef": "dim_project.latitude",
-              "nativeQueryRef": "latitude"
+              "queryRef": "Average(dim_project.latitude)",
+              "nativeQueryRef": "Average of latitude"
             }
           ]
         },
@@ -53,17 +58,22 @@
           "projections": [
             {
               "field": {
-                "Column": {
+                "Aggregation": {
                   "Expression": {
-                    "SourceRef": {
-                      "Entity": "dim_project"
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "dim_project"
+                        }
+                      },
+                      "Property": "longitude"
                     }
                   },
-                  "Property": "longitude"
+                  "Function": 1
                 }
               },
-              "queryRef": "dim_project.longitude",
-              "nativeQueryRef": "longitude"
+              "queryRef": "Average(dim_project.longitude)",
+              "nativeQueryRef": "Average of longitude"
             }
           ]
         },

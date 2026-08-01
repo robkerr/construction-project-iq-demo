@@ -46,8 +46,18 @@ def meas(entity: str, prop: str) -> dict:
     return {"Measure": {"Expression": {"SourceRef": {"Entity": entity}}, "Property": prop}}
 
 
+def agg(entity: str, prop: str, func: int = 1) -> dict:
+    """Aggregated column field (func 1 = Average). Azure Maps requires lat/lon to be
+    aggregated when a Location field is also present."""
+    return {"Aggregation": {"Expression": {"Column": {"Expression": {"SourceRef": {"Entity": entity}}, "Property": prop}}, "Function": func}}
+
+
 def proj(field: dict, entity: str, prop: str) -> dict:
     return {"field": field, "queryRef": f"{entity}.{prop}", "nativeQueryRef": prop}
+
+
+def proj_avg(entity: str, prop: str) -> dict:
+    return {"field": agg(entity, prop, 1), "queryRef": f"Average({entity}.{prop})", "nativeQueryRef": f"Average of {prop}"}
 
 
 def pos(x, y, w, h, z=0, tab=0) -> dict:
@@ -183,8 +193,8 @@ def map_bubble(name, position, location, lat, lon, size_spec, legend, tooltip_sp
             "query": {
                 "queryState": {
                     "Category": {"projections": [proj(col(ce, cc), ce, cc)]},
-                    "Y": {"projections": [proj(col(le, lc), le, lc)]},
-                    "X": {"projections": [proj(col(oe, oc), oe, oc)]},
+                    "Y": {"projections": [proj_avg(le, lc)]},
+                    "X": {"projections": [proj_avg(oe, oc)]},
                     "Size": {"projections": [proj(meas(se, sm), se, sm)]},
                     "Series": {"projections": [proj(col(ge, gc), ge, gc)]},
                     "Tooltips": {"projections": tips},
