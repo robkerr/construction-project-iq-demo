@@ -162,9 +162,13 @@ def donut(name, position, cat_entity, cat_col, val_entity, val_meas, title) -> d
     }
 
 
-def map_bubble(name, position, lat, lon, size_spec, legend, tooltip_specs, title) -> dict:
-    """Classic bubble map. lat/lon = (entity, col); size_spec/legend = (entity, name);
+def map_bubble(name, position, location, lat, lon, size_spec, legend, tooltip_specs, title) -> dict:
+    """Native Azure Maps bubble layer. location = (entity, col) supplies the Category /
+    Location bucket so every bubble has a selection identity (required — without it the
+    Azure Maps click handler throws 'handleClearSelection' and the report fails to render).
+    lat/lon = (entity, col) provide precise positioning; size_spec/legend = (entity, name);
     tooltip_specs = list of (entity, prop, is_measure)."""
+    ce, cc = location
     le, lc = lat
     oe, oc = lon
     se, sm = size_spec
@@ -175,9 +179,10 @@ def map_bubble(name, position, lat, lon, size_spec, legend, tooltip_specs, title
         "name": name,
         "position": position,
         "visual": {
-            "visualType": "map",
+            "visualType": "azureMap",
             "query": {
                 "queryState": {
+                    "Category": {"projections": [proj(col(ce, cc), ce, cc)]},
                     "Y": {"projections": [proj(col(le, lc), le, lc)]},
                     "X": {"projections": [proj(col(oe, oc), oe, oc)]},
                     "Size": {"projections": [proj(meas(se, sm), se, sm)]},
@@ -254,6 +259,7 @@ def page_executive() -> list[dict]:
 
     # map (left) — global portfolio, bubble size = project financial size, color by region
     v.append(map_bubble("p0Map", pos(24, 280, 1160, 560, tab=6),
+                        ("dim_project", "city"),
                         ("dim_project", "latitude"), ("dim_project", "longitude"),
                         ("sap_fi_cost", "Earned Value"), ("dim_project", "region"),
                         [("dim_project", "project_name", False),

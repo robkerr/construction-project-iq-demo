@@ -10,9 +10,27 @@
     "tabOrder": 6
   },
   "visual": {
-    "visualType": "map",
+    "visualType": "azureMap",
     "query": {
       "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_project"
+                    }
+                  },
+                  "Property": "city"
+                }
+              },
+              "queryRef": "dim_project.city",
+              "nativeQueryRef": "city"
+            }
+          ]
+        },
         "Y": {
           "projections": [
             {
