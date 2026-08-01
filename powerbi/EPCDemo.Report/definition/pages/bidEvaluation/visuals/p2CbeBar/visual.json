@@ -5,8 +5,8 @@
     "x": 968,
     "y": 348,
     "z": 0,
-    "width": 928,
     "height": 288,
+    "width": 928,
     "tabOrder": 11
   },
   "visual": {
@@ -27,7 +27,8 @@
                 }
               },
               "queryRef": "fact_bid.supplier_name",
-              "nativeQueryRef": "supplier_name"
+              "nativeQueryRef": "supplier_name",
+              "active": true
             }
           ]
         },
@@ -81,28 +82,6 @@
           }
         ]
       }
-    },
-    "objects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'CBE \u00b7 Quoted vs evaluated price by supplier'"
-                }
-              }
-            }
-          }
-        }
-      ]
     },
     "drillFilterOtherVisuals": true
   }

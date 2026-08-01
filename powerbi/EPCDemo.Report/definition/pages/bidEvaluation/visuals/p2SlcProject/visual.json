@@ -5,8 +5,8 @@
     "x": 968,
     "y": 132,
     "z": 0,
-    "width": 456,
     "height": 64,
+    "width": 456,
     "tabOrder": 4
   },
   "visual": {
@@ -27,33 +27,14 @@
                 }
               },
               "queryRef": "dim_project.project_name",
-              "nativeQueryRef": "project_name"
+              "nativeQueryRef": "project_name",
+              "active": true
             }
           ]
         }
       }
     },
     "objects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Project'"
-                }
-              }
-            }
-          }
-        }
-      ],
       "data": [
         {
           "properties": {

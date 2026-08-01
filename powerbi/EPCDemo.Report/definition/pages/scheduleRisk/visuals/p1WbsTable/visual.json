@@ -5,8 +5,8 @@
     "x": 24,
     "y": 784,
     "z": 0,
-    "width": 1872,
     "height": 272,
+    "width": 1872,
     "tabOrder": 21
   },
   "visual": {
@@ -119,28 +119,6 @@
           }
         ]
       }
-    },
-    "objects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'WBS drivers (same WBS carries both the late SAP PO and the schedule slip)'"
-                }
-              }
-            }
-          }
-        }
-      ]
     },
     "drillFilterOtherVisuals": true
   }

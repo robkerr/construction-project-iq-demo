@@ -5,8 +5,8 @@
     "x": 968,
     "y": 948,
     "z": 0,
-    "width": 456,
     "height": 108,
+    "width": 456,
     "tabOrder": 14
   },
   "visual": {
@@ -32,28 +32,6 @@
           ]
         }
       }
-    },
-    "objects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Recommended supplier'"
-                }
-              }
-            }
-          }
-        }
-      ]
     },
     "drillFilterOtherVisuals": true
   }

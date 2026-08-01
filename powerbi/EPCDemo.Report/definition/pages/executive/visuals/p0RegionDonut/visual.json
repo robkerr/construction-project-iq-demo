@@ -5,8 +5,8 @@
     "x": 1208,
     "y": 280,
     "z": 0,
-    "width": 688,
     "height": 270,
+    "width": 688,
     "tabOrder": 7
   },
   "visual": {
@@ -27,7 +27,8 @@
                 }
               },
               "queryRef": "dim_project.region",
-              "nativeQueryRef": "region"
+              "nativeQueryRef": "region",
+              "active": true
             }
           ]
         },
@@ -50,28 +51,6 @@
           ]
         }
       }
-    },
-    "objects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Active projects by region'"
-                }
-              }
-            }
-          }
-        }
-      ]
     },
     "drillFilterOtherVisuals": true
   }

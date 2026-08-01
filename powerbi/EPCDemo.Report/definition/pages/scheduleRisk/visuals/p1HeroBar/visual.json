@@ -5,8 +5,8 @@
     "x": 24,
     "y": 348,
     "z": 0,
-    "width": 1160,
     "height": 420,
+    "width": 1160,
     "tabOrder": 10
   },
   "visual": {
@@ -27,7 +27,8 @@
                 }
               },
               "queryRef": "dim_project.project_name",
-              "nativeQueryRef": "project_name"
+              "nativeQueryRef": "project_name",
+              "active": true
             }
           ]
         },
@@ -67,28 +68,6 @@
           }
         ]
       }
-    },
-    "objects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Schedule Risk Score by project (Falcon = #1)'"
-                }
-              }
-            }
-          }
-        }
-      ]
     },
     "drillFilterOtherVisuals": true
   }

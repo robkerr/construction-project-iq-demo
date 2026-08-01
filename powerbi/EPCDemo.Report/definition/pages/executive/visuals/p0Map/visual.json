@@ -5,8 +5,8 @@
     "x": 24,
     "y": 280,
     "z": 0,
-    "width": 1160,
     "height": 560,
+    "width": 1160,
     "tabOrder": 6
   },
   "visual": {
@@ -27,71 +27,8 @@
                 }
               },
               "queryRef": "dim_project.city",
-              "nativeQueryRef": "city"
-            }
-          ]
-        },
-        "Y": {
-          "projections": [
-            {
-              "field": {
-                "Aggregation": {
-                  "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "dim_project"
-                        }
-                      },
-                      "Property": "latitude"
-                    }
-                  },
-                  "Function": 1
-                }
-              },
-              "queryRef": "Average(dim_project.latitude)",
-              "nativeQueryRef": "Average of latitude"
-            }
-          ]
-        },
-        "X": {
-          "projections": [
-            {
-              "field": {
-                "Aggregation": {
-                  "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "dim_project"
-                        }
-                      },
-                      "Property": "longitude"
-                    }
-                  },
-                  "Function": 1
-                }
-              },
-              "queryRef": "Average(dim_project.longitude)",
-              "nativeQueryRef": "Average of longitude"
-            }
-          ]
-        },
-        "Size": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "sap_fi_cost"
-                    }
-                  },
-                  "Property": "Earned Value"
-                }
-              },
-              "queryRef": "sap_fi_cost.Earned Value",
-              "nativeQueryRef": "Earned Value"
+              "nativeQueryRef": "city",
+              "active": true
             }
           ]
         },
@@ -110,6 +47,24 @@
               },
               "queryRef": "dim_project.region",
               "nativeQueryRef": "region"
+            }
+          ]
+        },
+        "Size": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "sap_fi_cost"
+                    }
+                  },
+                  "Property": "Earned Value"
+                }
+              },
+              "queryRef": "sap_fi_cost.Earned Value",
+              "nativeQueryRef": "Earned Value"
             }
           ]
         },
@@ -172,24 +127,77 @@
               "nativeQueryRef": "Avg % Complete"
             }
           ]
+        },
+        "X": {
+          "projections": [
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "dim_project"
+                        }
+                      },
+                      "Property": "longitude"
+                    }
+                  },
+                  "Function": 1
+                }
+              },
+              "queryRef": "Average(dim_project.longitude)",
+              "nativeQueryRef": "Average of longitude"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "dim_project"
+                        }
+                      },
+                      "Property": "latitude"
+                    }
+                  },
+                  "Function": 1
+                }
+              },
+              "queryRef": "Average(dim_project.latitude)",
+              "nativeQueryRef": "Average of latitude"
+            }
+          ]
         }
       }
     },
     "objects": {
-      "title": [
+      "mapControls": [
         {
           "properties": {
-            "show": {
+            "zoom": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "1.33D"
                 }
               }
             },
-            "text": {
+            "centerLatitude": {
               "expr": {
                 "Literal": {
-                  "Value": "'Portfolio map \u00b7 bubble size = earned value, color = region'"
+                  "Value": "16.970629895965303D"
+                }
+              }
+            },
+            "centerLongitude": {
+              "expr": {
+                "Literal": {
+                  "Value": "0.9143500000000131D"
                 }
               }
             }
@@ -198,5 +206,145 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "42410ae6666ee069179e",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_project"
+              }
+            },
+            "Property": "city"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "9ea9c5903ec59d006bd7",
+        "field": {
+          "Aggregation": {
+            "Expression": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "dim_project"
+                  }
+                },
+                "Property": "latitude"
+              }
+            },
+            "Function": 1
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "a2e671d84c68d376e07d",
+        "field": {
+          "Aggregation": {
+            "Expression": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "dim_project"
+                  }
+                },
+                "Property": "longitude"
+              }
+            },
+            "Function": 1
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "8394337d3b00d0210a89",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "sap_fi_cost"
+              }
+            },
+            "Property": "Earned Value"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "ec5e64540013569c0226",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_project"
+              }
+            },
+            "Property": "region"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "52d20742c9477160c900",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_project"
+              }
+            },
+            "Property": "project_name"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "b59ba40a96ca415cb837",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_project"
+              }
+            },
+            "Property": "Risk Band"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "eed8fa039c34b7e40787",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_project"
+              }
+            },
+            "Property": "Schedule Risk Score"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "2b1cbe54e8945e7a4475",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_project"
+              }
+            },
+            "Property": "Avg % Complete"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

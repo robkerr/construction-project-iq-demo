@@ -19,14 +19,14 @@
               {
                 "textRuns": [
                   {
-                    "value": "\u26a0 Ask Copilot\n",
+                    "value": "⚠ Ask Copilot\n",
                     "textStyle": {
                       "fontSize": "13pt",
                       "fontWeight": "bold"
                     }
                   },
                   {
-                    "value": "The cheapest bid was disqualified on technical grounds. Open the agent and ask: \u201cGenerate the technical and commercial bid evaluation for RFQ-0001.\u201d",
+                    "value": "The cheapest bid was disqualified on technical grounds. Open the agent and ask: “Generate the technical and commercial bid evaluation for RFQ-0001.”",
                     "textStyle": {
                       "fontSize": "11pt"
                     }

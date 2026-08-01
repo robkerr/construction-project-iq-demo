@@ -5,8 +5,8 @@
     "x": 496,
     "y": 132,
     "z": 0,
-    "width": 456,
     "height": 64,
+    "width": 456,
     "tabOrder": 3
   },
   "visual": {
@@ -27,33 +27,14 @@
                 }
               },
               "queryRef": "dim_rfq.material_category",
-              "nativeQueryRef": "material_category"
+              "nativeQueryRef": "material_category",
+              "active": true
             }
           ]
         }
       }
     },
     "objects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Material category'"
-                }
-              }
-            }
-          }
-        }
-      ],
       "data": [
         {
           "properties": {

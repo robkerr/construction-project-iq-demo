@@ -5,8 +5,8 @@
     "x": 1560,
     "y": 676,
     "z": 0,
-    "width": 336,
     "height": 88,
+    "width": 336,
     "tabOrder": 20
   },
   "visual": {
@@ -32,28 +32,6 @@
           ]
         }
       }
-    },
-    "objects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Earned Value'"
-                }
-              }
-            }
-          }
-        }
-      ]
     },
     "drillFilterOtherVisuals": true
   }

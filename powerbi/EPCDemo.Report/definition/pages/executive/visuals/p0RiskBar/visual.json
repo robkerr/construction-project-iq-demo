@@ -5,8 +5,8 @@
     "x": 24,
     "y": 856,
     "z": 0,
-    "width": 1872,
     "height": 200,
+    "width": 1872,
     "tabOrder": 9
   },
   "visual": {
@@ -27,7 +27,8 @@
                 }
               },
               "queryRef": "dim_project.project_name",
-              "nativeQueryRef": "project_name"
+              "nativeQueryRef": "project_name",
+              "active": true
             }
           ]
         },
@@ -67,28 +68,6 @@
           }
         ]
       }
-    },
-    "objects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Schedule Risk Score by project (Red = act now)'"
-                }
-              }
-            }
-          }
-        }
-      ]
     },
     "drillFilterOtherVisuals": true
   }

@@ -5,8 +5,8 @@
     "x": 1440,
     "y": 132,
     "z": 0,
-    "width": 456,
     "height": 64,
+    "width": 456,
     "tabOrder": 5
   },
   "visual": {
@@ -27,33 +27,14 @@
                 }
               },
               "queryRef": "sap_supplier.risk_rating",
-              "nativeQueryRef": "risk_rating"
+              "nativeQueryRef": "risk_rating",
+              "active": true
             }
           ]
         }
       }
     },
     "objects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Supplier risk (SAP)'"
-                }
-              }
-            }
-          }
-        }
-      ],
       "data": [
         {
           "properties": {

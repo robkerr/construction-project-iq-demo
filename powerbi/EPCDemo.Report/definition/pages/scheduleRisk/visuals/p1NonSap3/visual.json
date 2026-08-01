@@ -5,8 +5,8 @@
     "x": 1208,
     "y": 676,
     "z": 0,
-    "width": 336,
     "height": 88,
+    "width": 336,
     "tabOrder": 16
   },
   "visual": {
@@ -32,28 +32,6 @@
           ]
         }
       }
-    },
-    "objects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Approved EC Impact (days)'"
-                }
-              }
-            }
-          }
-        }
-      ]
     },
     "drillFilterOtherVisuals": true
   }
