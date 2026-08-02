@@ -1,0 +1,21 @@
+# Configuration for setup_bigquery_mirror.py
+#
+# Fill in workspace_id and mirrored_database_id after you have created the
+# "Mirrored Google BigQuery" item in the Fabric portal.
+#
+# To find the values:
+#   1. Open the target workspace in Fabric; the workspace_id is the GUID in the
+#      URL: https://app.fabric.microsoft.com/groups/<workspace_id>/...
+#   2. Run:  ./run.sh --list-mirrored-databases --workspace <workspace_id>
+#      and copy the MirroredDatabase ID (NOT the SQLEndpoint) into
+#      mirrored_database_id below.
+
+# --- Required: Fabric target ---
+workspace_id: REPLACE_WITH_WORKSPACE_ID
+mirrored_database_id: REPLACE_WITH_MIRRORED_DATABASE_ID
+
+# --- Informational: BigQuery source (for display only) ---
+# These are echoed in status output; they do not drive the API calls
+# (the source is bound to the Mirrored item in the Fabric portal).
+gcp_project_id: gen-lang-client-0875336337
+bigquery_dataset: epc_workorders

@@ -33,3 +33,7 @@ Thumbs.db
 # ---- Power BI Project (PBIP) local/user files ----
 **/.pbi/localSettings.json
 **/.pbi/cache.abf
+
+# ---- BigQuery mirroring: service account key & venv ----
+external_sources/bigquery_mirroring/*-key.json
+external_sources/bigquery_mirroring/.venv/
