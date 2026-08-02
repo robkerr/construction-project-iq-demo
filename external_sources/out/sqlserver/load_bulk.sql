@@ -1,42 +1,31 @@
 -- Bulk-load the CSV extracts into the [timeclock] tables.
--- Adjust @dir to the folder where you copied the CSV files on the SQL Server host.
--- CSVs have a header row (FIRSTROW = 2) and are UTF-8, comma-delimited.
+-- Requires SQL Server 2017+ (FORMAT = 'CSV').
+-- 1) Copy the six timeclock/*.csv files to a folder the SQL Server service
+--    account can read, then edit @dir below (keep the trailing backslash).
+-- 2) The CSVs are UTF-8 with a header row (FIRSTROW = 2) and Unix (LF) line
+--    endings. If your files have Windows (CRLF) endings, change @row to '0x0d0a'.
 
-DECLARE @dir NVARCHAR(400) = 'C:\\timeclock_csv\\';  -- <-- EDIT THIS PATH
+SET NOCOUNT ON;
+DECLARE @dir NVARCHAR(400) = N'C:\timeclock_csv\';  -- <-- EDIT THIS PATH
+DECLARE @row NVARCHAR(10)  = N'0x0a';                 -- LF; use '0x0d0a' for CRLF files
+DECLARE @sql NVARCHAR(MAX);
 
-BULK INSERT timeclock.employee
-FROM '' + @dir + 'employee.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK, CODEPAGE = '65001');
-GO
+SET @sql = N'BULK INSERT timeclock.employee FROM ''' + @dir + N'employee.csv'' WITH (FORMAT=''CSV'', FIRSTROW=2, FIELDTERMINATOR='','', ROWTERMINATOR=''' + @row + N''', TABLOCK, CODEPAGE=''65001'');';
+EXEC sys.sp_executesql @sql;
 
-BULK INSERT timeclock.crew
-FROM '' + @dir + 'crew.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK, CODEPAGE = '65001');
-GO
+SET @sql = N'BULK INSERT timeclock.crew FROM ''' + @dir + N'crew.csv'' WITH (FORMAT=''CSV'', FIRSTROW=2, FIELDTERMINATOR='','', ROWTERMINATOR=''' + @row + N''', TABLOCK, CODEPAGE=''65001'');';
+EXEC sys.sp_executesql @sql;
 
-BULK INSERT timeclock.cost_code
-FROM '' + @dir + 'cost_code.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK, CODEPAGE = '65001');
-GO
+SET @sql = N'BULK INSERT timeclock.cost_code FROM ''' + @dir + N'cost_code.csv'' WITH (FORMAT=''CSV'', FIRSTROW=2, FIELDTERMINATOR='','', ROWTERMINATOR=''' + @row + N''', TABLOCK, CODEPAGE=''65001'');';
+EXEC sys.sp_executesql @sql;
 
-BULK INSERT timeclock.timesheet
-FROM '' + @dir + 'timesheet.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK, CODEPAGE = '65001');
-GO
+SET @sql = N'BULK INSERT timeclock.timesheet FROM ''' + @dir + N'timesheet.csv'' WITH (FORMAT=''CSV'', FIRSTROW=2, FIELDTERMINATOR='','', ROWTERMINATOR=''' + @row + N''', TABLOCK, CODEPAGE=''65001'');';
+EXEC sys.sp_executesql @sql;
 
-BULK INSERT timeclock.time_entry
-FROM '' + @dir + 'time_entry.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK, CODEPAGE = '65001');
-GO
+SET @sql = N'BULK INSERT timeclock.time_entry FROM ''' + @dir + N'time_entry.csv'' WITH (FORMAT=''CSV'', FIRSTROW=2, FIELDTERMINATOR='','', ROWTERMINATOR=''' + @row + N''', TABLOCK, CODEPAGE=''65001'');';
+EXEC sys.sp_executesql @sql;
 
-BULK INSERT timeclock.labor_charge
-FROM '' + @dir + 'labor_charge.csv'
-WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0a', TABLOCK, CODEPAGE = '65001');
-GO
+SET @sql = N'BULK INSERT timeclock.labor_charge FROM ''' + @dir + N'labor_charge.csv'' WITH (FORMAT=''CSV'', FIRSTROW=2, FIELDTERMINATOR='','', ROWTERMINATOR=''' + @row + N''', TABLOCK, CODEPAGE=''65001'');';
+EXEC sys.sp_executesql @sql;
 
--- NOTE: BULK INSERT requires a string literal for FROM. If the paths above
--- error, use this dynamic-SQL pattern per table instead:
---
--- DECLARE @sql NVARCHAR(MAX) = N'BULK INSERT timeclock.employee FROM ''' + @dir +
---   'employee.csv'' WITH (FORMAT=''CSV'', FIRSTROW=2, FIELDTERMINATOR='','', ROWTERMINATOR=''0x0a'', CODEPAGE=''65001'');';
--- EXEC sp_executesql @sql;
+PRINT 'Time clock load complete.';
