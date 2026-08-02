@@ -213,6 +213,15 @@ def ic_onelake(cx, cy):
             f'<path d="M{cx-8},{cy+7} q8,-9 16,0" fill="none" stroke="#cfe6fb" stroke-width="2"/>')
 
 
+def ic_stream(cx, cy):  # eventstream
+    t = "#2AA79B"
+    ch = "".join(
+        f'<path d="M{cx-13+o},{cy-7} L{cx-6+o},{cy} L{cx-13+o},{cy+7}" fill="none" '
+        f'stroke="{t}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>'
+        for o in (0, 9, 18))
+    return ch
+
+
 def logo_fabric(cx, cy):
     return (f'<polygon points="{cx-9},{cy} {cx-3},{cy-8} {cx+2},{cy} {cx-3},{cy+8}" fill="#2AA79B"/>'
             f'<polygon points="{cx-1},{cy-2} {cx+5},{cy-10} {cx+10},{cy-2} {cx+5},{cy+6}" fill="#57C4B6"/>')
@@ -280,23 +289,17 @@ def tile(x, y, w, h, rows, icon, rx=12, stroke="#c9d2de", size=12.5):
     return "".join(g)
 
 # ================================ FABRIC ======================================
-S.append(tile(78, 150, 150, 118, ["Project Controls", "Dashboards"], ic_chart))
-S.append(tile(300, 150, 150, 118, ["Fabric Data", "Agent"], ic_hex))
+S.append(tile(58, 150, 144, 118, ["Project Controls", "Dashboards"], ic_chart))
+S.append(tile(218, 150, 144, 118, ["Eventstream"], ic_stream))
+S.append(tile(378, 150, 144, 118, ["Fabric Data", "Agent"], ic_hex))
 
 # semantic-layer container
 S.append(rr(60, 300, 456, 168, fill="#ffffff", stroke="#d6deea", opacity=0.55, rx=14))
 S.append(tile(78, 320, 132, 130, ["Fabric", "Lakehouse"], ic_house))
 S.append(tile(248, 314, 250, 68, ["Semantic Model", "(ProjectControlsIQ)"], ic_cube))
 S.append(tile(248, 392, 250, 62, ["Fabric IQ  (Ontology)"], ic_graph))
-# internal arrows
-S.append(arrow(210, 360, 246, 347))
-S.append(arrow(210, 408, 246, 421))
-# up to serving tiles
-S.append(arrow(330, 316, 200, 270))
-S.append(arrow(360, 390, 400, 270))
 
 # data sources + OneLake (below dashed region)
-S.append(arrow(240, 484, 240, 508, double=True))
 S.append(rr(44, 508, 492, 150, fill="#eef3fa", stroke="#d6deea", rx=14))
 ds = [("SAP", "#C0392B", "#8e2a20", "SAP"),
       ("BigQuery", "#3B7DD8", "#2a5aa0", "BQ"),
@@ -332,18 +335,6 @@ for nm, ic, cx in wq:
     S.append(txt(cx, 434, nm, size=11.5, w=600))
 S.append(txt(628, 470, "and more...", size=12.5, w=400, anchor="start", italic=True, fill=GRAY))
 
-# alarm event
-S.append(rr(690, 524, 176, 74, shadow=True, rx=12, stroke="#e0b3ad"))
-S.append(ic_alarm(716, 548))
-S.append(lines(786, 561, ["Commissioning", "Alarm Event"], size=12.5, w=600, gap=15))
-S.append(arrow(778, 524, 786, 470))
-
-# cross-section + intra arrows
-S.append(arrow(452, 220, 582, 220, double=True))
-S.append(arrow(1026, 220, 1078, 220, double=True))
-S.append(arrow(690, 292, 690, 318, double=True))
-S.append(arrow(902, 292, 858, 388, double=True))
-
 # ============================== FOUNDRY =======================================
 # Agent Framework
 S.append(rr(1080, 150, 470, 148, fill="#ffffff", stroke="#d6deea", opacity=0.65, rx=14))
@@ -372,8 +363,6 @@ S.append(tile(1300, 500, 150, 96, ["Knowledge", "Corpus"],
 S.append(rr(1150, 616, 300, 34, fill="#ffffff", stroke="#cfd8e4", rx=10))
 S.append(ic_storage(1178, 633))
 S.append(txt(1202, 638, "Azure Storage", size=13.5, w=600, anchor="start"))
-S.append(arrow(1375, 500, 1375, 442))
-S.append(arrow(1258, 300, 1258, 318, double=True))
 
 S.append("</svg>")
 svg_text = "\n".join(S)
