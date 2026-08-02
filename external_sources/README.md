@@ -16,6 +16,11 @@ you can fuse them with the existing Fabric model in one query.
 | 1 | Google **BigQuery** | Work-order management | **Mirroring** → shortcut in bronze | `place_bigquery.sh` (automated) |
 | 2 | On-prem **SQL Server** | Time clock / labor | **Mirroring** → shortcut in bronze | You run `schema.sql` + `load_bulk.sql` |
 | 3 | Amazon **S3** (Delta Lake) | Government permits & inspections | **Shortcut** into bronze Tables | `place_s3.sh` + `convert_s3_to_delta.py` + `place_s3_delta.sh` (automated) |
+| 4 | Amazon **S3** (raw Parquet, `ods/`) | Core project/SAP landing data | **ELT pipeline** → Copy into Files/landing → notebooks | `elt_pipeline/` (automated) |
+
+These cover the three headline ingestion patterns side by side: **mirroring**
+(#1–2, near-real-time replication), **shortcuts** (#3, zero-copy virtualization),
+and a **traditional ELT data pipeline** (#4, Copy + notebook orchestration).
 
 ## Regenerate the data
 
@@ -178,3 +183,64 @@ Each lands as a queryable table: `bronze.authority`, `bronze.permit`,
 Once wired, all three sources join to the existing model on `project_id` /
 `wbs_id` / `equipment_tag` / `supplier_id` — demonstrating a single OneLake view
 over BigQuery + SQL Server + S3 + the existing SAP/non-SAP data.
+
+---
+
+### D. ELT pipeline: S3 `ods/` → Files/landing → bronze/silver/gold
+
+The third ingestion pattern is a **traditional ELT data pipeline** — not
+mirroring, not shortcuts. It shows the classic "land, then transform" flow that
+most teams already know, running natively on Fabric compute.
+
+```
+s3://contoso-enc-external-permits-107573631416/ods/*.parquet
+    │  (Fabric Copy activity, source connection "Permitting_Data_S3")
+    ▼
+lh_project_intelligence  Files/landing/*.parquet
+    │  (notebook 02_load_bronze)
+    ▼
+bronze.<table>  (Delta)
+    │  (notebook 03_build_silver_gold)
+    ▼
+silver.* / gold.*
+```
+
+**Artifacts** (in `elt_pipeline/`):
+
+| File | Purpose |
+|------|---------|
+| `pipeline-content.json` | The Fabric DataPipeline definition (Copy → 02 → 03, chained on Succeeded). |
+| `create_pipeline.py` | Creates/updates the pipeline `PL_ELT_Landing_to_Gold` via the Fabric REST API (Entra auth, no secrets). `--verify` prints the deployed activity graph. |
+| `setup_s3_ods.sh` | Uploads `out/parquet/*.parquet` to the S3 `ods/` prefix and extends the reader IAM policy. |
+
+**Security model** (all real, no account keys):
+
+- **Source (S3):** reuses the existing least-privilege IAM user
+  `fabric-s3-permits-reader`; its `FabricPermitsReadOnly` policy was extended to
+  allow `s3:GetObject` on `ods/*` (in addition to `permits/*` and
+  `permits-delta/*`). The pipeline's Copy source reuses the existing Fabric
+  Amazon S3 connection **`Permitting_Data_S3`**
+  (`4debad80-8aef-46cc-b581-c9298361bb6f`).
+- **Sink (lakehouse):** the Copy activity writes to
+  `lh_project_intelligence` (`3ecdff20-93ee-4f5a-81e7-c022007d128b`) using the
+  Fabric workspace's own identity — no keys, no external storage.
+- **Pipeline creation:** `create_pipeline.py` authenticates with your `az`
+  login (`az account get-access-token`). Nothing sensitive is committed.
+
+**Build it (does not run it):**
+
+```bash
+# 1. Land the parquet in S3 and grant read (one-time)
+external_sources/elt_pipeline/setup_s3_ods.sh
+
+# 2. Create the pipeline in Fabric (idempotent — updates if it exists)
+./.venv/bin/python external_sources/elt_pipeline/create_pipeline.py
+
+# 3. Inspect what was deployed
+./.venv/bin/python external_sources/elt_pipeline/create_pipeline.py --verify
+```
+
+The pipeline `PL_ELT_Landing_to_Gold` is created but **intentionally not
+triggered** — run it manually from the Fabric portal to demo the full ELT path.
+The Copy activity flattens `ods/*.parquet` into `Files/landing/<table>.parquet`
+(PreserveHierarchy), which is exactly what `02_load_bronze` expects.

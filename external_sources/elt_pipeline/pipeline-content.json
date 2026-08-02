@@ -1,0 +1,127 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "name": "Copy_ODS_to_Landing",
+        "type": "Copy",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "typeProperties": {
+          "source": {
+            "type": "ParquetSource",
+            "storeSettings": {
+              "type": "AmazonS3ReadSettings",
+              "recursive": true,
+              "wildcardFolderPath": "ods",
+              "wildcardFileName": "*.parquet",
+              "enablePartitionDiscovery": false
+            },
+            "formatSettings": {
+              "type": "ParquetReadSettings"
+            },
+            "datasetSettings": {
+              "annotations": [],
+              "type": "Parquet",
+              "typeProperties": {
+                "location": {
+                  "type": "AmazonS3Location",
+                  "bucketName": "contoso-enc-external-permits-107573631416"
+                }
+              },
+              "schema": [],
+              "externalReferences": {
+                "connection": "4debad80-8aef-46cc-b581-c9298361bb6f"
+              }
+            }
+          },
+          "sink": {
+            "type": "ParquetSink",
+            "storeSettings": {
+              "type": "LakehouseWriteSettings",
+              "copyBehavior": "PreserveHierarchy"
+            },
+            "formatSettings": {
+              "type": "ParquetWriteSettings"
+            },
+            "datasetSettings": {
+              "annotations": [],
+              "type": "Parquet",
+              "typeProperties": {
+                "location": {
+                  "type": "LakehouseLocation",
+                  "folderPath": "landing"
+                }
+              },
+              "schema": [],
+              "linkedService": {
+                "name": "lh_project_intelligence",
+                "properties": {
+                  "annotations": [],
+                  "type": "Lakehouse",
+                  "typeProperties": {
+                    "workspaceId": "8f4cf2c2-381f-4afa-9b7d-9fcfabd4f82d",
+                    "artifactId": "3ecdff20-93ee-4f5a-81e7-c022007d128b",
+                    "rootFolder": "Files"
+                  }
+                }
+              }
+            }
+          },
+          "enableStaging": false
+        }
+      },
+      {
+        "name": "Run_02_load_bronze",
+        "type": "TridentNotebook",
+        "dependsOn": [
+          {
+            "activity": "Copy_ODS_to_Landing",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "typeProperties": {
+          "notebookId": "bd653e1c-8551-4fcf-b756-d24d7d88d955",
+          "workspaceId": "8f4cf2c2-381f-4afa-9b7d-9fcfabd4f82d"
+        }
+      },
+      {
+        "name": "Run_03_build_silver_gold",
+        "type": "TridentNotebook",
+        "dependsOn": [
+          {
+            "activity": "Run_02_load_bronze",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "typeProperties": {
+          "notebookId": "b4b8b870-3563-4c7d-9ec0-7955de786286",
+          "workspaceId": "8f4cf2c2-381f-4afa-9b7d-9fcfabd4f82d"
+        }
+      }
+    ]
+  }
+}
