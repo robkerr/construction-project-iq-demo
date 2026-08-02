@@ -260,7 +260,7 @@ S.append(stile(x + 8, 226, CW - 16, 116, ic_dash, "Real-Time Dashboard",
 S.append(stile(x + 8, 356, CW - 16, 100, ic_bell, "Activator alert",
                [("actCommissioningAlarms", True),
                 ("Email / Teams when asset enters ALARM", False)], accent="#cdb8e2"))
-S.append(stile(x + 8, 470, CW - 16, 108, ic_gear, "[ENVISIONED] Operations agent",
+S.append(stile(x + 8, 470, CW - 16, 108, ic_gear, "Operations agent",
                [("summarize alarming asset's context", False),
                 ("grounded on the Fabric IQ ontology", False),
                 ("acts on the real-time trigger", False)], accent="#cdb8e2", tsize=12.5))
