@@ -11,8 +11,8 @@
 #      mirrored_database_id below.
 
 # --- Required: Fabric target ---
-workspace_id: REPLACE_WITH_WORKSPACE_ID
-mirrored_database_id: REPLACE_WITH_MIRRORED_DATABASE_ID
+workspace_id: 8f4cf2c2-381f-4afa-9b7d-9fcfabd4f82d
+mirrored_database_id: 2d4261b0-f554-4757-9e81-4d517072353c  # WorkOrders_Mirror_BigQuery
 
 # --- Informational: BigQuery source (for display only) ---
 # These are echoed in status output; they do not drive the API calls
