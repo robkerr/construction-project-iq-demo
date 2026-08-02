@@ -1,59 +1,56 @@
 #!/usr/bin/env python3
 """Generate the Project Controls IQ ontology diagram (SVG + PNG).
 
-Entities are color-coded by the source system that backs their data binding:
-  green  = OneLake / Fabric managed tables
-  blue   = Google BigQuery (mirrored database, shortcut)
+Matches the ontology as implemented. Entities are color-coded by the source
+system that backs their data binding:
+  green  = Fabric / OneLake
   yellow = Amazon S3 (Delta shortcut)
+  blue   = Google BigQuery (mirrored database)
+  red    = SAP
 
-Relationships are drawn as labeled directed edges. See
-design/ontology_design.md for the underlying entity/relationship spec.
+Relationships are drawn as labeled directed edges.
 """
-import math
 import os
 
-# ---- palette -----------------------------------------------------------------
+# ---- palette: key -> (fill, stroke, legend label) ----------------------------
 COLORS = {
-    "onelake":  ("#C6EFCE", "#2E7D32", "OneLake (Fabric tables)"),
-    "bigquery": ("#BDD7EE", "#1F4E79", "Google BigQuery (mirrored)"),
+    "fabric":   ("#C6EFCE", "#2E7D32", "Fabric / OneLake"),
     "s3":       ("#FFEB9C", "#B7860B", "Amazon S3 (Delta shortcut)"),
+    "bigquery": ("#BDD7EE", "#1F4E79", "Google BigQuery (mirrored)"),
+    "sap":      ("#F4C7C3", "#C0392B", "SAP"),
 }
 TEXT_DARK = "#1a1a1a"
 
-# ---- nodes: name -> (cx, cy, source, subtitle) -------------------------------
-BOX_W, BOX_H = 202, 72
+BOX_W, BOX_H = 208, 72
 HW, HH = BOX_W / 2, BOX_H / 2
 
+# ---- nodes: name -> (cx, cy, source) -----------------------------------------
 NODES = {
-    "Project":            (160, 500, "onelake",  "gold.project_schedule_risk"),
-    "WorkPackage":        (470, 330, "onelake",  "silver.dim_wbs"),
-    "EngineeringChange":  (470, 130, "onelake",  "silver.fact_engineering_change"),
-    "Equipment":          (470, 690, "bigquery", "BigQuery asset + RTI stream"),
-    "WorkOrder":          (160, 850, "bigquery", "BigQuery: work_order"),
-    "PurchaseOrder":      (800, 250, "onelake",  "silver.sap_mm_po"),
-    "RFQ":                (800, 520, "onelake",  "silver.dim_rfq"),
-    "Permit":             (800, 850, "s3",       "S3 shortcut: permit"),
-    "Supplier":           (1150, 250, "onelake", "silver.sap_supplier"),
-    "Bid":                (1410, 440, "onelake", "gold.bid_evaluation"),
+    "Project":                (210, 500, "fabric"),
+    "WorkBreakdownStructure": (210, 210, "fabric"),
+    "WorkOrder":              (650, 250, "bigquery"),
+    "Bids":                   (650, 540, "fabric"),
+    "Permits":                (650, 820, "s3"),
+    "WorkOrderLabor":         (1095, 140, "bigquery"),
+    "WorkOrderMaterial":      (1095, 300, "bigquery"),
+    "WorkOrderTask":          (1095, 460, "bigquery"),
+    "Suppliers":              (1095, 620, "sap"),
+    "PermitInspection":       (1095, 820, "s3"),
 }
 
-# ---- edges: (source, target, label, curve_ctrl or None) ----------------------
+# ---- edges: (source, target, label) ------------------------------------------
 EDGES = [
-    ("Project", "WorkPackage", "contains", None),
-    ("Project", "Equipment", "hasAsset", None),
-    ("Project", "RFQ", "issues", None),
-    ("Project", "Permit", "hasPermit", (300, 940)),
-    ("WorkPackage", "EngineeringChange", "affectedByChange", None),
-    ("WorkPackage", "PurchaseOrder", "procuredVia", None),
-    ("WorkPackage", "Equipment", "scopes", None),
-    ("Supplier", "PurchaseOrder", "fulfills", None),
-    ("Supplier", "Bid", "submits", None),
-    ("RFQ", "Equipment", "forEquipment", None),
-    ("RFQ", "Bid", "receivesBid", None),
-    ("Equipment", "WorkOrder", "hasWorkOrder", None),
+    ("WorkOrder", "WorkOrderLabor", "workorder_has_labor"),
+    ("WorkOrder", "WorkOrderMaterial", "workorder_has_material"),
+    ("WorkOrder", "WorkOrderTask", "workorder_has_task"),
+    ("Project", "WorkOrder", "project_has_workorders"),
+    ("Project", "Bids", "project_has_bid"),
+    ("Project", "Permits", "projects_have_permits"),
+    ("Bids", "Suppliers", "bid_has_supplier"),
+    ("Permits", "PermitInspection", "permit_has_inspection"),
 ]
 
-W, H = 1580, 1010
+W, H = 1380, 1010
 
 
 def border_point(cx, cy, tx, ty):
@@ -61,8 +58,8 @@ def border_point(cx, cy, tx, ty):
     dx, dy = tx - cx, ty - cy
     if dx == 0 and dy == 0:
         return cx, cy
-    sx = HW / abs(dx) if dx else math.inf
-    sy = HH / abs(dy) if dy else math.inf
+    sx = HW / abs(dx) if dx else 1e9
+    sy = HH / abs(dy) if dy else 1e9
     s = min(sx, sy)
     return cx + dx * s, cy + dy * s
 
@@ -98,26 +95,16 @@ svg.append(
 
 # ---- edges (draw before nodes so nodes sit on top) ---------------------------
 edge_svg, label_svg = [], []
-for s, t, label, ctrl in EDGES:
-    sx, sy, *_ = NODES[s]
-    tx, ty, *_ = NODES[t]
-    if ctrl is None:
-        p0 = border_point(sx, sy, tx, ty)
-        p1 = border_point(tx, ty, sx, sy)
-        path = f'M{p0[0]:.1f},{p0[1]:.1f} L{p1[0]:.1f},{p1[1]:.1f}'
-        mx, my = (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2
-    else:
-        cxp, cyp = ctrl
-        p0 = border_point(sx, sy, cxp, cyp)
-        p1 = border_point(tx, ty, cxp, cyp)
-        path = f'M{p0[0]:.1f},{p0[1]:.1f} Q{cxp},{cyp} {p1[0]:.1f},{p1[1]:.1f}'
-        mx = 0.25 * p0[0] + 0.5 * cxp + 0.25 * p1[0]
-        my = 0.25 * p0[1] + 0.5 * cyp + 0.25 * p1[1]
+for s, t, label in EDGES:
+    sx, sy, _ = NODES[s]
+    tx, ty, _ = NODES[t]
+    p0 = border_point(sx, sy, tx, ty)
+    p1 = border_point(tx, ty, sx, sy)
     edge_svg.append(
-        f'<path d="{path}" fill="none" stroke="#8a8a8a" stroke-width="2" '
-        'marker-end="url(#arrow)"/>'
+        f'<path d="M{p0[0]:.1f},{p0[1]:.1f} L{p1[0]:.1f},{p1[1]:.1f}" fill="none" '
+        'stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>'
     )
-    # label with white pill background
+    mx, my = (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2
     fw = len(label) * 7.4 + 14
     label_svg.append(
         f'<g>'
@@ -130,41 +117,39 @@ svg.extend(edge_svg)
 svg.extend(label_svg)
 
 # ---- nodes -------------------------------------------------------------------
-for name, (cx, cy, src, sub) in NODES.items():
+for name, (cx, cy, src) in NODES.items():
     fill, stroke, _ = COLORS[src]
     x, y = cx - HW, cy - HH
     svg.append(
         f'<rect x="{x}" y="{y}" width="{BOX_W}" height="{BOX_H}" rx="12" '
         f'fill="{fill}" stroke="{stroke}" stroke-width="2.5" filter="url(#shadow)"/>'
     )
+    # dynamic font size so long names (e.g. WorkBreakdownStructure) fit
+    fs = min(19.0, (BOX_W - 20) / (0.60 * max(len(name), 1)))
     svg.append(
-        f'<text x="{cx}" y="{cy - 4}" font-size="18" font-weight="700" '
-        f'text-anchor="middle" fill="{TEXT_DARK}">{esc(name)}</text>'
-    )
-    svg.append(
-        f'<text x="{cx}" y="{cy + 17}" font-size="11" text-anchor="middle" '
-        f'fill="#555" font-family="Consolas, monospace">{esc(sub)}</text>'
+        f'<text x="{cx}" y="{cy + fs*0.35:.1f}" font-size="{fs:.1f}" '
+        f'font-weight="700" text-anchor="middle" fill="{TEXT_DARK}">{esc(name)}</text>'
     )
 
-# ---- legend ------------------------------------------------------------------
-lx, ly = 40, H - 118
+# ---- legend (4 sources) ------------------------------------------------------
+lx, ly = 40, H - 168
 svg.append(
-    f'<rect x="{lx}" y="{ly}" width="360" height="98" rx="10" fill="#fafafa" '
+    f'<rect x="{lx}" y="{ly}" width="380" height="146" rx="10" fill="#fafafa" '
     'stroke="#cccccc" stroke-width="1.5"/>'
 )
 svg.append(
-    f'<text x="{lx + 16}" y="{ly + 26}" font-size="15" font-weight="700" '
+    f'<text x="{lx + 16}" y="{ly + 28}" font-size="15" font-weight="700" '
     f'fill="{TEXT_DARK}">Source system</text>'
 )
-for i, key in enumerate(["onelake", "bigquery", "s3"]):
+for i, key in enumerate(["fabric", "s3", "bigquery", "sap"]):
     fill, stroke, desc = COLORS[key]
-    yy = ly + 44 + i * 18
+    yy = ly + 52 + i * 22
     svg.append(
-        f'<rect x="{lx + 16}" y="{yy - 12}" width="22" height="14" rx="3" '
+        f'<rect x="{lx + 16}" y="{yy - 13}" width="24" height="15" rx="3" '
         f'fill="{fill}" stroke="{stroke}" stroke-width="1.8"/>'
     )
     svg.append(
-        f'<text x="{lx + 46}" y="{yy}" font-size="13.5" fill="#333">{esc(desc)}</text>'
+        f'<text x="{lx + 50}" y="{yy}" font-size="13.5" fill="#333">{esc(desc)}</text>'
     )
 
 svg.append("</svg>")
