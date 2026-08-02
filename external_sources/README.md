@@ -15,7 +15,7 @@ you can fuse them with the existing Fabric model in one query.
 |---|---------------|---------|-----------------|-----------|
 | 1 | Google **BigQuery** | Work-order management | **Mirroring** → shortcut in bronze | `place_bigquery.sh` (automated) |
 | 2 | On-prem **SQL Server** | Time clock / labor | **Mirroring** → shortcut in bronze | You run `schema.sql` + `load_bulk.sql` |
-| 3 | Amazon **S3** (Parquet) | Government permits & inspections | **Shortcut** from bronze | `place_s3.sh` (automated) |
+| 3 | Amazon **S3** (Delta Lake) | Government permits & inspections | **Shortcut** into bronze Tables | `place_s3.sh` + `convert_s3_to_delta.py` + `place_s3_delta.sh` (automated) |
 
 ## Regenerate the data
 
@@ -31,7 +31,8 @@ Outputs land in `external_sources/out/`:
 out/
   bigquery/<table>/<table>.parquet   + <table>.csv   (6 work-order tables)
   sqlserver/<table>.csv  + schema.sql + load_bulk.sql (6 time-clock tables)
-  s3/permits/<table>/<table>.parquet                  (6 permit tables)
+  s3/permits/<table>/<table>.parquet                  (6 permit tables, raw parquet)
+  s3_delta/permits/<table>/                           (6 permit tables, Delta Lake)
   manifest.json
 ```
 
@@ -131,13 +132,48 @@ Then in Fabric:
 4. In the **bronze** lakehouse → **New shortcut → Microsoft OneLake** → point at
    the mirrored `timeclock.*` tables.
 
-### C. Shortcut S3 → bronze
-1. In the **bronze** lakehouse → **New shortcut → Amazon S3**.
-2. URL `https://contoso-enc-external-permits-107573631416.s3.us-east-1.amazonaws.com/`
-   (or `s3://contoso-enc-external-permits-107573631416/permits/`), supply an
-   access key/secret with read access.
-3. Point the shortcut at the `permits/` prefix; the six `<table>/` folders appear
-   as shortcut tables in bronze.
+### C. Shortcut S3 → bronze (as true queryable tables via Delta Lake)
+
+> **Why Delta?** OneLake shortcuts placed in the lakehouse **Tables** section are
+> only recognized as tables when the source is **Delta Lake** format (a folder
+> with a `_delta_log`). Raw parquet works only as a **Files** shortcut. To make
+> the permits appear as real, queryable `bronze.*` tables with **zero copy**, the
+> data is published to S3 in Delta format.
+
+**1. Convert the permit parquet to Delta and upload to S3** (automated):
+
+```bash
+./.venv/bin/python external_sources/convert_s3_to_delta.py   # writes out/s3_delta/permits/<table>/
+external_sources/place_s3_delta.sh                            # uploads to s3://<bucket>/permits-delta/<table>/
+```
+
+This produces six Delta tables (each `_delta_log` + one parquet part) at
+`s3://contoso-enc-external-permits-107573631416/permits-delta/<table>/`.
+
+**2. Create an Amazon S3 connection in Fabric** (portal): Settings → Manage
+connections and gateways → New → **Amazon S3**. Provide an access key/secret with
+read access to the bucket.
+
+**3. Create one shortcut per table in the bronze lakehouse** (portal): open the
+schema-enabled **bronze** lakehouse → under **Tables → bronze** →
+**New shortcut → Amazon S3** → use the connection from step 2, then point each
+shortcut at a Delta table folder:
+
+```
+s3://contoso-enc-external-permits-107573631416/permits-delta/authority/
+s3://contoso-enc-external-permits-107573631416/permits-delta/permit/
+s3://contoso-enc-external-permits-107573631416/permits-delta/inspection/
+s3://contoso-enc-external-permits-107573631416/permits-delta/code_violation/
+s3://contoso-enc-external-permits-107573631416/permits-delta/permit_fee/
+s3://contoso-enc-external-permits-107573631416/permits-delta/environmental_reading/
+```
+
+Each lands as a queryable table: `bronze.authority`, `bronze.permit`,
+`bronze.inspection`, `bronze.code_violation`, `bronze.permit_fee`,
+`bronze.environmental_reading` — no data movement (the bytes stay in S3).
+
+> Tip: point the shortcut at the **table folder** (the one containing
+> `_delta_log`), not the parent `permits-delta/` prefix.
 
 Once wired, all three sources join to the existing model on `project_id` /
 `wbs_id` / `equipment_tag` / `supplier_id` — demonstrating a single OneLake view

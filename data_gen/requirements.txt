@@ -4,3 +4,4 @@ pyarrow>=14.0
 faker>=24.0
 python-dateutil>=2.8
 PyYAML>=6.0
+deltalake>=0.18  # external_sources/convert_s3_to_delta.py (S3 permit tables -> Delta Lake)
