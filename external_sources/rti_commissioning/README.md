@@ -36,6 +36,8 @@ and `project_id`.
 | `eh_rti_telemetry` | Eventhouse | `3800b0b8-c465-4a80-bdce-27f7fb5ea6f6` |
 | `eh_rti_telemetry` | KQL Database | `b110a01f-386f-4adb-9249-a8dc9f1062c1` |
 | `esCommissioning` | Eventstream | `60df0ca6-45ea-4cad-a04f-3101f5135dbb` |
+| `actCommissioningAlarms` | Activator (Reflex) | `f1a0359f-44a0-4af1-998d-e42934f019a5` |
+| `rtdCommissioning` | Real-Time Dashboard | `0912dc5b-e3fa-4b8f-880a-c8bd1bb137b3` |
 
 KQL cluster URI: `https://trd-psr494w5ftntwyskww.z3.kusto.fabric.microsoft.com`
 
@@ -47,6 +49,8 @@ KQL cluster URI: `https://trd-psr494w5ftntwyskww.z3.kusto.fabric.microsoft.com`
 | `deploy_kql.sh` | Deploys `schema.kql` statement-by-statement (Kusto mgmt REST, Entra auth). Idempotent. |
 | `create_eventstream.py` | Creates `esCommissioning` (CustomEndpoint → KQL DB, ProcessedIngestion) and prints the producer connection string. `--endpoint` re-prints it. |
 | `produce_telemetry.py` | Streams the fleet to the custom-app endpoint; ET-1001 ramps to alarm. |
+| `create_activator.py` | Creates Activator (Reflex) `actCommissioningAlarms` — emails when an asset's `status` **changes to `alarm`**. `--show` decodes the rule. |
+| `create_dashboard.py` | Creates Real-Time Dashboard `rtdCommissioning` (winding-temp & DGA line tiles + `active_alarms()` table). `--show` decodes it. |
 
 ## Security
 
@@ -81,8 +85,30 @@ winding_temp_anomalies(15m, 10s)
 dga_trend(24h)
 ```
 
-## Next step (optional)
+## Alerting & visualization (built)
 
-Wire an **Activator** alert on `active_alarms()` (or a threshold on
-`winding_temp_c`) to notify when an asset enters alarm — closing the loop from
-live telemetry to action.
+**Activator `actCommissioningAlarms`** (`create_activator.py`) — a KQL-sourced
+`EventTrigger` Reflex over `commissioning_telemetry`. It fires when an asset's
+`status` **changes to `alarm`** (transition-based, so each asset notifies once
+when it *enters* alarm rather than on every hot sample) and sends an
+**email** naming the `equipment_tag` and `project_id`. The rule is created in
+the running state (`shouldRun: true`).
+
+**Real-Time Dashboard `rtdCommissioning`** (`create_dashboard.py`) — one page,
+three tiles over the same table/functions:
+
+| Tile | Visual | Query |
+|------|--------|-------|
+| Winding temperature by asset (°C) | line | `winding_temp_c` avg by 15s bin, series = `equipment_tag` |
+| Active alarms | table | `active_alarms()` |
+| Dissolved-gas H₂ by asset (ppm) | line | `dga_h2_ppm` avg by 15s bin, series = `equipment_tag` |
+
+```bash
+./../../.venv/bin/python create_activator.py     # create/verify the alert
+./../../.venv/bin/python create_dashboard.py      # create/verify the dashboard
+```
+
+> The producer stamps `event_time` with simulated commissioning timestamps, so
+> the dashboard tiles query the full table rather than the "last hour" picker.
+> Run a fresh `produce_telemetry.py` burst to watch ET-1001 ramp live and the
+> Activator email fire.

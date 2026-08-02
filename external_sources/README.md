@@ -262,7 +262,8 @@ produce_telemetry.py  ──▶  Eventstream esCommissioning (custom-app source)
                         Eventhouse eh_rti_telemetry ▶ KQL DB
                                 │  commissioning_telemetry (+ view + functions)
                                 ▼
-                        winding_temp_anomalies() / active_alarms()  ──▶ (opt) Activator
+        active_alarms() ──▶ Activator actCommissioningAlarms (email on enter-alarm)
+                        └──▶ Real-Time Dashboard rtdCommissioning (temp/DGA/alarms)
 ```
 
 Power transformers and shunt reactors being commissioned at the Project **Falcon
@@ -274,5 +275,8 @@ and ELT data on `equipment_tag` / `project_id`.
 
 Everything is real and provisioned via REST/Entra (no secrets in the repo — the
 Eventstream custom-app endpoint vends a Fabric-managed SAS, passed to the
-producer via `ES_CONNECTION_STRING`). Full details, IDs, and run instructions:
+producer via `ES_CONNECTION_STRING`). An **Activator** (`actCommissioningAlarms`)
+emails when an asset enters alarm, and a **Real-Time Dashboard**
+(`rtdCommissioning`) charts winding temperature, DGA H₂, and active alarms. Full
+details, IDs, and run instructions:
 **[`rti_commissioning/README.md`](rti_commissioning/README.md)**.
