@@ -26,31 +26,32 @@ HW, HH = BOX_W / 2, BOX_H / 2
 
 # ---- nodes: name -> (cx, cy, source) -----------------------------------------
 NODES = {
-    "Project":                (210, 500, "fabric"),
-    "WorkBreakdownStructure": (210, 210, "fabric"),
-    "WorkOrder":              (650, 250, "bigquery"),
-    "Bids":                   (650, 540, "fabric"),
-    "Permits":                (650, 820, "s3"),
-    "WorkOrderLabor":         (1095, 140, "bigquery"),
-    "WorkOrderMaterial":      (1095, 300, "bigquery"),
-    "WorkOrderTask":          (1095, 460, "bigquery"),
-    "Suppliers":              (1095, 620, "sap"),
-    "PermitInspection":       (1095, 820, "s3"),
+    "Project":                (185, 520, "fabric"),
+    "WorkBreakdownStructure": (590, 250, "fabric"),
+    "Bids":                   (590, 540, "fabric"),
+    "Permits":                (590, 830, "s3"),
+    "WorkOrder":              (1000, 250, "bigquery"),
+    "Suppliers":              (1000, 540, "sap"),
+    "PermitInspection":       (1000, 830, "s3"),
+    "WorkOrderLabor":         (1400, 120, "bigquery"),
+    "WorkOrderMaterial":      (1400, 260, "bigquery"),
+    "WorkOrderTask":          (1400, 400, "bigquery"),
 }
 
 # ---- edges: (source, target, label) ------------------------------------------
 EDGES = [
+    ("Project", "WorkBreakdownStructure", "project_has_work_breakdown_structure"),
+    ("Project", "Bids", "project_has_bid"),
+    ("Project", "Permits", "projects_have_permits"),
+    ("WorkBreakdownStructure", "WorkOrder", "wbs_has_workorders"),
     ("WorkOrder", "WorkOrderLabor", "workorder_has_labor"),
     ("WorkOrder", "WorkOrderMaterial", "workorder_has_material"),
     ("WorkOrder", "WorkOrderTask", "workorder_has_task"),
-    ("Project", "WorkOrder", "project_has_workorders"),
-    ("Project", "Bids", "project_has_bid"),
-    ("Project", "Permits", "projects_have_permits"),
     ("Bids", "Suppliers", "bid_has_supplier"),
     ("Permits", "PermitInspection", "permit_has_inspection"),
 ]
 
-W, H = 1380, 1010
+W, H = 1580, 1010
 
 
 def border_point(cx, cy, tx, ty):
@@ -134,7 +135,7 @@ for name, (cx, cy, src) in NODES.items():
 # ---- legend (4 sources) ------------------------------------------------------
 lx, ly = 40, H - 168
 svg.append(
-    f'<rect x="{lx}" y="{ly}" width="380" height="146" rx="10" fill="#fafafa" '
+    f'<rect x="{lx}" y="{ly}" width="366" height="146" rx="10" fill="#fafafa" '
     'stroke="#cccccc" stroke-width="1.5"/>'
 )
 svg.append(
