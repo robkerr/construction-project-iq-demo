@@ -1,0 +1,50 @@
+// ============================================================================
+// EPC Demo - RTI commissioning telemetry KQL schema
+// Database: eh_rti_telemetry  (Eventhouse: eh_rti_telemetry)
+//
+// One command per statement. Deploy with deploy_kql.sh (executes each via the
+// Kusto management REST endpoint). All commands are idempotent.
+// ============================================================================
+
+// --- 1. Landing table: raw commissioning telemetry (Eventstream writes here) ---
+.create-merge table commissioning_telemetry (event_time: datetime, equipment_tag: string, project_id: string, asset_class: string, commissioning_phase: string, winding_temp_c: real, top_oil_temp_c: real, load_current_a: real, load_pct: real, dga_h2_ppm: real, vibration_mm_s: real, ambient_temp_c: real, tap_position: int, cooling_stage: string, status: string)
+
+// --- 2. JSON ingestion mapping (Eventstream references this by name) ---
+.create-or-alter table commissioning_telemetry ingestion json mapping 'telemetry_json' '[{"column":"event_time","path":"$.event_time","datatype":"datetime"},{"column":"equipment_tag","path":"$.equipment_tag","datatype":"string"},{"column":"project_id","path":"$.project_id","datatype":"string"},{"column":"asset_class","path":"$.asset_class","datatype":"string"},{"column":"commissioning_phase","path":"$.commissioning_phase","datatype":"string"},{"column":"winding_temp_c","path":"$.winding_temp_c","datatype":"real"},{"column":"top_oil_temp_c","path":"$.top_oil_temp_c","datatype":"real"},{"column":"load_current_a","path":"$.load_current_a","datatype":"real"},{"column":"load_pct","path":"$.load_pct","datatype":"real"},{"column":"dga_h2_ppm","path":"$.dga_h2_ppm","datatype":"real"},{"column":"vibration_mm_s","path":"$.vibration_mm_s","datatype":"real"},{"column":"ambient_temp_c","path":"$.ambient_temp_c","datatype":"real"},{"column":"tap_position","path":"$.tap_position","datatype":"int"},{"column":"cooling_stage","path":"$.cooling_stage","datatype":"string"},{"column":"status","path":"$.status","datatype":"string"}]'
+
+// --- 3. Low-latency streaming ingestion (events visible within seconds) ---
+.alter table commissioning_telemetry policy streamingingestion enable
+
+// --- 4. Retention (365d) and hot cache (30d) ---
+.alter table commissioning_telemetry policy retention '{"SoftDeletePeriod":"365.00:00:00","Recoverability":"Enabled"}'
+
+.alter table commissioning_telemetry policy caching hot = 30d
+
+// --- 5. Materialized view: current state per asset (arg_max latest reading) ---
+.create-or-alter materialized-view with (backfill=true) latest_by_asset on table commissioning_telemetry { commissioning_telemetry | summarize arg_max(event_time, *) by equipment_tag }
+
+// --- 6. Function: winding-temperature anomalies via series_decompose_anomalies ---
+.create-or-alter function with (docstring='Per-asset winding-temp anomaly flags over a lookback window', folder='RTI') winding_temp_anomalies(lookback:timespan=1h, bin_size:timespan=10s) {
+    commissioning_telemetry
+    | where event_time > ago(lookback)
+    | make-series avg_winding = avg(winding_temp_c) default=real(null) on event_time step bin_size by equipment_tag
+    | extend (anomaly, score, baseline) = series_decompose_anomalies(avg_winding, 2.5)
+    | mv-expand event_time to typeof(datetime), avg_winding to typeof(real), anomaly to typeof(long), score to typeof(real), baseline to typeof(real)
+    | where anomaly != 0
+    | project event_time, equipment_tag, avg_winding, baseline, score, anomaly
+}
+
+// --- 7. Function: dissolved-gas (H2) trend, hourly, per asset ---
+.create-or-alter function with (docstring='Hourly dissolved-hydrogen trend per asset (incipient-fault indicator)', folder='RTI') dga_trend(lookback:timespan=24h) {
+    commissioning_telemetry
+    | where event_time > ago(lookback)
+    | summarize avg_h2 = avg(dga_h2_ppm), max_h2 = max(dga_h2_ppm) by equipment_tag, bin(event_time, 1h)
+    | order by equipment_tag asc, event_time asc
+}
+
+// --- 8. Function: currently-active alarms (drives Activator / dashboard tile) ---
+.create-or-alter function with (docstring='Latest reading per asset that is currently in alarm', folder='RTI') active_alarms() {
+    latest_by_asset
+    | where status == 'alarm'
+    | project event_time, equipment_tag, project_id, commissioning_phase, winding_temp_c, dga_h2_ppm, vibration_mm_s, status
+}

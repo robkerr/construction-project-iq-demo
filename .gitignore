@@ -37,3 +37,7 @@ Thumbs.db
 # ---- BigQuery mirroring: service account key & venv ----
 external_sources/bigquery_mirroring/*-key.json
 external_sources/bigquery_mirroring/.venv/
+
+# ---- RTI: Eventstream custom-app connection string (never commit) ----
+external_sources/rti_commissioning/*.endpoint
+external_sources/rti_commissioning/.env

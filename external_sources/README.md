@@ -17,10 +17,12 @@ you can fuse them with the existing Fabric model in one query.
 | 2 | On-prem **SQL Server** | Time clock / labor | **Mirroring** → shortcut in bronze | You run `schema.sql` + `load_bulk.sql` |
 | 3 | Amazon **S3** (Delta Lake) | Government permits & inspections | **Shortcut** into bronze Tables | `place_s3.sh` + `convert_s3_to_delta.py` + `place_s3_delta.sh` (automated) |
 | 4 | Amazon **S3** (raw Parquet, `ods/`) | Core project/SAP landing data | **ELT pipeline** → Copy into Files/landing → notebooks | `elt_pipeline/` (automated) |
+| 5 | **Eventstream** (custom app) | Equipment commissioning telemetry (IIoT) | **RTI** → KQL Database (Eventhouse) | `rti_commissioning/` (automated) |
 
-These cover the three headline ingestion patterns side by side: **mirroring**
+These cover the four headline ingestion patterns side by side: **mirroring**
 (#1–2, near-real-time replication), **shortcuts** (#3, zero-copy virtualization),
-and a **traditional ELT data pipeline** (#4, Copy + notebook orchestration).
+a **traditional ELT data pipeline** (#4, Copy + notebook orchestration), and
+**Real-Time Intelligence** (#5, Eventstream → KQL for live telemetry analytics).
 
 ## Regenerate the data
 
@@ -244,3 +246,33 @@ The pipeline `PL_ELT_Landing_to_Gold` is created but **intentionally not
 triggered** — run it manually from the Fabric portal to demo the full ELT path.
 The Copy activity flattens `ods/*.parquet` into `Files/landing/<table>.parquet`
 (PreserveHierarchy), which is exactly what `02_load_bronze` expects.
+
+---
+
+### E. RTI: commissioning telemetry (Eventstream → KQL Database)
+
+The fifth pattern is **Real-Time Intelligence** — a live event stream landing in
+a **KQL database** (Eventhouse), the right engine for high-frequency time-series
+telemetry and anomaly detection.
+
+```
+produce_telemetry.py  ──▶  Eventstream esCommissioning (custom-app source)
+                                │  ProcessedIngestion
+                                ▼
+                        Eventhouse eh_rti_telemetry ▶ KQL DB
+                                │  commissioning_telemetry (+ view + functions)
+                                ▼
+                        winding_temp_anomalies() / active_alarms()  ──▶ (opt) Activator
+```
+
+Power transformers and shunt reactors being commissioned at the Project **Falcon
+(PRJ-001)** substation stream winding/oil temperature, load current,
+dissolved-hydrogen (DGA), and vibration. The hero transformer **ET-1001** is
+scripted to drift **healthy → warning → alarm** live, reproducing the batch
+emergency work order **WO-900001** — so RTI fuses with the mirrored, shortcut,
+and ELT data on `equipment_tag` / `project_id`.
+
+Everything is real and provisioned via REST/Entra (no secrets in the repo — the
+Eventstream custom-app endpoint vends a Fabric-managed SAS, passed to the
+producer via `ES_CONNECTION_STRING`). Full details, IDs, and run instructions:
+**[`rti_commissioning/README.md`](rti_commissioning/README.md)**.
