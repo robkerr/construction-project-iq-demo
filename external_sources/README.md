@@ -73,19 +73,20 @@ Override with `S3_BUCKET`, `AWS_REGION`, `S3_PREFIX`.
 ### 2) SQL Server (manual — no reachable server from this environment)
 On a host that can reach your SQL Server instance:
 
-1. Create/choose a database (e.g. `TimeClockDB`).
+1. Create/choose a database (e.g. `EmployeeTimeTracking`).
 2. Create the schema + tables:
    ```
-   sqlcmd -S <server> -d TimeClockDB -i out/sqlserver/schema.sql
+   sqlcmd -S <server> -d EmployeeTimeTracking -i out/sqlserver/schema.sql
    ```
 3. Copy the six `out/sqlserver/*.csv` files to a folder the SQL Server service
    account can read (e.g. `C:\timeclock_csv\`), edit the `@dir` variable at the
    top of `out/sqlserver/load_bulk.sql`, then:
    ```
-   sqlcmd -S <server> -d TimeClockDB -i out/sqlserver/load_bulk.sql
+   sqlcmd -S <server> -d EmployeeTimeTracking -i out/sqlserver/load_bulk.sql
    ```
-   (If `BULK INSERT` can't see the path, use the dynamic-SQL variant noted at the
-   bottom of the script, or `bcp <table> in <file>.csv -c -t, -F 2 -S <server> -d TimeClockDB`.)
+   (`load_bulk.sql` uses dynamic SQL + `sp_executesql` because `BULK INSERT`
+   requires a string literal for `FROM`. Alternatively:
+   `bcp <table> in <file>.csv -c -t, -F 2 -S <server> -d EmployeeTimeTracking`.)
 
 Every mirrored table already has a **primary key** (required by Fabric mirroring).
 
@@ -103,11 +104,31 @@ Every mirrored table already has a **primary key** (required by Fabric mirroring
 3. In the **bronze** lakehouse → **New shortcut → Microsoft OneLake** → point at
    the mirrored database's tables (e.g. under `bronze/Tables/wo_*`).
 
-### B. Mirror SQL Server → bronze
-1. Fabric workspace → **New item → Mirrored Database → SQL Server**
-   (via **on-premises data gateway** for an on-prem instance).
-2. Select the `[timeclock]` tables, mirror. Wait for replication.
-3. In the **bronze** lakehouse → **New shortcut → Microsoft OneLake** → point at
+### B. Mirror SQL Server → bronze (SQL Server 2022 = CDC-based)
+Prep the on-prem instance first (run in order, as a sysadmin, against
+`EmployeeTimeTracking`). SQL Server 2016-2022 mirroring replicates via **Change
+Data Capture**, so CDC must be enabled and **SQL Server Agent must be running**:
+
+```
+sqlcmd -S <server> -d EmployeeTimeTracking -i out/sqlserver/mirroring_01_enable_cdc.sql
+sqlcmd -S <server> -d EmployeeTimeTracking -i out/sqlserver/mirroring_02_security.sql
+sqlcmd -S <server> -d EmployeeTimeTracking -i out/sqlserver/mirroring_03_verify_cdc.sql
+```
+
+- `mirroring_01_enable_cdc.sql` — enables CDC at the database level and on all
+  six `timeclock` tables (idempotent).
+- `mirroring_02_security.sql` — grants the existing `fabric_login` server-level
+  `CONNECT SQL`, maps it to a `fabric_user` database user, and grants `CONNECT,
+  SELECT`. Because CDC is pre-enabled, **`fabric_login` never needs sysadmin**.
+- `mirroring_03_verify_cdc.sql` — verification queries (DB flag, per-table CDC,
+  capture instances, CDC Agent jobs, Agent status, `fabric_user` grants).
+
+Then in Fabric:
+1. **Create → Mirrored SQL Server database**, enter the source database name.
+2. **New connection → SQL Server database**, select your **on-premises data
+   gateway**, authenticate as `fabric_login`, check **Use encrypted connection**.
+3. Select the `timeclock.*` tables and start mirroring. Wait for replication.
+4. In the **bronze** lakehouse → **New shortcut → Microsoft OneLake** → point at
    the mirrored `timeclock.*` tables.
 
 ### C. Shortcut S3 → bronze
