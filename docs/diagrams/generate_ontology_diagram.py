@@ -26,16 +26,18 @@ HW, HH = BOX_W / 2, BOX_H / 2
 
 # ---- nodes: name -> (cx, cy, source) -----------------------------------------
 NODES = {
-    "Project":                (185, 520, "fabric"),
-    "WorkBreakdownStructure": (590, 250, "fabric"),
-    "Bids":                   (590, 540, "fabric"),
-    "Permits":                (590, 830, "s3"),
-    "WorkOrder":              (1000, 250, "bigquery"),
-    "Suppliers":              (1000, 540, "sap"),
-    "PermitInspection":       (1000, 830, "s3"),
-    "WorkOrderLabor":         (1400, 120, "bigquery"),
-    "WorkOrderMaterial":      (1400, 260, "bigquery"),
-    "WorkOrderTask":          (1400, 400, "bigquery"),
+    "Project":                (175, 585, "fabric"),
+    "WorkBreakdownStructure": (575, 250, "fabric"),
+    "Bids":                   (575, 620, "fabric"),
+    "Permits":                (575, 975, "s3"),
+    "WorkOrder":              (980, 150, "bigquery"),
+    "PurchaseOrder":          (980, 330, "sap"),
+    "EngineeringChange":      (980, 470, "fabric"),
+    "Suppliers":              (980, 620, "sap"),
+    "PermitInspection":       (980, 975, "s3"),
+    "WorkOrderLabor":         (1385, 70, "bigquery"),
+    "WorkOrderMaterial":      (1385, 190, "bigquery"),
+    "WorkOrderTask":          (1385, 310, "bigquery"),
 }
 
 # ---- edges: (source, target, label) ------------------------------------------
@@ -44,6 +46,8 @@ EDGES = [
     ("Project", "Bids", "project_has_bid"),
     ("Project", "Permits", "projects_have_permits"),
     ("WorkBreakdownStructure", "WorkOrder", "wbs_has_workorders"),
+    ("WorkBreakdownStructure", "PurchaseOrder", "wps_procured_by_purchase_order"),
+    ("WorkBreakdownStructure", "EngineeringChange", "wbs_affected_by_change"),
     ("WorkOrder", "WorkOrderLabor", "workorder_has_labor"),
     ("WorkOrder", "WorkOrderMaterial", "workorder_has_material"),
     ("WorkOrder", "WorkOrderTask", "workorder_has_task"),
@@ -51,7 +55,7 @@ EDGES = [
     ("Permits", "PermitInspection", "permit_has_inspection"),
 ]
 
-W, H = 1580, 1010
+W, H = 1620, 1175
 
 
 def border_point(cx, cy, tx, ty):

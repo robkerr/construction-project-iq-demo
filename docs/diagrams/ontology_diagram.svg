@@ -1,54 +1,62 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1580" height="1010" viewBox="0 0 1580 1010" font-family="Segoe UI, Arial, sans-serif">
-<rect x="0" y="0" width="1580" height="1010" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1620" height="1175" viewBox="0 0 1620 1175" font-family="Segoe UI, Arial, sans-serif">
+<rect x="0" y="0" width="1620" height="1175" fill="#ffffff"/>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5a5a5a"/></marker><filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="2.2" flood-color="#000" flood-opacity="0.18"/></filter></defs>
 <text x="40" y="52" font-size="30" font-weight="700" fill="#1a1a1a">Project Controls IQ — Fabric IQ Ontology</text>
 <text x="41" y="82" font-size="16" fill="#555">Entities colored by source system &#8226; relationships labeled with their titles</text>
-<path d="M239.0,484.0 L536.0,286.0" fill="none" stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>
-<path d="M289.0,525.1 L486.0,534.9" fill="none" stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>
-<path d="M232.0,556.0 L543.0,794.0" fill="none" stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>
-<path d="M694.0,250.0 L896.0,250.0" fill="none" stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>
-<path d="M1104.0,216.2 L1296.0,153.8" fill="none" stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>
-<path d="M1104.0,252.6 L1296.0,257.4" fill="none" stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>
-<path d="M1096.0,286.0 L1304.0,364.0" fill="none" stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>
-<path d="M694.0,540.0 L896.0,540.0" fill="none" stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>
-<path d="M694.0,830.0 L896.0,830.0" fill="none" stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>
-<g><rect x="247.3" y="373.0" width="280.4" height="22" rx="8" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/><text x="387.5" y="388.0" font-size="13.5" font-style="italic" text-anchor="middle" fill="#444">project_has_work_breakdown_structure</text></g>
-<g><rect x="325.0" y="518.0" width="125.0" height="22" rx="8" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/><text x="387.5" y="533.0" font-size="13.5" font-style="italic" text-anchor="middle" fill="#444">project_has_bid</text></g>
-<g><rect x="302.8" y="663.0" width="169.4" height="22" rx="8" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/><text x="387.5" y="678.0" font-size="13.5" font-style="italic" text-anchor="middle" fill="#444">projects_have_permits</text></g>
-<g><rect x="721.4" y="238.0" width="147.2" height="22" rx="8" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/><text x="795.0" y="253.0" font-size="13.5" font-style="italic" text-anchor="middle" fill="#444">wbs_has_workorders</text></g>
-<g><rect x="1122.7" y="173.0" width="154.6" height="22" rx="8" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/><text x="1200.0" y="188.0" font-size="13.5" font-style="italic" text-anchor="middle" fill="#444">workorder_has_labor</text></g>
-<g><rect x="1111.6" y="243.0" width="176.8" height="22" rx="8" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/><text x="1200.0" y="258.0" font-size="13.5" font-style="italic" text-anchor="middle" fill="#444">workorder_has_material</text></g>
-<g><rect x="1126.4" y="313.0" width="147.2" height="22" rx="8" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/><text x="1200.0" y="328.0" font-size="13.5" font-style="italic" text-anchor="middle" fill="#444">workorder_has_task</text></g>
-<g><rect x="728.8" y="528.0" width="132.4" height="22" rx="8" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/><text x="795.0" y="543.0" font-size="13.5" font-style="italic" text-anchor="middle" fill="#444">bid_has_supplier</text></g>
-<g><rect x="710.3" y="818.0" width="169.4" height="22" rx="8" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/><text x="795.0" y="833.0" font-size="13.5" font-style="italic" text-anchor="middle" fill="#444">permit_has_inspection</text></g>
-<rect x="81.0" y="484.0" width="208" height="72" rx="12" fill="#C6EFCE" stroke="#2E7D32" stroke-width="2.5" filter="url(#shadow)"/>
-<text x="185" y="526.6" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">Project</text>
-<rect x="486.0" y="214.0" width="208" height="72" rx="12" fill="#C6EFCE" stroke="#2E7D32" stroke-width="2.5" filter="url(#shadow)"/>
-<text x="590" y="255.0" font-size="14.2" font-weight="700" text-anchor="middle" fill="#1a1a1a">WorkBreakdownStructure</text>
-<rect x="486.0" y="504.0" width="208" height="72" rx="12" fill="#C6EFCE" stroke="#2E7D32" stroke-width="2.5" filter="url(#shadow)"/>
-<text x="590" y="546.6" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">Bids</text>
-<rect x="486.0" y="794.0" width="208" height="72" rx="12" fill="#FFEB9C" stroke="#B7860B" stroke-width="2.5" filter="url(#shadow)"/>
-<text x="590" y="836.6" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">Permits</text>
-<rect x="896.0" y="214.0" width="208" height="72" rx="12" fill="#BDD7EE" stroke="#1F4E79" stroke-width="2.5" filter="url(#shadow)"/>
-<text x="1000" y="256.6" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">WorkOrder</text>
-<rect x="896.0" y="504.0" width="208" height="72" rx="12" fill="#F4C7C3" stroke="#C0392B" stroke-width="2.5" filter="url(#shadow)"/>
-<text x="1000" y="546.6" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">Suppliers</text>
-<rect x="896.0" y="794.0" width="208" height="72" rx="12" fill="#FFEB9C" stroke="#B7860B" stroke-width="2.5" filter="url(#shadow)"/>
-<text x="1000" y="836.6" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">PermitInspection</text>
-<rect x="1296.0" y="84.0" width="208" height="72" rx="12" fill="#BDD7EE" stroke="#1F4E79" stroke-width="2.5" filter="url(#shadow)"/>
-<text x="1400" y="126.7" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">WorkOrderLabor</text>
-<rect x="1296.0" y="224.0" width="208" height="72" rx="12" fill="#BDD7EE" stroke="#1F4E79" stroke-width="2.5" filter="url(#shadow)"/>
-<text x="1400" y="266.5" font-size="18.4" font-weight="700" text-anchor="middle" fill="#1a1a1a">WorkOrderMaterial</text>
-<rect x="1296.0" y="364.0" width="208" height="72" rx="12" fill="#BDD7EE" stroke="#1F4E79" stroke-width="2.5" filter="url(#shadow)"/>
-<text x="1400" y="406.6" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">WorkOrderTask</text>
-<rect x="40" y="842" width="366" height="146" rx="10" fill="#fafafa" stroke="#cccccc" stroke-width="1.5"/>
-<text x="56" y="870" font-size="15" font-weight="700" fill="#1a1a1a">Source system</text>
-<rect x="56" y="881" width="24" height="15" rx="3" fill="#C6EFCE" stroke="#2E7D32" stroke-width="1.8"/>
-<text x="90" y="894" font-size="13.5" fill="#333">Fabric / OneLake</text>
-<rect x="56" y="903" width="24" height="15" rx="3" fill="#FFEB9C" stroke="#B7860B" stroke-width="1.8"/>
-<text x="90" y="916" font-size="13.5" fill="#333">Amazon S3 (Delta shortcut)</text>
-<rect x="56" y="925" width="24" height="15" rx="3" fill="#BDD7EE" stroke="#1F4E79" stroke-width="1.8"/>
-<text x="90" y="938" font-size="13.5" fill="#333">Google BigQuery (mirrored)</text>
-<rect x="56" y="947" width="24" height="15" rx="3" fill="#F4C7C3" stroke="#C0392B" stroke-width="1.8"/>
-<text x="90" y="960" font-size="13.5" fill="#333">SAP</text>
+<path d="M218.0,549.0 L532.0,286.0" fill="none" stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M279.0,594.1 L471.0,610.9" fill="none" stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M211.9,621.0 L538.1,939.0" fill="none" stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M679.0,224.3 L876.0,175.7" fill="none" stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M679.0,270.5 L876.0,309.5" fill="none" stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M641.3,286.0 L913.7,434.0" fill="none" stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M1084.0,129.5 L1281.0,90.5" fill="none" stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M1084.0,160.3 L1281.0,179.7" fill="none" stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M1071.1,186.0 L1293.9,274.0" fill="none" stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M679.0,620.0 L876.0,620.0" fill="none" stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M679.0,975.0 L876.0,975.0" fill="none" stroke="#8a8a8a" stroke-width="2" marker-end="url(#arrow)"/>
+<g><rect x="234.8" y="405.5" width="280.4" height="22" rx="8" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/><text x="375.0" y="420.5" font-size="13.5" font-style="italic" text-anchor="middle" fill="#444">project_has_work_breakdown_structure</text></g>
+<g><rect x="312.5" y="590.5" width="125.0" height="22" rx="8" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/><text x="375.0" y="605.5" font-size="13.5" font-style="italic" text-anchor="middle" fill="#444">project_has_bid</text></g>
+<g><rect x="290.3" y="768.0" width="169.4" height="22" rx="8" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/><text x="375.0" y="783.0" font-size="13.5" font-style="italic" text-anchor="middle" fill="#444">projects_have_permits</text></g>
+<g><rect x="703.9" y="188.0" width="147.2" height="22" rx="8" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/><text x="777.5" y="203.0" font-size="13.5" font-style="italic" text-anchor="middle" fill="#444">wbs_has_workorders</text></g>
+<g><rect x="659.5" y="278.0" width="236.0" height="22" rx="8" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/><text x="777.5" y="293.0" font-size="13.5" font-style="italic" text-anchor="middle" fill="#444">wps_procured_by_purchase_order</text></g>
+<g><rect x="689.1" y="348.0" width="176.8" height="22" rx="8" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/><text x="777.5" y="363.0" font-size="13.5" font-style="italic" text-anchor="middle" fill="#444">wbs_affected_by_change</text></g>
+<g><rect x="1105.2" y="98.0" width="154.6" height="22" rx="8" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/><text x="1182.5" y="113.0" font-size="13.5" font-style="italic" text-anchor="middle" fill="#444">workorder_has_labor</text></g>
+<g><rect x="1094.1" y="158.0" width="176.8" height="22" rx="8" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/><text x="1182.5" y="173.0" font-size="13.5" font-style="italic" text-anchor="middle" fill="#444">workorder_has_material</text></g>
+<g><rect x="1108.9" y="218.0" width="147.2" height="22" rx="8" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/><text x="1182.5" y="233.0" font-size="13.5" font-style="italic" text-anchor="middle" fill="#444">workorder_has_task</text></g>
+<g><rect x="711.3" y="608.0" width="132.4" height="22" rx="8" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/><text x="777.5" y="623.0" font-size="13.5" font-style="italic" text-anchor="middle" fill="#444">bid_has_supplier</text></g>
+<g><rect x="692.8" y="963.0" width="169.4" height="22" rx="8" fill="#ffffff" stroke="#d0d0d0" stroke-width="1"/><text x="777.5" y="978.0" font-size="13.5" font-style="italic" text-anchor="middle" fill="#444">permit_has_inspection</text></g>
+<rect x="71.0" y="549.0" width="208" height="72" rx="12" fill="#C6EFCE" stroke="#2E7D32" stroke-width="2.5" filter="url(#shadow)"/>
+<text x="175" y="591.6" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">Project</text>
+<rect x="471.0" y="214.0" width="208" height="72" rx="12" fill="#C6EFCE" stroke="#2E7D32" stroke-width="2.5" filter="url(#shadow)"/>
+<text x="575" y="255.0" font-size="14.2" font-weight="700" text-anchor="middle" fill="#1a1a1a">WorkBreakdownStructure</text>
+<rect x="471.0" y="584.0" width="208" height="72" rx="12" fill="#C6EFCE" stroke="#2E7D32" stroke-width="2.5" filter="url(#shadow)"/>
+<text x="575" y="626.6" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">Bids</text>
+<rect x="471.0" y="939.0" width="208" height="72" rx="12" fill="#FFEB9C" stroke="#B7860B" stroke-width="2.5" filter="url(#shadow)"/>
+<text x="575" y="981.6" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">Permits</text>
+<rect x="876.0" y="114.0" width="208" height="72" rx="12" fill="#BDD7EE" stroke="#1F4E79" stroke-width="2.5" filter="url(#shadow)"/>
+<text x="980" y="156.7" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">WorkOrder</text>
+<rect x="876.0" y="294.0" width="208" height="72" rx="12" fill="#F4C7C3" stroke="#C0392B" stroke-width="2.5" filter="url(#shadow)"/>
+<text x="980" y="336.6" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">PurchaseOrder</text>
+<rect x="876.0" y="434.0" width="208" height="72" rx="12" fill="#C6EFCE" stroke="#2E7D32" stroke-width="2.5" filter="url(#shadow)"/>
+<text x="980" y="476.5" font-size="18.4" font-weight="700" text-anchor="middle" fill="#1a1a1a">EngineeringChange</text>
+<rect x="876.0" y="584.0" width="208" height="72" rx="12" fill="#F4C7C3" stroke="#C0392B" stroke-width="2.5" filter="url(#shadow)"/>
+<text x="980" y="626.6" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">Suppliers</text>
+<rect x="876.0" y="939.0" width="208" height="72" rx="12" fill="#FFEB9C" stroke="#B7860B" stroke-width="2.5" filter="url(#shadow)"/>
+<text x="980" y="981.6" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">PermitInspection</text>
+<rect x="1281.0" y="34.0" width="208" height="72" rx="12" fill="#BDD7EE" stroke="#1F4E79" stroke-width="2.5" filter="url(#shadow)"/>
+<text x="1385" y="76.7" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">WorkOrderLabor</text>
+<rect x="1281.0" y="154.0" width="208" height="72" rx="12" fill="#BDD7EE" stroke="#1F4E79" stroke-width="2.5" filter="url(#shadow)"/>
+<text x="1385" y="196.5" font-size="18.4" font-weight="700" text-anchor="middle" fill="#1a1a1a">WorkOrderMaterial</text>
+<rect x="1281.0" y="274.0" width="208" height="72" rx="12" fill="#BDD7EE" stroke="#1F4E79" stroke-width="2.5" filter="url(#shadow)"/>
+<text x="1385" y="316.6" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">WorkOrderTask</text>
+<rect x="40" y="1007" width="366" height="146" rx="10" fill="#fafafa" stroke="#cccccc" stroke-width="1.5"/>
+<text x="56" y="1035" font-size="15" font-weight="700" fill="#1a1a1a">Source system</text>
+<rect x="56" y="1046" width="24" height="15" rx="3" fill="#C6EFCE" stroke="#2E7D32" stroke-width="1.8"/>
+<text x="90" y="1059" font-size="13.5" fill="#333">Fabric / OneLake</text>
+<rect x="56" y="1068" width="24" height="15" rx="3" fill="#FFEB9C" stroke="#B7860B" stroke-width="1.8"/>
+<text x="90" y="1081" font-size="13.5" fill="#333">Amazon S3 (Delta shortcut)</text>
+<rect x="56" y="1090" width="24" height="15" rx="3" fill="#BDD7EE" stroke="#1F4E79" stroke-width="1.8"/>
+<text x="90" y="1103" font-size="13.5" fill="#333">Google BigQuery (mirrored)</text>
+<rect x="56" y="1112" width="24" height="15" rx="3" fill="#F4C7C3" stroke="#C0392B" stroke-width="1.8"/>
+<text x="90" y="1125" font-size="13.5" fill="#333">SAP</text>
 </svg>
