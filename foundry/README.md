@@ -108,3 +108,4 @@ and body `{ "input": "...", "agent_reference": { "name": "epc-technical-bid-eval
 |---|---|---|
 | `epc-technical-bid-evaluation` | **Priya** — Technical Bid Evaluation (TBE) for a tagged-equipment RFQ (hero: RFQ-0001 / ET-1001). | ✅ built |
 | `epc-monthly-progress-report` | **Maya** — Monthly Progress Report (MPR) fusing SAP cost/procurement + non-SAP schedule/EC (hero: PRJ-001 Project Falcon). | ✅ built |
+| `epc-commercial-bid-evaluation` | **Priya** — Commercial Bid Evaluation (CBE); normalizes quotes to evaluated price, recommends the award (hero: RFQ-0001). Downstream of the TBE. | ✅ built |
