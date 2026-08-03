@@ -15,18 +15,21 @@
 <rect x="248" y="314" width="250" height="68" rx="12" fill="#ffffff" stroke="#c9d2de" stroke-width="1.6" filter="url(#sh)"/><g fill="#d7ccf0" stroke="#6A4FB3" stroke-width="1.6"><polygon points="373.0,333 384.0,339 373.0,345 362.0,339"/><polygon points="362.0,339 373.0,345 373.0,356 362.0,350" fill="#c3b4e6"/><polygon points="384.0,339 373.0,345 373.0,356 384.0,350" fill="#b3a1df"/></g><text x="373.0" y="358.875" font-size="12.5" font-weight="600" text-anchor="middle" fill="#1f2430" font-family="Segoe UI, Arial, sans-serif">Semantic Model</text><text x="373.0" y="373.875" font-size="12.5" font-weight="600" text-anchor="middle" fill="#1f2430" font-family="Segoe UI, Arial, sans-serif">(ProjectControlsIQ)</text>
 <rect x="248" y="392" width="250" height="62" rx="12" fill="#ffffff" stroke="#c9d2de" stroke-width="1.6" filter="url(#sh)"/><g stroke="#3f8f3f" stroke-width="1.8"><line x1="364.0" y1="414" x2="382.0" y2="418"/><line x1="364.0" y1="414" x2="367.0" y2="431"/><line x1="382.0" y1="418" x2="367.0" y2="431"/></g><circle cx="364.0" cy="414" r="4" fill="#7BC67B"/><circle cx="382.0" cy="418" r="4" fill="#7BC67B"/><circle cx="367.0" cy="431" r="4" fill="#7BC67B"/><text x="373.0" y="446.375" font-size="12.5" font-weight="600" text-anchor="middle" fill="#1f2430" font-family="Segoe UI, Arial, sans-serif">Fabric IQ  (Ontology)</text>
 <rect x="44" y="508" width="492" height="150" rx="14" fill="#eef3fa" stroke="#d6deea" stroke-width="1.6"/>
-<rect x="56" y="522" width="108" height="84" rx="10" fill="#ffffff" stroke="#c9d2de" stroke-width="1.6" filter="url(#sh)"/>
-<rect x="94" y="535" width="32" height="26" rx="6" fill="#C0392B" stroke="#8e2a20" stroke-width="1.6"/><text x="110" y="552" font-size="12" font-weight="800" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif">SAP</text>
-<text x="110" y="592" font-size="12" font-weight="600" text-anchor="middle" fill="#1f2430" font-family="Segoe UI, Arial, sans-serif">SAP</text>
-<rect x="174" y="522" width="108" height="84" rx="10" fill="#ffffff" stroke="#c9d2de" stroke-width="1.6" filter="url(#sh)"/>
-<rect x="212" y="535" width="32" height="26" rx="6" fill="#3B7DD8" stroke="#2a5aa0" stroke-width="1.6"/><text x="228" y="552" font-size="12" font-weight="800" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif">BQ</text>
-<text x="228" y="592" font-size="12" font-weight="600" text-anchor="middle" fill="#1f2430" font-family="Segoe UI, Arial, sans-serif">BigQuery</text>
-<rect x="292" y="522" width="108" height="84" rx="10" fill="#ffffff" stroke="#c9d2de" stroke-width="1.6" filter="url(#sh)"/>
-<rect x="330" y="535" width="32" height="26" rx="6" fill="#E8912A" stroke="#b06d1c" stroke-width="1.6"/><text x="346" y="552" font-size="12" font-weight="800" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif">S3</text>
-<text x="346" y="592" font-size="12" font-weight="600" text-anchor="middle" fill="#1f2430" font-family="Segoe UI, Arial, sans-serif">Amazon S3</text>
-<rect x="410" y="522" width="108" height="84" rx="10" fill="#ffffff" stroke="#c9d2de" stroke-width="1.6" filter="url(#sh)"/>
-<rect x="448" y="535" width="32" height="26" rx="6" fill="#2AA79B" stroke="#1e7a70" stroke-width="1.6"/><text x="464" y="552" font-size="12" font-weight="800" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif">FN</text>
-<text x="464" y="592" font-size="12" font-weight="600" text-anchor="middle" fill="#1f2430" font-family="Segoe UI, Arial, sans-serif">Fabric Native</text>
+<rect x="56" y="522" width="84" height="84" rx="10" fill="#ffffff" stroke="#c9d2de" stroke-width="1.6" filter="url(#sh)"/>
+<rect x="82" y="535" width="32" height="26" rx="6" fill="#2AA79B" stroke="#1e7a70" stroke-width="1.6"/><text x="98" y="552" font-size="12" font-weight="800" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif">FN</text>
+<text x="98" y="592" font-size="11" font-weight="600" text-anchor="middle" fill="#1f2430" font-family="Segoe UI, Arial, sans-serif">Fabric Native</text>
+<rect x="152" y="522" width="84" height="84" rx="10" fill="#ffffff" stroke="#c9d2de" stroke-width="1.6" filter="url(#sh)"/>
+<rect x="178" y="535" width="32" height="26" rx="6" fill="#C0392B" stroke="#8e2a20" stroke-width="1.6"/><text x="194" y="552" font-size="12" font-weight="800" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif">SAP</text>
+<text x="194" y="592" font-size="11" font-weight="600" text-anchor="middle" fill="#1f2430" font-family="Segoe UI, Arial, sans-serif">SAP</text>
+<rect x="248" y="522" width="84" height="84" rx="10" fill="#ffffff" stroke="#c9d2de" stroke-width="1.6" filter="url(#sh)"/>
+<rect x="274" y="535" width="32" height="26" rx="6" fill="#3B7DD8" stroke="#2a5aa0" stroke-width="1.6"/><text x="290" y="552" font-size="12" font-weight="800" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif">BQ</text>
+<text x="290" y="592" font-size="11" font-weight="600" text-anchor="middle" fill="#1f2430" font-family="Segoe UI, Arial, sans-serif">BigQuery</text>
+<rect x="344" y="522" width="84" height="84" rx="10" fill="#ffffff" stroke="#c9d2de" stroke-width="1.6" filter="url(#sh)"/>
+<rect x="370" y="535" width="32" height="26" rx="6" fill="#E8912A" stroke="#b06d1c" stroke-width="1.6"/><text x="386" y="552" font-size="12" font-weight="800" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif">S3</text>
+<text x="386" y="592" font-size="11" font-weight="600" text-anchor="middle" fill="#1f2430" font-family="Segoe UI, Arial, sans-serif">Amazon S3</text>
+<rect x="440" y="522" width="84" height="84" rx="10" fill="#ffffff" stroke="#c9d2de" stroke-width="1.6" filter="url(#sh)"/>
+<rect x="466" y="535" width="32" height="26" rx="6" fill="#8657C6" stroke="#5f3c94" stroke-width="1.6"/><text x="482" y="552" font-size="12" font-weight="800" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif">SQL</text>
+<text x="482" y="592" font-size="11" font-weight="600" text-anchor="middle" fill="#1f2430" font-family="Segoe UI, Arial, sans-serif">SQL Server</text>
 <rect x="56" y="616" width="468" height="34" rx="10" fill="#ffffff" stroke="#cfd8e4" stroke-width="1.6"/>
 <circle cx="80" cy="633" r="12" fill="#2E7CC4"/><path d="M72,635 q8,-9 16,0" fill="none" stroke="#fff" stroke-width="2.4"/><path d="M72,640 q8,-9 16,0" fill="none" stroke="#cfe6fb" stroke-width="2"/>
 <text x="100" y="638" font-size="14" font-weight="700" text-anchor="start" fill="#2E7CC4" font-family="Segoe UI, Arial, sans-serif">OneLake</text><text x="172" y="638" font-size="13.5" font-weight="500" text-anchor="start" fill="#1f2430" font-family="Segoe UI, Arial, sans-serif">| Unified Data Foundation</text>

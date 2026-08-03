@@ -301,16 +301,17 @@ S.append(tile(248, 392, 250, 62, ["Fabric IQ  (Ontology)"], ic_graph))
 
 # data sources + OneLake (below dashed region)
 S.append(rr(44, 508, 492, 150, fill="#eef3fa", stroke="#d6deea", rx=14))
-ds = [("SAP", "#C0392B", "#8e2a20", "SAP"),
+ds = [("Fabric Native", "#2AA79B", "#1e7a70", "FN"),
+      ("SAP", "#C0392B", "#8e2a20", "SAP"),
       ("BigQuery", "#3B7DD8", "#2a5aa0", "BQ"),
       ("Amazon S3", "#E8912A", "#b06d1c", "S3"),
-      ("Fabric Native", "#2AA79B", "#1e7a70", "FN")]
+      ("SQL Server", "#8657C6", "#5f3c94", "SQL")]
 dx = 56
 for name, fill, stroke, short in ds:
-    S.append(rr(dx, 522, 108, 84, shadow=True, rx=10))
-    S.append(badge(dx + 54, 548, fill, stroke, short))
-    S.append(txt(dx + 54, 592, name, size=12, w=600))
-    dx += 118
+    S.append(rr(dx, 522, 84, 84, shadow=True, rx=10))
+    S.append(badge(dx + 42, 548, fill, stroke, short))
+    S.append(txt(dx + 42, 592, name, size=11, w=600))
+    dx += 96
 S.append(rr(56, 616, 468, 34, fill="#ffffff", stroke="#cfd8e4", rx=10))
 S.append(ic_onelake(80, 633))
 S.append(txt(100, 638, "OneLake", size=14, w=700, anchor="start", fill="#2E7CC4") +
