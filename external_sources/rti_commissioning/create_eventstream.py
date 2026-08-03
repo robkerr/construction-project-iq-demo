@@ -126,6 +126,46 @@ def create(tok):
     return item_id
 
 
+def ensure_running(tok, es_id, wait=True):
+    """Resume any Paused/Stopped source or destination so telemetry reaches the
+    Eventhouse. A paused Eventhouse destination silently drops the stream: events
+    enter the Eventstream but never land in the KQL table, so no alarm fires."""
+    s, _, topo = request("GET", f"{API}/workspaces/{WORKSPACE_ID}/eventstreams/{es_id}/topology", tok)
+    if s >= 400 or not topo:
+        print("Preflight: could not read Eventstream topology; skipping resume.",
+              file=sys.stderr)
+        return
+    resumed = []
+    for kind in ("sources", "destinations"):
+        for node in (topo.get(kind) or []):
+            st = (node.get("status") or "")
+            if st.lower() in ("paused", "stopped"):
+                nid, nm = node.get("id"), node.get("name")
+                rs, _, _ = request(
+                    "POST",
+                    f"{API}/workspaces/{WORKSPACE_ID}/eventstreams/{es_id}/{kind}/{nid}/resume",
+                    tok, {"startType": "Now"})
+                print(f"Preflight: resuming {kind[:-1]} '{nm}' (was {st}) -> HTTP {rs}",
+                      file=sys.stderr)
+                resumed.append((kind, nid, nm))
+    if not resumed:
+        print("Preflight: all Eventstream nodes already running.", file=sys.stderr)
+        return
+    if wait:
+        want = {(k, i) for k, i, _ in resumed}
+        for _ in range(15):  # up to ~45s for Resuming -> Running
+            time.sleep(3)
+            _, _, t2 = request("GET",
+                               f"{API}/workspaces/{WORKSPACE_ID}/eventstreams/{es_id}/topology", tok)
+            running = {(k, n.get("id")) for k in ("sources", "destinations")
+                       for n in (t2.get(k) or []) if (n.get("status") or "").lower() == "running"}
+            if want <= running:
+                print("Preflight: resumed nodes are Running.", file=sys.stderr)
+                return
+        print("Preflight: resume issued; nodes still transitioning (continuing).",
+              file=sys.stderr)
+
+
 def print_endpoint(tok, es_id):
     # Topology API: find the source id, then GET its connection.
     s, _, topo = request("GET", f"{API}/workspaces/{WORKSPACE_ID}/eventstreams/{es_id}/topology", tok)
@@ -144,9 +184,17 @@ def print_endpoint(tok, es_id):
 
 def main():
     tok = token()
+    if "--ensure-running" in sys.argv:
+        es_id = find_es(tok)
+        if es_id:
+            ensure_running(tok, es_id)
+        else:
+            print("No esCommissioning eventstream found.", file=sys.stderr)
+        return
     es_id = find_es(tok) if "--endpoint" in sys.argv else create(tok)
     if not es_id:
         es_id = find_es(tok)
+    ensure_running(tok, es_id)
     print_endpoint(tok, es_id)
 
 

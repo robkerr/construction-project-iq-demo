@@ -112,3 +112,36 @@ three tiles over the same table/functions:
 > the dashboard tiles query the full table rather than the "last hour" picker.
 > Run a fresh `produce_telemetry.py` burst to watch ET-1001 ramp live and the
 > Activator email fire.
+
+## Demo run (recommended) & troubleshooting
+
+For a live demo, use the helper — it auto-resumes a paused destination first,
+then streams:
+
+```bash
+./run_demo_burst.sh 180          # let it run to COMPLETION; do NOT Ctrl-C early
+```
+
+- ET-1001 ramps `ok → warning → alarm`; **alarm starts at ~72% of the run**
+  (~130s into a 180s run). Shorter run = earlier alarm (`./run_demo_burst.sh 90`).
+- After the alarm, the **email lands ~2–4 min later** (Activator polls every 60s
+  with a 60s ingestion delay, plus mail delivery). Check Junk/Other too.
+
+**No alarm email? Check the Eventstream destination first.** The most common
+cause is a **paused Eventhouse destination**: telemetry enters the Eventstream
+(source shows `Running`) but never lands in `commissioning_telemetry`, so the
+Activator sees nothing and never fires. Diagnose / fix:
+
+```bash
+# Auto-resume any paused source/destination (also runs inside run_demo_burst.sh)
+./../../.venv/bin/python create_eventstream.py --ensure-running
+
+# Confirm fresh rows are landing (secs_since_latest should be small)
+#   commissioning_telemetry
+#   | summarize latest=max(event_time),
+#               secs=datetime_diff('second', now(), max(event_time))
+```
+
+If `--ensure-running` reports it resumed the `KqlCommissioning` destination,
+re-run the burst — data will flow and the alarm email will fire.
+

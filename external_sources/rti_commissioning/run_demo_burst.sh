@@ -41,6 +41,13 @@ if [[ -z "${ES_CONNECTION_STRING:-}" ]]; then
   exit 1
 fi
 
+# Preflight: make sure the Eventstream's Eventhouse destination isn't paused.
+# A paused destination silently drops telemetry (events enter the Eventstream but
+# never land in the KQL table), so the Activator never fires. Auto-resume it.
+echo "Preflight: ensuring Eventstream destination is running..."
+"$VENV_PY" create_eventstream.py --ensure-running || \
+  echo "  (preflight check failed; continuing anyway)"
+
 echo "Streaming ~${SECONDS_RUN}s (tick ${INTERVAL}s). ET-1001 will ramp to alarm."
 echo "Tip: open rtdCommissioning first; the email fires ~1-2 min after alarm."
 echo
