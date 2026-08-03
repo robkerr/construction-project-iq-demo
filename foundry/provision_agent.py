@@ -83,7 +83,7 @@ def build_tools(with_web: bool):
     return tools
 
 
-def create_or_update_agent(name: str, instructions_path: Path, with_web: bool) -> None:
+def create_or_update_agent(name: str, instructions_path: Path, with_web: bool, temperature: float) -> None:
     instructions = instructions_path.read_text(encoding="utf-8")
     client = AIProjectClient(endpoint=C.PROJECT_ENDPOINT, credential=DefaultAzureCredential())
 
@@ -91,9 +91,10 @@ def create_or_update_agent(name: str, instructions_path: Path, with_web: bool) -
         model=C.MODEL,
         instructions=instructions,
         tools=build_tools(with_web),
+        temperature=temperature,
     )
     version = client.agents.create_version(agent_name=name, definition=definition)
-    print(f"[agent] '{name}' version {version.version} created/updated (model {C.MODEL}).")
+    print(f"[agent] '{name}' version {version.version} created/updated (model {C.MODEL}, temperature {temperature}).")
     print(f"[agent] tools: fabric_iq_preview(EPCOntology){' + web_search' if with_web else ''}")
 
 
@@ -103,6 +104,8 @@ def main() -> None:
     ap.add_argument("--instructions", default=None, help="Path to the instructions markdown file.")
     ap.add_argument("--no-web", dest="web", action="store_false", help="Do not attach the web_search tool.")
     ap.add_argument("--skip-connection", action="store_true", help="Skip ensuring the ontology connection.")
+    ap.add_argument("--temperature", type=float, default=0.0,
+                    help="Sampling temperature (default 0 for faithful, grounded output).")
     ap.set_defaults(web=True)
     args = ap.parse_args()
 
@@ -112,7 +115,7 @@ def main() -> None:
 
     if not args.skip_connection:
         ensure_ontology_connection()
-    create_or_update_agent(args.agent, instructions_path, args.web)
+    create_or_update_agent(args.agent, instructions_path, args.web, args.temperature)
 
 
 if __name__ == "__main__":

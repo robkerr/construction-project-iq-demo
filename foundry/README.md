@@ -109,3 +109,17 @@ and body `{ "input": "...", "agent_reference": { "name": "epc-technical-bid-eval
 | `epc-technical-bid-evaluation` | **Priya** — Technical Bid Evaluation (TBE) for a tagged-equipment RFQ (hero: RFQ-0001 / ET-1001). | ✅ built |
 | `epc-monthly-progress-report` | **Maya** — Monthly Progress Report (MPR) fusing SAP cost/procurement + non-SAP schedule/EC (hero: PRJ-001 Project Falcon). | ✅ built |
 | `epc-commercial-bid-evaluation` | **Priya** — Commercial Bid Evaluation (CBE); normalizes quotes to evaluated price, recommends the award (hero: RFQ-0001). Downstream of the TBE. | ✅ built |
+| `epc-change-notice` | **Project Controls** — drafts a formal change notice fusing an approved EC and a late long-lead PO on the same WBS (hero: PRJ-001, EC-1207 + transformer PO-00510). | ⚠️ built — see *Known limitation* |
+
+### Known limitation — `epc-change-notice` grounding fidelity
+
+The ontology returns 100% correct data for this agent's tool calls (verified: `PO-00510`,
+supplier `Henderson Systems` / `SUP-009`, promised `2026-07-08` → revised `2026-08-02`, `EC-1207`
++18 days on `ACT-000008`, `$1,103,930.67` overrun). However **gpt-4.1 intermittently fabricates the
+date-, name-, and short-id-shaped fields** during composition (e.g., renames the supplier, rewrites
+the PO dates, or lengthens `PO-00510` to a SAP-style number) — reconstructing them from format
+priors instead of copying the tool output. It grounds distinctive dollar amounts reliably (the
+CBE/TBE/MPR agents are unaffected because their payload is dollar-figure-heavy). Attempted mitigations
+that did **not** fully resolve it: column-style retrieval protocol, `temperature=0`, and a forceful
+verbatim-echo rule. **Revisit options:** deploy a stronger model for this agent, or pin the fixed
+demo-hero facts into the instructions while keeping the live Fabric IQ call for the grounding story.
