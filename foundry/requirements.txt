@@ -1,0 +1,6 @@
+# Foundry agent SDKs
+azure-ai-projects>=2.4.0
+azure-identity>=1.17
+openai>=2.0
+# Only needed to directly probe the Fabric MCP endpoints (probe scripts / debugging):
+mcp>=1.9,<2
