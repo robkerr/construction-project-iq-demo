@@ -1,0 +1,42 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.4.0/schema.json",
+  "name": "rootCauseHeader",
+  "position": {
+    "x": 16,
+    "y": 528,
+    "z": 0,
+    "width": 920,
+    "height": 30,
+    "tabOrder": 14
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Why Falcon is red \u2014 root cause:  ",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "select Project Falcon in the risk bar \u2014 the SAME work package (WBS) carries BOTH a schedule slip (Primavera change control) and a late long-lead transformer PO (SAP).",
+                    "textStyle": {
+                      "fontSize": "10pt"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

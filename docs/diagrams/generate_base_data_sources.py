@@ -3,10 +3,9 @@
 
 A simplified, color-coded summary of the data we integrated into OneLake, one
 card per source system (colors match solution_overview.png):
-  Fabric Native (green) - project controls
+  Fabric Native (green) - project controls + permits
   SAP (red)             - suppliers, POs, cost
   BigQuery (blue)       - work-order management
-  Amazon S3 (orange)    - government permits & inspections
   SQL Server (purple)   - on-prem time clock / labor
 Every source is keyed to the same project / WBS / supplier / asset IDs and
 lands in one bronze lakehouse via mirroring, shortcuts, and ELT.
@@ -103,18 +102,18 @@ S.append(f'<rect x="0" y="0" width="{W}" height="{H}" fill="url(#bg)"/>')
 
 # ---- title -------------------------------------------------------------------
 S.append(txt(860, 52, "Base Data \u2014 What We Integrated, and From Where", size=24, w=700))
-S.append(txt(860, 80, "Five source systems unified in OneLake \u2014 color-coded by origin, so "
+S.append(txt(860, 80, "Four source systems unified in OneLake \u2014 color-coded by origin, so "
              "you can see which system owns each slice of data before the demos",
              size=13.5, w=400, fill=GRAY))
 
 # ---- source-color legend chip (top-right) -----------------------------------
 S.append(rr(1360, 96, 304, 34, fill="#ffffff", stroke="#cfe0ee", rx=17, shadow=True))
 S.append(txt(1378, 118, "Color = source system", size=12, w=700, anchor="start", fill=GRAY))
-for i, c in enumerate(["#2AA79B", "#C0392B", "#3B7DD8", "#E8912A", "#8657C6"]):
+for i, c in enumerate(["#2AA79B", "#C0392B", "#3B7DD8", "#8657C6"]):
     S.append(f'<circle cx="{1548+i*22}" cy="{113}" r="7" fill="{c}"/>')
 
 # ---- cards -------------------------------------------------------------------
-xs = [58, 382, 706, 1030, 1354]
+xs = [58, 490, 922, 1354]
 
 card_data = [
     dict(x=xs[0], color="#2AA79B", tint="#e3f5f2", short="FN", name="Fabric Native",
@@ -122,7 +121,7 @@ card_data = [
          subject="Project controls (core)",
          entities=["Projects & portfolio", "Work Breakdown Structure",
                    "Schedule activities & float", "Engineering changes",
-                   "Bids / RFQs", "Technical evaluations"],
+                   "Bids, RFQs & tech evals", "Permits & inspections"],
          hero="Project Falcon (PRJ-001) \u00b7 change EC-1207"),
     dict(x=xs[1], color="#C0392B", tint="#fbe9e7", short="SAP", name="SAP",
          method="ELT pipeline \u2192 landing",
@@ -137,13 +136,7 @@ card_data = [
          entities=["Equipment / assets", "Work orders", "WO tasks",
                    "WO labor", "WO materials (\u2192 supplier)", "WO status history"],
          hero="Emergency WO-900001 on ET-1001"),
-    dict(x=xs[3], color="#E8912A", tint="#fdefdc", short="S3", name="Amazon S3",
-         method="Shortcut (Delta Lake)",
-         subject="Permits & inspections",
-         entities=["Permitting authorities", "Permits", "Inspections",
-                   "Code violations", "Permit fees", "Environmental readings"],
-         hero="Failed inspection INS-900001 + violation"),
-    dict(x=xs[4], color="#8657C6", tint="#efe7f9", short="SQL", name="SQL Server",
+    dict(x=xs[3], color="#8657C6", tint="#efe7f9", short="SQL", name="SQL Server",
          method="Mirroring \u2192 shortcut",
          subject="On-prem time clock / labor",
          entities=["Employees", "Crews", "Cost codes", "Timesheets",

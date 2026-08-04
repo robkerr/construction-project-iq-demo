@@ -5,8 +5,8 @@
     "x": 496,
     "y": 132,
     "z": 0,
-    "height": 120,
     "width": 456,
+    "height": 120,
     "tabOrder": 3
   },
   "visual": {
@@ -33,24 +33,28 @@
         }
       }
     },
-    "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "33e3073561c79597baee",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "dim_project"
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
               }
             },
-            "Property": "Avg % Complete"
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Avg % Complete'"
+                }
+              }
+            }
           }
-        },
-        "type": "Advanced"
-      }
-    ]
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
   }
 }

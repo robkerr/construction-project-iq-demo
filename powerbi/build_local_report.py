@@ -113,14 +113,14 @@ def bar(name, position, cat_entity, cat_col, val_specs, title, sort_entity, sort
     }
 
 
-def table(name, position, fields, title, sort_field=None, sort_dir="Ascending") -> dict:
+def table(name, position, fields, title, sort_field=None, sort_dir="Ascending", filters=None) -> dict:
     """fields: list of (entity, prop, is_measure)."""
     projs = [proj((meas(e, p) if m else col(e, p)), e, p) for (e, p, m) in fields]
     q = {"queryState": {"Values": {"projections": projs}}}
     if sort_field is not None:
         se, sp, sm = sort_field
         q["sortDefinition"] = {"sort": [{"field": (meas(se, sp) if sm else col(se, sp)), "direction": sort_dir}]}
-    return {
+    vis = {
         "$schema": S_VISUAL,
         "name": name,
         "position": position,
@@ -129,6 +129,34 @@ def table(name, position, fields, title, sort_field=None, sort_dir="Ascending") 
             "query": q,
             "objects": title_objs(title),
             "drillFilterOtherVisuals": True,
+        },
+    }
+    if filters:
+        vis["filterConfig"] = {"filters": filters}
+    return vis
+
+
+def catfilter(entity: str, prop: str, values: list) -> dict:
+    """Applied categorical visual-level filter: entity[prop] IN values.
+
+    `values` are literal expressions already formatted for the query language —
+    strings as "'Late'" (single-quoted), booleans as "true"/"false".
+    """
+    return {
+        "name": f"flt_{entity}_{prop}",
+        "field": {"Column": {"Expression": {"SourceRef": {"Entity": entity}}, "Property": prop}},
+        "type": "Categorical",
+        "filter": {
+            "Version": 2,
+            "From": [{"Name": "f", "Entity": entity, "Type": 0}],
+            "Where": [{
+                "Condition": {
+                    "In": {
+                        "Expressions": [{"Column": {"Expression": {"SourceRef": {"Source": "f"}}, "Property": prop}}],
+                        "Values": [[{"Literal": {"Value": v}}] for v in values],
+                    }
+                }
+            }],
         },
     }
 
@@ -304,8 +332,12 @@ def page_schedule_risk() -> list[dict]:
                      [("Portfolio Schedule Risk", H1)]))
     v.append(textbox("p1Copilot", pos(1160, 16, 736, 104, tab=1), [
         ("\u26a0 Ask Copilot\n", CALLOUT_HDR),
-        ("Project Falcon is the #1 schedule risk (Red). Open the agent and ask: "
-         "\u201cWhy is Project Falcon red, and generate the monthly progress report.\u201d", CALLOUT_BODY),
+        ("The dashboard shows the ", CALLOUT_BODY),
+        ("what", {"fontSize": "11pt", "fontWeight": "bold"}),
+        (". Open the agent and ask the cross-system ", CALLOUT_BODY),
+        ("so-what", {"fontSize": "11pt", "fontWeight": "bold"}),
+        (": \u201cWhat\u2019s driving Falcon\u2019s schedule risk, and what does the late transformer "
+         "PO mean for our sourcing and live field risk?\u201d", CALLOUT_BODY),
     ]))
 
     # slicer strip
@@ -348,16 +380,35 @@ def page_schedule_risk() -> list[dict]:
     for i, (title, ent, m) in enumerate(sap):
         v.append(card(f"p1Sap{i}", pos(1560, y0 + i * (ch + gap), 336, ch, tab=17 + i), ent, m, title))
 
-    # WBS driver table (bottom)
-    v.append(table("p1WbsTable", pos(24, 784, 1872, 272, tab=21), [
+    # Root-cause band (bottom): "Why Falcon is red" — names EC-1207 + PO-00510 on the same WBS.
+    # Select Falcon in the hero bar and both tables resolve the SAME dim_wbs[wbs_name],
+    # so the collision (one work package, two systems) is shown by name, not inferred.
+    v.append(textbox("p1RootCauseHdr", pos(24, 784, 1872, 40, tab=21), [
+        ("Why Falcon is red \u2014 root cause:  ", GROUP_HDR),
+        ("select Project Falcon in the risk bar \u2014 the SAME work package (WBS) carries BOTH a "
+         "schedule slip (Primavera change control) and a late long-lead transformer PO (SAP).",
+         {"fontSize": "12pt"}),
+    ]))
+    v.append(table("p1EcRootCause", pos(24, 832, 920, 224, tab=22), [
+        ("fact_engineering_change", "ec_id", False),
         ("dim_wbs", "wbs_name", False),
-        ("dim_wbs", "discipline", False),
-        ("fact_schedule_activity", "Critical Path At Risk", True),
-        ("fact_schedule_activity", "Min Total Float (days)", True),
-        ("sap_mm_po", "Late Long-Lead POs", True),
-        ("sap_fi_cost", "Forecast Overrun", True),
-    ], "WBS drivers (same WBS carries both the late SAP PO and the schedule slip)",
-        sort_field=("sap_fi_cost", "Forecast Overrun", True), sort_dir="Descending"))
+        ("fact_engineering_change", "schedule_impact_days", False),
+        ("fact_engineering_change", "title", False),
+    ], "Schedule driver \u2014 approved engineering change (Primavera)",
+        sort_field=("fact_engineering_change", "schedule_impact_days", False), sort_dir="Descending",
+        filters=[catfilter("fact_engineering_change", "status", ["'Approved'"])]))
+    v.append(table("p1PoRootCause", pos(976, 832, 920, 224, tab=23), [
+        ("sap_mm_po", "po_id", False),
+        ("dim_wbs", "wbs_name", False),
+        ("sap_mm_po", "material_desc", False),
+        ("sap_supplier", "supplier_name", False),
+        ("sap_mm_po", "status", False),
+    ], "Procurement driver \u2014 late long-lead PO (SAP)",
+        sort_field=("sap_mm_po", "status", False), sort_dir="Descending",
+        filters=[
+            catfilter("sap_mm_po", "is_long_lead", ["true"]),
+            catfilter("sap_mm_po", "status", ["'Late'"]),
+        ]))
     return v
 
 

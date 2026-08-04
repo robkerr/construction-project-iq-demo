@@ -3,11 +3,11 @@
   "name": "slcRegion",
   "position": {
     "x": 952,
-    "y": 532,
+    "y": 632,
     "z": 0,
     "width": 312,
-    "height": 40,
-    "tabOrder": 15
+    "height": 32,
+    "tabOrder": 18
   },
   "visual": {
     "visualType": "slicer",

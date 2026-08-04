@@ -3,11 +3,11 @@
   "name": "slcSupplierRisk",
   "position": {
     "x": 952,
-    "y": 620,
+    "y": 668,
     "z": 0,
     "width": 312,
-    "height": 40,
-    "tabOrder": 17
+    "height": 32,
+    "tabOrder": 19
   },
   "visual": {
     "visualType": "slicer",

@@ -5,8 +5,8 @@
     "x": 24,
     "y": 652,
     "z": 0,
-    "height": 404,
     "width": 928,
+    "height": 404,
     "tabOrder": 12
   },
   "visual": {
@@ -120,94 +120,28 @@
         ]
       }
     },
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Bid comparison (sorted by evaluated price)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "1e52c1e10040ec1a0092",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "fact_bid"
-              }
-            },
-            "Property": "supplier_name"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
-        "name": "2c80912f4892a10c07a0",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "fact_bid"
-              }
-            },
-            "Property": "Avg Technical Score"
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "b6ef8bf09957d21384ec",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "fact_bid"
-              }
-            },
-            "Property": "tbe_status"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
-        "name": "022a742e7895c20cb6eb",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "fact_bid"
-              }
-            },
-            "Property": "Quoted Price"
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "b6d6fc1ced14328c4635",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "fact_bid"
-              }
-            },
-            "Property": "Evaluated Price"
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "56906bf7952d57a166b0",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "fact_bid"
-              }
-            },
-            "Property": "award_status"
-          }
-        },
-        "type": "Categorical"
-      }
-    ]
   }
 }

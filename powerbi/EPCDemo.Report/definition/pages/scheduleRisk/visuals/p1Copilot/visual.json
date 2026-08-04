@@ -19,14 +19,40 @@
               {
                 "textRuns": [
                   {
-                    "value": "⚠ Ask Copilot\n",
+                    "value": "\u26a0 Ask Copilot\n",
                     "textStyle": {
                       "fontSize": "13pt",
                       "fontWeight": "bold"
                     }
                   },
                   {
-                    "value": "Project Falcon is the #1 schedule risk (Red). Open the agent and ask: “Why is Project Falcon red, and generate the monthly progress report.”",
+                    "value": "The dashboard shows the ",
+                    "textStyle": {
+                      "fontSize": "11pt"
+                    }
+                  },
+                  {
+                    "value": "what",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": ". Open the agent and ask the cross-system ",
+                    "textStyle": {
+                      "fontSize": "11pt"
+                    }
+                  },
+                  {
+                    "value": "so-what",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": ": \u201cWhat\u2019s driving Falcon\u2019s schedule risk, and what does the late transformer PO mean for our sourcing and live field risk?\u201d",
                     "textStyle": {
                       "fontSize": "11pt"
                     }

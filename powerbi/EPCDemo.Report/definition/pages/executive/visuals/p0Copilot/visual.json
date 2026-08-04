@@ -5,8 +5,8 @@
     "x": 1160,
     "y": 16,
     "z": 0,
-    "height": 104,
     "width": 736,
+    "height": 104,
     "tabOrder": 1
   },
   "visual": {
@@ -19,18 +19,14 @@
               {
                 "textRuns": [
                   {
-                    "value": "⚠ Ask Copilot",
+                    "value": "\u26a0 Ask Copilot\n",
                     "textStyle": {
-                      "fontWeight": "bold",
-                      "fontSize": "13pt"
+                      "fontSize": "13pt",
+                      "fontWeight": "bold"
                     }
-                  }
-                ]
-              },
-              {
-                "textRuns": [
+                  },
                   {
-                    "value": "One project is trending Red on schedule. Click the largest red-flagged bubble, then open the agent and ask: “Which project is most at risk right now, and why?”",
+                    "value": "One project is trending Red on schedule. Click the largest red-flagged bubble, then open the agent and ask: \u201cWhich project is most at risk right now, and why?\u201d",
                     "textStyle": {
                       "fontSize": "11pt"
                     }

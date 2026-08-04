@@ -5,33 +5,14 @@
     "x": 968,
     "y": 652,
     "z": 0,
-    "height": 280,
     "width": 928,
+    "height": 280,
     "tabOrder": 13
   },
   "visual": {
     "visualType": "pivotTable",
     "query": {
       "queryState": {
-        "Columns": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "fact_bid"
-                    }
-                  },
-                  "Property": "supplier_name"
-                }
-              },
-              "queryRef": "fact_bid.supplier_name",
-              "nativeQueryRef": "supplier_name",
-              "active": true
-            }
-          ]
-        },
         "Rows": {
           "projections": [
             {
@@ -46,8 +27,25 @@
                 }
               },
               "queryRef": "dim_tech_requirement.requirement",
-              "nativeQueryRef": "requirement",
-              "active": true
+              "nativeQueryRef": "requirement"
+            }
+          ]
+        },
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_bid"
+                    }
+                  },
+                  "Property": "supplier_name"
+                }
+              },
+              "queryRef": "fact_bid.supplier_name",
+              "nativeQueryRef": "supplier_name"
             }
           ]
         },
@@ -70,6 +68,28 @@
           ]
         }
       }
+    },
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Technical compliance \u00b7 exceptions by requirement \u00d7 supplier'"
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "drillFilterOtherVisuals": true
   }

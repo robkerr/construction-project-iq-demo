@@ -5,8 +5,8 @@
     "x": 1208,
     "y": 580,
     "z": 0,
-    "height": 88,
     "width": 336,
+    "height": 88,
     "tabOrder": 15
   },
   "visual": {
@@ -32,6 +32,28 @@
           ]
         }
       }
+    },
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Min Total Float (days)'"
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "drillFilterOtherVisuals": true
   }

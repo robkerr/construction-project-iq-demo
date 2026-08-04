@@ -32,15 +32,24 @@ Two labeled groups so viewers *see* both systems contributing to the selected pr
 Tile subtitles carry the **SAP** / **non-SAP** label explicitly. With Falcon selected, at least one
 tile in *each* group is non-zero — the coexistence proof.
 
-### 4. Driver detail table (bottom)
-Table at WBS grain for the selected project, columns:
-`dim_wbs[wbs_name]`, `dim_wbs[discipline]`, `Critical Path At Risk`, `Min Total Float (days)`,
-`Late Long-Lead POs`, `Forecast Overrun`, and an `origin_system` tag column.
-This is where a viewer drills into Falcon and finds the **same WBS** carrying both the late SAP
-transformer PO and the Primavera critical-path slip.
+### 4. Root-cause band (bottom-left) — "Why Falcon is red"
+A thesis textbox + two side-by-side tables that make the collision **explicit**. Select Project
+Falcon in the hero bar (cross-filter) and both tables resolve the **same** `dim_wbs[wbs_name]`:
+- **Schedule driver — engineering change (Primavera):** `fact_engineering_change[ec_id]`,
+  `dim_wbs[wbs_name]`, `schedule_impact_days`, `title` — sorted by impact so **EC-1207 (+18 days)**
+  is named at the top.
+- **Procurement driver — late long-lead PO (SAP):** `sap_mm_po[po_id]`, `dim_wbs[wbs_name]`,
+  `material_desc`, `sap_supplier[supplier_name]`, `status` — the late transformer PO on the same WBS.
 
-### 5. Slicers
-- `dim_project[region]`, `dim_project[client]`, `Risk Band`, `sap_supplier[risk_rating]`.
+This replaces the earlier WBS-grain summary table: instead of leaving the viewer to *infer* the
+collision, it **names** the engineering change and the purchase order on one work package.
+
+### 5. Ask-Copilot call-to-action + slicers (bottom-right)
+- **⚠ Ask Copilot** textbox — a cross-system prompt the dashboard itself can't answer, setting up the
+  agent hand-off: *"what's driving Falcon's schedule risk, and what does the late transformer PO mean
+  for our sourcing and live field risk?"* The dashboard shows the **what**; the agent supplies the
+  cross-system **so-what** (supplier identity → disqualified bid → live equipment alarm).
+- Slicers: `dim_project[region]`, `sap_supplier[risk_rating]`.
 
 ## Design notes
 - Theme: neutral/corporate (generic — no client branding). Red/Amber/Green only for risk bands.
@@ -51,6 +60,6 @@ transformer PO and the Primavera critical-path slip.
 
 ## Acceptance
 - With no filter, the bar ranks **PRJ-001 Project Falcon #1 (Red, ~96)**.
-- Selecting Falcon lights up ≥1 **SAP** tile and ≥1 **non-SAP** tile, and the detail table shows a
-  WBS with both a late long-lead PO and negative critical-path float.
+- Selecting Falcon lights up ≥1 **SAP** tile and ≥1 **non-SAP** tile, and the root-cause band names
+  **EC-1207** and the late long-lead transformer PO on the **same** WBS.
 - KPI band matches `out/manifest.json` (worst score, projects-at-risk count).

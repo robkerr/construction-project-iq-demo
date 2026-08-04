@@ -5,8 +5,8 @@
     "x": 496,
     "y": 132,
     "z": 0,
-    "height": 64,
     "width": 456,
+    "height": 64,
     "tabOrder": 3
   },
   "visual": {
@@ -27,14 +27,33 @@
                 }
               },
               "queryRef": "dim_project.client",
-              "nativeQueryRef": "client",
-              "active": true
+              "nativeQueryRef": "client"
             }
           ]
         }
       }
     },
     "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Client'"
+                }
+              }
+            }
+          }
+        }
+      ],
       "data": [
         {
           "properties": {

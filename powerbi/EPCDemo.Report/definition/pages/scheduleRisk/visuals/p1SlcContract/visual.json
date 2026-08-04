@@ -5,8 +5,8 @@
     "x": 968,
     "y": 132,
     "z": 0,
-    "height": 64,
     "width": 456,
+    "height": 64,
     "tabOrder": 4
   },
   "visual": {
@@ -27,14 +27,33 @@
                 }
               },
               "queryRef": "dim_project.contract_type",
-              "nativeQueryRef": "contract_type",
-              "active": true
+              "nativeQueryRef": "contract_type"
             }
           ]
         }
       }
     },
     "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Contract type'"
+                }
+              }
+            }
+          }
+        }
+      ],
       "data": [
         {
           "properties": {

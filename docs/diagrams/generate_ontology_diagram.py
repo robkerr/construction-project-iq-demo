@@ -4,7 +4,6 @@
 Matches the ontology as implemented. Entities are color-coded by the source
 system that backs their data binding:
   green  = Fabric / OneLake
-  yellow = Amazon S3 (Delta shortcut)
   blue   = Google BigQuery (mirrored database)
   red    = SAP
 
@@ -29,12 +28,12 @@ NODES = {
     "Project":                (175, 585, "fabric"),
     "WorkBreakdownStructure": (575, 250, "fabric"),
     "Bids":                   (575, 620, "fabric"),
-    "Permits":                (575, 975, "s3"),
+    "Permits":                (575, 975, "fabric"),
     "WorkOrder":              (980, 150, "bigquery"),
     "PurchaseOrder":          (980, 330, "sap"),
     "EngineeringChange":      (980, 470, "fabric"),
     "Suppliers":              (980, 620, "sap"),
-    "PermitInspection":       (980, 975, "s3"),
+    "PermitInspection":       (980, 975, "fabric"),
     "WorkOrderLabor":         (1385, 70, "bigquery"),
     "WorkOrderMaterial":      (1385, 190, "bigquery"),
     "WorkOrderTask":          (1385, 310, "bigquery"),
@@ -136,17 +135,17 @@ for name, (cx, cy, src) in NODES.items():
         f'font-weight="700" text-anchor="middle" fill="{TEXT_DARK}">{esc(name)}</text>'
     )
 
-# ---- legend (4 sources) ------------------------------------------------------
+# ---- legend (3 sources) ------------------------------------------------------
 lx, ly = 40, H - 168
 svg.append(
-    f'<rect x="{lx}" y="{ly}" width="366" height="146" rx="10" fill="#fafafa" '
+    f'<rect x="{lx}" y="{ly}" width="366" height="124" rx="10" fill="#fafafa" '
     'stroke="#cccccc" stroke-width="1.5"/>'
 )
 svg.append(
     f'<text x="{lx + 16}" y="{ly + 28}" font-size="15" font-weight="700" '
     f'fill="{TEXT_DARK}">Source system</text>'
 )
-for i, key in enumerate(["fabric", "s3", "bigquery", "sap"]):
+for i, key in enumerate(["fabric", "bigquery", "sap"]):
     fill, stroke, desc = COLORS[key]
     yy = ly + 52 + i * 22
     svg.append(

@@ -31,7 +31,7 @@
 <text x="575" y="255.0" font-size="14.2" font-weight="700" text-anchor="middle" fill="#1a1a1a">WorkBreakdownStructure</text>
 <rect x="471.0" y="584.0" width="208" height="72" rx="12" fill="#C6EFCE" stroke="#2E7D32" stroke-width="2.5" filter="url(#shadow)"/>
 <text x="575" y="626.6" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">Bids</text>
-<rect x="471.0" y="939.0" width="208" height="72" rx="12" fill="#FFEB9C" stroke="#B7860B" stroke-width="2.5" filter="url(#shadow)"/>
+<rect x="471.0" y="939.0" width="208" height="72" rx="12" fill="#C6EFCE" stroke="#2E7D32" stroke-width="2.5" filter="url(#shadow)"/>
 <text x="575" y="981.6" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">Permits</text>
 <rect x="876.0" y="114.0" width="208" height="72" rx="12" fill="#BDD7EE" stroke="#1F4E79" stroke-width="2.5" filter="url(#shadow)"/>
 <text x="980" y="156.7" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">WorkOrder</text>
@@ -41,7 +41,7 @@
 <text x="980" y="476.5" font-size="18.4" font-weight="700" text-anchor="middle" fill="#1a1a1a">EngineeringChange</text>
 <rect x="876.0" y="584.0" width="208" height="72" rx="12" fill="#F4C7C3" stroke="#C0392B" stroke-width="2.5" filter="url(#shadow)"/>
 <text x="980" y="626.6" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">Suppliers</text>
-<rect x="876.0" y="939.0" width="208" height="72" rx="12" fill="#FFEB9C" stroke="#B7860B" stroke-width="2.5" filter="url(#shadow)"/>
+<rect x="876.0" y="939.0" width="208" height="72" rx="12" fill="#C6EFCE" stroke="#2E7D32" stroke-width="2.5" filter="url(#shadow)"/>
 <text x="980" y="981.6" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">PermitInspection</text>
 <rect x="1281.0" y="34.0" width="208" height="72" rx="12" fill="#BDD7EE" stroke="#1F4E79" stroke-width="2.5" filter="url(#shadow)"/>
 <text x="1385" y="76.7" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">WorkOrderLabor</text>
@@ -49,14 +49,12 @@
 <text x="1385" y="196.5" font-size="18.4" font-weight="700" text-anchor="middle" fill="#1a1a1a">WorkOrderMaterial</text>
 <rect x="1281.0" y="274.0" width="208" height="72" rx="12" fill="#BDD7EE" stroke="#1F4E79" stroke-width="2.5" filter="url(#shadow)"/>
 <text x="1385" y="316.6" font-size="19.0" font-weight="700" text-anchor="middle" fill="#1a1a1a">WorkOrderTask</text>
-<rect x="40" y="1007" width="366" height="146" rx="10" fill="#fafafa" stroke="#cccccc" stroke-width="1.5"/>
+<rect x="40" y="1007" width="366" height="124" rx="10" fill="#fafafa" stroke="#cccccc" stroke-width="1.5"/>
 <text x="56" y="1035" font-size="15" font-weight="700" fill="#1a1a1a">Source system</text>
 <rect x="56" y="1046" width="24" height="15" rx="3" fill="#C6EFCE" stroke="#2E7D32" stroke-width="1.8"/>
 <text x="90" y="1059" font-size="13.5" fill="#333">Fabric / OneLake</text>
-<rect x="56" y="1068" width="24" height="15" rx="3" fill="#FFEB9C" stroke="#B7860B" stroke-width="1.8"/>
-<text x="90" y="1081" font-size="13.5" fill="#333">Amazon S3 (Delta shortcut)</text>
-<rect x="56" y="1090" width="24" height="15" rx="3" fill="#BDD7EE" stroke="#1F4E79" stroke-width="1.8"/>
-<text x="90" y="1103" font-size="13.5" fill="#333">Google BigQuery (mirrored)</text>
-<rect x="56" y="1112" width="24" height="15" rx="3" fill="#F4C7C3" stroke="#C0392B" stroke-width="1.8"/>
-<text x="90" y="1125" font-size="13.5" fill="#333">SAP</text>
+<rect x="56" y="1068" width="24" height="15" rx="3" fill="#BDD7EE" stroke="#1F4E79" stroke-width="1.8"/>
+<text x="90" y="1081" font-size="13.5" fill="#333">Google BigQuery (mirrored)</text>
+<rect x="56" y="1090" width="24" height="15" rx="3" fill="#F4C7C3" stroke="#C0392B" stroke-width="1.8"/>
+<text x="90" y="1103" font-size="13.5" fill="#333">SAP</text>
 </svg>

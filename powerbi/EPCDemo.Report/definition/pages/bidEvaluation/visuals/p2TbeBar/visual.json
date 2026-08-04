@@ -5,8 +5,8 @@
     "x": 24,
     "y": 348,
     "z": 0,
-    "height": 288,
     "width": 928,
+    "height": 288,
     "tabOrder": 10
   },
   "visual": {
@@ -27,8 +27,7 @@
                 }
               },
               "queryRef": "fact_bid.supplier_name",
-              "nativeQueryRef": "supplier_name",
-              "active": true
+              "nativeQueryRef": "supplier_name"
             }
           ]
         },
@@ -68,6 +67,28 @@
           }
         ]
       }
+    },
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'TBE \u00b7 Technical score by supplier'"
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "drillFilterOtherVisuals": true
   }

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.4.0/schema.json",
+  "name": "askCopilot",
+  "position": {
+    "x": 952,
+    "y": 528,
+    "z": 0,
+    "width": 312,
+    "height": 96,
+    "tabOrder": 17
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "\u26a0 Ask Copilot\n",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "The dashboard shows ",
+                    "textStyle": {
+                      "fontSize": "9pt"
+                    }
+                  },
+                  {
+                    "value": "what",
+                    "textStyle": {
+                      "fontSize": "9pt",
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": ". Ask the agent what it can\u2019t: \u201cWhat\u2019s driving Falcon\u2019s schedule risk, and what does the late transformer PO mean for our sourcing and live field risk?\u201d",
+                    "textStyle": {
+                      "fontSize": "9pt"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

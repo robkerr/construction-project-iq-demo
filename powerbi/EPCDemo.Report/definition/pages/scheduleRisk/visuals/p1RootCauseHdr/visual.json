@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
-  "name": "p1NonSapHdr",
+  "name": "p1RootCauseHdr",
   "position": {
-    "x": 1208,
-    "y": 348,
+    "x": 24,
+    "y": 784,
     "z": 0,
-    "width": 336,
-    "height": 32,
-    "tabOrder": 11
+    "width": 1872,
+    "height": 40,
+    "tabOrder": 21
   },
   "visual": {
     "visualType": "textbox",
@@ -19,10 +19,16 @@
               {
                 "textRuns": [
                   {
-                    "value": "Non-SAP \u00b7 Schedule",
+                    "value": "Why Falcon is red \u2014 root cause:  ",
                     "textStyle": {
                       "fontSize": "12pt",
                       "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "select Project Falcon in the risk bar \u2014 the SAME work package (WBS) carries BOTH a schedule slip (Primavera change control) and a late long-lead transformer PO (SAP).",
+                    "textStyle": {
+                      "fontSize": "12pt"
                     }
                   }
                 ]

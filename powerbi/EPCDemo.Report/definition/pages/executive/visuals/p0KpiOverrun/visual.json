@@ -5,8 +5,8 @@
     "x": 1440,
     "y": 132,
     "z": 0,
-    "height": 120,
     "width": 456,
+    "height": 120,
     "tabOrder": 5
   },
   "visual": {
@@ -32,6 +32,28 @@
           ]
         }
       }
+    },
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Forecast Overrun (SAP)'"
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "drillFilterOtherVisuals": true
   }

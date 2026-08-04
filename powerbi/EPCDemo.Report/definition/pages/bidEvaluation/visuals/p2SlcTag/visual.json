@@ -5,8 +5,8 @@
     "x": 24,
     "y": 132,
     "z": 0,
-    "height": 64,
     "width": 456,
+    "height": 64,
     "tabOrder": 2
   },
   "visual": {
@@ -27,14 +27,33 @@
                 }
               },
               "queryRef": "dim_rfq.equipment_tag",
-              "nativeQueryRef": "equipment_tag",
-              "active": true
+              "nativeQueryRef": "equipment_tag"
             }
           ]
         }
       }
     },
     "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'RFQ / equipment tag'"
+                }
+              }
+            }
+          }
+        }
+      ],
       "data": [
         {
           "properties": {
